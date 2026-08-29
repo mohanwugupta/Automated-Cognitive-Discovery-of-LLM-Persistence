@@ -54,37 +54,37 @@ case "$PHASE" in
     python -m pytest -q
     ;;
   prepare)
-    cognitive-discovery-active --config "$CONFIG" --output "$V2_OUTPUT" \
+    python scripts/active_discovery.py --config "$CONFIG" --output "$V2_OUTPUT" \
       --round1-output "$ROUND1_OUTPUT" --phase prepare
     ;;
   active_collect)
-    cognitive-discovery-run --config "$CONFIG" --output "$ACTIVE_OUTPUT" \
+    python scripts/run_experiments.py --config "$CONFIG" --output "$ACTIVE_OUTPUT" \
       --phase collect --manifest "$ACTIVE_MANIFEST" \
       --shard-count "$SHARD_COUNT" --shard-index "$SHARD_INDEX" \
       --model "$MODEL_PATH" --resume
     ;;
   active_finalize)
-    cognitive-discovery-run --config "$CONFIG" --output "$ACTIVE_OUTPUT" \
+    python scripts/run_experiments.py --config "$CONFIG" --output "$ACTIVE_OUTPUT" \
       --phase finalize --manifest "$ACTIVE_MANIFEST"
     python -c 'import json,sys; data=json.load(open(sys.argv[1])); raise SystemExit(0 if data["approved"] else 1)' \
       "$ACTIVE_OUTPUT/validation/pilot_approval.json"
     ;;
   update)
-    cognitive-discovery-active --config "$CONFIG" --output "$V2_OUTPUT" \
+    python scripts/active_discovery.py --config "$CONFIG" --output "$V2_OUTPUT" \
       --round1-output "$ROUND1_OUTPUT" --active-output "$ACTIVE_OUTPUT" --phase update
     ;;
   final_collect)
-    cognitive-discovery-run --config "$CONFIG" --output "$FINAL_OUTPUT" \
+    python scripts/run_experiments.py --config "$CONFIG" --output "$FINAL_OUTPUT" \
       --phase collect --manifest "$FINAL_MANIFEST" \
       --shard-count "$SHARD_COUNT" --shard-index "$SHARD_INDEX" \
       --model "$MODEL_PATH" --resume
     ;;
   final_finalize)
-    cognitive-discovery-run --config "$CONFIG" --output "$FINAL_OUTPUT" \
+    python scripts/run_experiments.py --config "$CONFIG" --output "$FINAL_OUTPUT" \
       --phase finalize --manifest "$FINAL_MANIFEST"
     ;;
   evaluate)
-    cognitive-discovery-active --config "$CONFIG" --output "$V2_OUTPUT" \
+    python scripts/active_discovery.py --config "$CONFIG" --output "$V2_OUTPUT" \
       --round1-output "$ROUND1_OUTPUT" --active-output "$ACTIVE_OUTPUT" \
       --final-output "$FINAL_OUTPUT" --phase evaluate
     ;;
