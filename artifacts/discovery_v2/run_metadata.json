@@ -1,0 +1,25 @@
+{
+  "active_budget": 1400,
+  "candidate_multiplier": 10,
+  "config_hash": "2863e09d953f60798512db7feab2ba42d9377e50c8a8ebf49fdb6faa04ce74b4",
+  "dependency_versions": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1",
+    "sweetpea": "0.2.14",
+    "torch": "2.13.0",
+    "transformers": "5.16.1"
+  },
+  "design_hash": "5503f1677cf8668e032efbe486daeca38c0e58992cb4359871c964498b92c975",
+  "design_seed": 280227,
+  "git_commit": "069a236511963724920281306f20623a9a0a1135",
+  "model_identifier": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "previous_semantic_hashes": 2800,
+  "protocol_version": "active_hierarchical_discovery_v2",
+  "round1_output": "artifacts/discovery_v1",
+  "task_renderer_version": "0.1.0",
+  "timestamp": "2026-08-29T16:11:42.020260+00:00"
+}

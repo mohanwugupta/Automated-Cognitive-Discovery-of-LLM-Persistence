@@ -1,0 +1,8 @@
+task_family,outcome_dependence,evidence_accumulation,explicit_progress,reward_stationarity,absorbing_disengagement,effort_accumulation
+bandit,1,1,0,1,0,0
+debugging,1,1,1,0,1,1
+effort,1,0,1,1,1,1
+foraging,1,1,0,0,1,0
+information_sampling,0,1,0,1,1,0
+solvability,1,1,1,1,1,0
+waiting,0,1,1,0,1,0

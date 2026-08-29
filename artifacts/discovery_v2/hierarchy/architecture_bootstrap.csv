@@ -1,0 +1,17 @@
+architecture_a,architecture_b,task_family,delta_r2_mean,delta_r2_ci_low,delta_r2_ci_high,probability_a_better,observationally_equivalent,split
+dual_history,latent_context,__macro__,0.0010843368634266264,-0.0013568907341814207,0.0035124869579991644,0.812,True,interpolation_test
+dual_history,latent_context,bandit,0.006712540382296417,-0.0031551242536306118,0.016435424321700944,0.908,True,interpolation_test
+dual_history,latent_context,debugging,0.0017350866044962654,-0.00636831125564406,0.009411823099580942,0.686,True,interpolation_test
+dual_history,latent_context,effort,-0.007777515955057727,-0.01623469455435145,0.0006784892912709826,0.032,True,interpolation_test
+dual_history,latent_context,foraging,0.00899982141792709,0.0012497984160425247,0.01659926158724734,0.994,False,interpolation_test
+dual_history,latent_context,information_sampling,0.008976941752920051,-0.03465273749527237,0.05145155043395585,0.68,True,interpolation_test
+dual_history,latent_context,solvability,0.0006409471520601347,-0.006727862324607453,0.0077476369596113665,0.57,True,interpolation_test
+dual_history,latent_context,waiting,-0.0037722720438179247,-0.007874077433433126,0.0003229537023151109,0.044,True,interpolation_test
+dual_history,latent_context,__macro__,0.00246320477081434,-0.0005811232689501288,0.005214823798470777,0.942,True,structural_test
+dual_history,latent_context,bandit,0.013627419136937552,0.0023221737853292928,0.02730587484964953,0.986,False,structural_test
+dual_history,latent_context,debugging,0.0045580670460970635,-0.006380106325689982,0.015769360037954566,0.804,True,structural_test
+dual_history,latent_context,effort,0.001033983562628945,-0.010253196554523194,0.011173865694621022,0.59,True,structural_test
+dual_history,latent_context,foraging,0.003415936652129421,-0.005337518963831745,0.011626033127947296,0.778,True,structural_test
+dual_history,latent_context,information_sampling,-0.01455552283687587,-0.06514119435623927,0.03773153303389248,0.318,True,structural_test
+dual_history,latent_context,solvability,0.0007984755602183773,-0.007602245508009547,0.009387931337209889,0.556,True,structural_test
+dual_history,latent_context,waiting,-0.0011774438541669301,-0.0046855558624897846,0.0024165073201144493,0.254,True,structural_test

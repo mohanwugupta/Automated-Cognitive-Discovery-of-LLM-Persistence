@@ -1,0 +1,7 @@
+interaction,selected_for_validation,stability_probability,selection_rows,selection_group_digest
+history_outcome_1*factor_progress_evidence,True,1.0,11856,d3b297a96a23f679
+factor_continuation_cost*factor_progress_evidence,True,0.995,11856,d3b297a96a23f679
+history_action_kernel*factor_environmental_stability,True,0.61,11856,d3b297a96a23f679
+factor_prior_investment*factor_goal_continuity,True,0.8,11856,d3b297a96a23f679
+history_action_1*factor_progress_evidence,True,0.85,11856,d3b297a96a23f679
+history_outcome_kernel*factor_goal_continuity,True,0.945,11856,d3b297a96a23f679
