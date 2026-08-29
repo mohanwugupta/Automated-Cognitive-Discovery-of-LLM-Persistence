@@ -1,0 +1,5 @@
+model,teacher,r2,mse,correlation,selected_epochs,threshold,passed,smoke
+linear_interactions,fitted_dynamic_reevaluation,0.999999999997713,2.153197808230576e-11,0.9999999999996605,,0.9,True,False
+gam,fitted_dynamic_reevaluation,0.9999999997718491,2.1480795476557848e-09,0.999999999896894,,0.9,True,False
+mlp,fitted_dynamic_reevaluation,0.9917950333848129,0.07725114931341276,0.9964016703726776,120.0,0.9,True,False
+gru,fitted_dynamic_reevaluation,0.9928043081862262,0.06774865624562502,0.9964895310066113,120.0,0.9,True,False

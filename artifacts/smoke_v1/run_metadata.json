@@ -1,0 +1,25 @@
+{
+  "config_hash": "299a8e64fff22eadeec19e16b6179faf188ee1cb408fc8e2d887f5fae5cc9d62",
+  "dependency_versions": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1",
+    "sweetpea": "0.2.14",
+    "torch": "2.13.0",
+    "transformers": "5.16.1"
+  },
+  "design_hash": "8fa06d27330bc480bb434631c8b0e3a7e2512ea2e005f0b3cc6587ea995fe5e1",
+  "design_seed": 270127,
+  "git_commit": "63e38bc12311c4dc8baa36761b1beec486e30425",
+  "model_identifier": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "observed_model_revisions": [],
+  "observed_models": [
+    "deterministic/model-free-smoke"
+  ],
+  "protocol_version": "cognitive_discovery_v1",
+  "task_renderer_version": "0.1.0",
+  "timestamp": "2026-08-29T03:55:33.645738+00:00"
+}
