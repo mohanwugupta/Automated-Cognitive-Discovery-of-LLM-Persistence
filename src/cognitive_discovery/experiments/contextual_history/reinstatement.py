@@ -128,6 +128,12 @@ def compile_contextual_history_design(
         payload = {
             "task": task,
             "factors": factors,
+            "history": {
+                "length": b_history.length,
+                "valence": b_history.valence,
+                "actions": b_history.actions,
+                "outcomes": b_history.outcomes,
+            },
             "contextual_history": {
                 key: value
                 for key, value in context.items()

@@ -8,6 +8,7 @@ from cognitive_discovery.sampling.active_mixture import select_active_mixture
 from cognitive_discovery.sampling.candidate_pool import (
     condition_frame,
     generate_candidate_pool,
+    observed_semantic_hashes,
 )
 from cognitive_discovery.sampling.coverage_score import coverage_scores
 from cognitive_discovery.sampling.disagreement_score import disagreement_scores
@@ -96,4 +97,27 @@ def test_candidate_pool_excludes_previously_observed_design(discovery_config):
         seed=1234,
     )
     assert len(candidates) == 70
+    assert set(previous.semantic_hash).isdisjoint(candidates.semantic_hash)
+
+
+def test_semantic_hashes_are_stable_with_arrow_string_missingness(discovery_config):
+    previous = condition_frame(
+        compile_design(discovery_config, n_conditions=28, seed=1234)
+    )
+    factor_columns = [
+        column
+        for column in previous
+        if column.startswith("factor_")
+        and not column.startswith("factor_available_")
+    ]
+    for column in factor_columns:
+        previous[column] = previous[column].astype("string[pyarrow]")
+    assert observed_semantic_hashes(previous) == set(previous.semantic_hash)
+    _, candidates = generate_candidate_pool(
+        discovery_config,
+        previous,
+        budget=7,
+        multiplier=10,
+        seed=1234,
+    )
     assert set(previous.semantic_hash).isdisjoint(candidates.semantic_hash)

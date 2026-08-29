@@ -12,6 +12,44 @@ from cognitive_discovery.ontology.task_schema import ConditionSpec, ResponseMapp
 from .sweetpea_design import declarative_spec
 
 
+def _canonical_value(value):
+    """Normalize Pandas/Arrow scalars and nested JSON values for stable hashes."""
+
+    if isinstance(value, dict):
+        return {str(key): _canonical_value(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_canonical_value(item) for item in value]
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.startswith(("[", "{")):
+            try:
+                return _canonical_value(json.loads(stripped))
+            except json.JSONDecodeError:
+                pass
+        return value
+    if value is None:
+        return None
+    try:
+        missing = pd.isna(value)
+    except (TypeError, ValueError):
+        missing = False
+    if isinstance(missing, bool) and missing:
+        return None
+    if hasattr(value, "item"):
+        try:
+            return value.item()
+        except (TypeError, ValueError):
+            pass
+    return value
+
+
+def _hash_payload(payload: dict) -> str:
+    canonical = _canonical_value(payload)
+    return hashlib.sha256(
+        json.dumps(canonical, sort_keys=True).encode()
+    ).hexdigest()
+
+
 def semantic_hash(condition) -> str:
     contextual = (
         {
@@ -22,7 +60,7 @@ def semantic_hash(condition) -> str:
         if condition.contextual_history is not None
         else None
     )
-    payload = {
+    payload: dict[str, object] = {
         "task": condition.task_family,
         "factors": condition.semantic_factors,
         "history": {
@@ -31,11 +69,10 @@ def semantic_hash(condition) -> str:
             "actions": condition.history.actions,
             "outcomes": condition.history.outcomes,
         },
-        "contextual_history": contextual,
     }
-    return hashlib.sha256(
-        json.dumps(payload, sort_keys=True, default=list).encode()
-    ).hexdigest()
+    if contextual is not None:
+        payload["contextual_history"] = contextual
+    return _hash_payload(payload)
 
 
 def semantic_hash_from_row(row) -> str:
@@ -53,7 +90,7 @@ def semantic_hash_from_row(row) -> str:
     if isinstance(outcomes, str):
         outcomes = json.loads(outcomes)
     factors = {
-        name.removeprefix("factor_"): get(name)
+        name.removeprefix("factor_"): _canonical_value(get(name))
         for name in row.index
         if name.startswith("factor_") and not name.startswith("factor_available_")
     }
@@ -62,7 +99,10 @@ def semantic_hash_from_row(row) -> str:
         "factors": factors,
         "history": {
             "length": len(actions),
-            "valence": get("history_valence", _history_valence(outcomes)),
+            "valence": _canonical_value(
+                get("history_valence", _history_valence(outcomes))
+            )
+            or _history_valence(outcomes),
             "actions": tuple(actions),
             "outcomes": tuple(int(value) for value in outcomes),
         },
@@ -74,13 +114,11 @@ def semantic_hash_from_row(row) -> str:
         value = get(name)
         if value is None or (not isinstance(value, (list, tuple, dict)) and pd.isna(value)):
             continue
-        context[name.removeprefix("context_")] = value
+        context[name.removeprefix("context_")] = _canonical_value(value)
     if context:
         context.pop("critical_contrast_id", None)
         payload["contextual_history"] = context
-    return hashlib.sha256(
-        json.dumps(payload, sort_keys=True, default=list).encode()
-    ).hexdigest()
+    return _hash_payload(payload)
 
 
 def _history_valence(outcomes) -> str:

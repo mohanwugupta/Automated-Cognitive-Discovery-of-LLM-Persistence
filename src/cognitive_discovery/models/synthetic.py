@@ -45,8 +45,9 @@ def _make(n, rng):
     frame = pd.DataFrame(
         {name: rng.choice(levels, size=n) for name, levels in LEVELS.items()}
     )
-    frame["task_family"] = np.resize(np.asarray(TASKS), n)
-    rng.shuffle(frame["task_family"].values)
+    task_family = np.resize(np.asarray(TASKS, dtype=object), n)
+    rng.shuffle(task_family)
+    frame["task_family"] = task_family
     frame["history_action_1"] = rng.choice((-1.0, 1.0), size=n)
     frame["history_action_kernel"] = 0.7 * frame.history_action_1 + rng.normal(
         0, 0.4, n

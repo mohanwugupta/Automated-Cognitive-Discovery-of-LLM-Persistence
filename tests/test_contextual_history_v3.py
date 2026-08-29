@@ -3,6 +3,7 @@ import json
 import numpy as np
 
 from cognitive_discovery.data.storage import records_frame
+from cognitive_discovery.design.manifests import semantic_hash
 from cognitive_discovery.experiments.collection import collect_conditions
 from cognitive_discovery.experiments.contextual_history import (
     compile_contextual_history_design,
@@ -35,6 +36,7 @@ def test_contextual_design_has_order_separate_histories_and_matched_contrasts(th
         assert tuple(context["a_history_outcomes"])
         assert tuple(context["b_history_outcomes"])
         assert condition.history.outcomes == tuple(context["b_history_outcomes"])
+        assert condition.paired_condition_id.endswith(semantic_hash(condition)[:16])
         groups.setdefault(context["critical_contrast_id"], []).append(condition)
     assert set(map(len, groups.values())) == {2}
     for contrast in groups.values():
