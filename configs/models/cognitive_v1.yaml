@@ -1,0 +1,16 @@
+cognitive:
+  - intercept
+  - immediate_state
+  - dynamic_reevaluation
+  - choice_perseveration
+  - outcome_history
+  - dual_history
+  - latent_motivation
+  - latent_context
+  - option_termination
+  - meta_control
+  - task_set_reinstatement
+  - generic_sequential_choice
+sharing: [task_specific, fully_shared, hierarchical]
+ridge_penalties: [0.001, 0.01, 0.1, 1.0, 10.0]
+

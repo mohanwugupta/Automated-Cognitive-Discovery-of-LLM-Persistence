@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-cognitive-discovery"
+version = "0.1.0"
+description = "Coverage-oriented behavioral discovery of LLM persistence computations"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pyyaml>=6.0",
+  "scipy>=1.10",
+  "scikit-learn>=1.3",
+  "torch>=2.1",
+  "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+qwen = ["transformers>=5.12", "accelerate>=1.2", "huggingface-hub>=0.34"]
+parquet = ["pyarrow>=14"]
+design = ["sweetpea>=0.2"]
+dev = ["pytest>=8", "pytest-cov", "ruff", "black"]
+
+[project.scripts]
+cognitive-discovery-design = "cognitive_discovery.cli:generate_design_main"
+cognitive-discovery-run = "cognitive_discovery.cli:run_experiments_main"
+cognitive-discovery-fit = "cognitive_discovery.cli:fit_models_main"
+cognitive-discovery-residuals = "cognitive_discovery.cli:discover_residuals_main"
+cognitive-discovery-validate = "cognitive_discovery.cli:validate_predictions_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

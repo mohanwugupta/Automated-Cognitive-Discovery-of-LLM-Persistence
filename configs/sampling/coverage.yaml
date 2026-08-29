@@ -1,0 +1,9 @@
+strategy: coverage
+adaptive: false
+balance:
+  - task_family
+  - response_mapping
+  - continuation_advantage
+  - history_valence
+exclude_previous_conditions_for_validation: true
+

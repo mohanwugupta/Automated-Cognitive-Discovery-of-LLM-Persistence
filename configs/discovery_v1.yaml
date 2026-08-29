@@ -1,0 +1,103 @@
+protocol_version: cognitive_discovery_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+base_seed: 270126
+design_seed: 270127
+split_seed: 270128
+response_labels: [X, Y]
+output_root: artifacts/discovery_v1
+
+design:
+  backend: native
+  discovery_conditions: 2800
+  pilot_conditions_per_task: 70
+  validation_conditions: 700
+  task_families:
+    - bandit
+    - foraging
+    - solvability
+    - information_sampling
+    - waiting
+    - effort
+    - debugging
+  core_crossing:
+    - task_family
+    - response_mapping
+    - continuation_advantage
+    - history_valence
+  factor_levels:
+    continuation_value: [low, medium, high]
+    disengagement_value: [low, medium, high]
+    continuation_cost: [low, medium, high]
+    progress_evidence: [negative, neutral, positive]
+    success_evidence: [low, medium, high]
+    uncertainty: [low, high]
+    prior_investment: [low, high]
+    controllability: [low, high]
+    environmental_stability: [stable, changing]
+    goal_continuity: [same, new]
+  history_lengths: [0, 1, 3, 5]
+  history_valences: [negative, neutral, mixed, positive]
+
+splits:
+  discovery: 0.60
+  interpolation_test: 0.20
+  structural_test: 0.20
+  structural_holdout:
+    - [continuation_value, high, continuation_cost, high]
+    - [progress_evidence, negative, uncertainty, high]
+
+collection:
+  sample_actions: true
+  expand_history_prefixes: true
+  save_prompts_separately: true
+  shard_count: 8
+  batch_size: 1
+  pilot_probability_bounds: [0.05, 0.95]
+  minimum_logit_sd: 0.15
+  minimum_parse_rate: 0.99
+  minimum_top_token_action_rate: 0.90
+  maximum_mapping_gap: 0.25
+
+models:
+  sharing: [task_specific, fully_shared, hierarchical]
+  ridge_penalties: [0.001, 0.01, 0.1, 1.0, 10.0]
+  cognitive:
+    - intercept
+    - immediate_state
+    - dynamic_reevaluation
+    - choice_perseveration
+    - outcome_history
+    - dual_history
+    - latent_motivation
+    - latent_context
+    - option_termination
+    - meta_control
+    - task_set_reinstatement
+    - generic_sequential_choice
+  flexible: [linear_interactions, gam, mlp, gru]
+  flexible_validation_minimum_r2: 0.90
+  mlp:
+    hidden_size: 64
+    learning_rate: 0.001
+    max_epochs: 200
+    patience: 20
+  gru:
+    hidden_size: 64
+    learning_rate: 0.001
+    max_epochs: 200
+    patience: 20
+
+residual_discovery:
+  minimum_task_families: 2
+  lasso_alphas: [0.0001, 0.001, 0.01, 0.1]
+
+validation:
+  conditions: 700
+  refit: false
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/llm-cognitive-discovery
+  gpu_constraint: gpu80
