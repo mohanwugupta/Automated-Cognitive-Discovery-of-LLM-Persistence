@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from cognitive_discovery.hierarchy.task_descriptors import DescriptorEncoder
 from cognitive_discovery.models.features import FeatureEncoder, all_observable_features
 from cognitive_discovery.models.fitting import regression_metrics
 
@@ -15,6 +16,7 @@ from cognitive_discovery.models.fitting import regression_metrics
 @dataclass
 class FlexibleFit:
     kind: str
+    sharing: str
     prediction: np.ndarray
     metrics: dict[str, float]
     selected_epochs: int
@@ -38,8 +40,12 @@ def _sequences(frame, matrix, target, device):
     for group_index, indices in enumerate(groups):
         ordered = sorted(indices, key=lambda index: int(frame.loc[index, "step"]))
         length = len(ordered)
-        x[group_index, :length] = torch.tensor(matrix[ordered], dtype=torch.float32, device=device)
-        y[group_index, :length] = torch.tensor(target[ordered], dtype=torch.float32, device=device)
+        x[group_index, :length] = torch.tensor(
+            matrix[ordered], dtype=torch.float32, device=device
+        )
+        y[group_index, :length] = torch.tensor(
+            target[ordered], dtype=torch.float32, device=device
+        )
         mask[group_index, :length] = True
         positions[group_index, :length] = ordered
     return x, y, mask, positions
@@ -55,6 +61,8 @@ def fit_flexible_model(
     learning_rate: float = 0.003,
     max_epochs: int = 200,
     patience: int = 20,
+    sharing: str = "fully_shared",
+    target: str = "persistence_logit",
 ) -> FlexibleFit:
     import torch
 
@@ -66,7 +74,50 @@ def fit_flexible_model(
     encoder = FeatureEncoder(features)
     x_all, names = encoder.fit_transform(train.reset_index(drop=True))
     x_test, _ = encoder.transform(test.reset_index(drop=True))
-    y_all = train.persistence_logit.to_numpy(dtype=np.float32)
+    train_tasks = train.task_family.astype(str).to_numpy()
+    test_tasks = test.task_family.astype(str).to_numpy()
+    known_tasks = tuple(sorted(set(train_tasks)))
+    if sharing != "fully_shared":
+        train_onehot = np.column_stack(
+            [(train_tasks == task).astype(float) for task in known_tasks]
+        )
+        test_onehot = np.column_stack(
+            [(test_tasks == task).astype(float) for task in known_tasks]
+        )
+        if sharing in {"task_specific_heads", "shared_trunk_task_head", "hierarchical"}:
+            train_interactions = np.column_stack(
+                [x_all * train_onehot[:, [index]] for index in range(len(known_tasks))]
+            )
+            test_interactions = np.column_stack(
+                [x_test * test_onehot[:, [index]] for index in range(len(known_tasks))]
+            )
+            x_all = np.column_stack((x_all, train_onehot, train_interactions))
+            x_test = np.column_stack((x_test, test_onehot, test_interactions))
+        elif sharing == "task_embedding":
+            descriptors = DescriptorEncoder().fit(known_tasks)
+            train_z = descriptors.transform_rows(train_tasks)
+            test_z = descriptors.transform_rows(test_tasks)
+            train_ontology = np.column_stack(
+                [x_all * train_z[:, [index]] for index in range(train_z.shape[1])]
+            )
+            test_ontology = np.column_stack(
+                [x_test * test_z[:, [index]] for index in range(test_z.shape[1])]
+            )
+            train_random = np.column_stack(
+                [x_all * train_onehot[:, [index]] for index in range(len(known_tasks))]
+            )
+            test_random = np.column_stack(
+                [x_test * test_onehot[:, [index]] for index in range(len(known_tasks))]
+            )
+            x_all = np.column_stack(
+                (x_all, train_z, train_onehot, train_ontology, train_random)
+            )
+            x_test = np.column_stack(
+                (x_test, test_z, test_onehot, test_ontology, test_random)
+            )
+        else:
+            raise ValueError(f"unknown flexible sharing structure: {sharing}")
+    y_all = train[target].to_numpy(dtype=np.float32)
     y_mean, y_scale = float(y_all.mean()), float(y_all.std())
     y_scale = y_scale if y_scale > 1e-8 else 1.0
     y_all = (y_all - y_mean) / y_scale
@@ -103,14 +154,19 @@ def fit_flexible_model(
             )
 
         def apply_test():
-            return model(torch.tensor(x_test, dtype=torch.float32, device=device)).squeeze(-1)
+            return model(
+                torch.tensor(x_test, dtype=torch.float32, device=device)
+            ).squeeze(-1)
 
     else:
+
         class PolicyGRU(torch.nn.Module):
             def __init__(self):
                 super().__init__()
                 self.project = torch.nn.Linear(x_all.shape[1], int(hidden_size))
-                self.gru = torch.nn.GRU(int(hidden_size), int(hidden_size), batch_first=True)
+                self.gru = torch.nn.GRU(
+                    int(hidden_size), int(hidden_size), batch_first=True
+                )
                 self.output = torch.nn.Linear(int(hidden_size), 1)
 
             def forward(self, values):
@@ -132,11 +188,15 @@ def fit_flexible_model(
         fit_y = y_all[fit_mask.to_numpy()]
         validation_y = y_all[validation_mask.to_numpy()]
         fit_batch = _sequences(fit_frame, fit_x, fit_y, device)
-        validation_batch = _sequences(validation_frame, validation_x, validation_y, device)
+        validation_batch = _sequences(
+            validation_frame, validation_x, validation_y, device
+        )
 
         def sequence_loss(batch):
             prediction = model(batch[0])
-            return torch.nn.functional.mse_loss(prediction[batch[2]], batch[1][batch[2]])
+            return torch.nn.functional.mse_loss(
+                prediction[batch[2]], batch[1][batch[2]]
+            )
 
         def train_loss():
             return sequence_loss(fit_batch)
@@ -191,11 +251,11 @@ def fit_flexible_model(
         prediction = apply_test().detach().cpu().numpy() * y_scale + y_mean
     return FlexibleFit(
         kind,
+        sharing,
         np.asarray(prediction),
-        regression_metrics(test.persistence_logit, prediction),
+        regression_metrics(test[target], prediction),
         best_epoch,
         names,
         model,
         encoder,
     )
-

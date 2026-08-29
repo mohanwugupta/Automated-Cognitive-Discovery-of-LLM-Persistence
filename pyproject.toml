@@ -30,6 +30,7 @@ cognitive-discovery-run = "cognitive_discovery.cli:run_experiments_main"
 cognitive-discovery-fit = "cognitive_discovery.cli:fit_models_main"
 cognitive-discovery-residuals = "cognitive_discovery.cli:discover_residuals_main"
 cognitive-discovery-validate = "cognitive_discovery.cli:validate_predictions_main"
+cognitive-discovery-active = "cognitive_discovery.cli:active_discovery_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

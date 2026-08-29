@@ -13,6 +13,12 @@ ontology → balanced design compiler → task renderers → Qwen policy logits
          → LOTO + residual discovery → frozen independent validation
 ```
 
+Discovery Round 2 extends that pipeline with a frozen six-variable task
+ontology, M1--M4 parameter sharing, zero/few-shot task transfer, matched
+flexible ceilings, nested residual validation, and a 40/40/20 active sampler.
+Its specification is
+[`PRD_Active_Hierarchical_Discovery_of_Persistence_Computations.md`](PRD_Active_Hierarchical_Discovery_of_Persistence_Computations.md).
+
 Phase 1 is behavior only. The runner never requests activations and rejects a
 participant result containing hidden states.
 
@@ -133,6 +139,45 @@ Override `MODEL_PATH`, `CONDA_ENV`, `SHARD_COUNT`, `OUTPUT`, or `SCRATCH_ROOT` a
 needed. Jobs set Hugging Face and Transformers offline mode and keep semantic
 pairs on the same array shard.
 
+## Active hierarchical Discovery Round 2
+
+Round 2 consumes the completed Round-1 standardized behavior; it never alters
+the Round-1 sample or frozen validation predictions. To run the entire workflow
+on Della from the repository root:
+
+```bash
+export ROUND1_OUTPUT=artifacts/discovery_v1
+export V2_OUTPUT=artifacts/discovery_v2
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+export SCRATCH_ROOT=/scratch/gpfs/JORDANAT/$USER/llm-cognitive-discovery
+export CONDA_ENV=llm-cognitive-discovery
+
+bash scripts/submit_active_discovery.sh
+```
+
+The dependency chain performs:
+
+```text
+tests → Round-1 audits/M1–M4 fits → active manifest
+      → 8-way active Qwen collection → quality gate
+      → hierarchy update → untouched coverage-random manifest
+      → 8-way final Qwen collection → frozen evaluation
+```
+
+The active manifest is immutable and can also be collected directly:
+
+```bash
+cognitive-discovery-run \
+  --config configs/discovery_v2.yaml \
+  --output artifacts/discovery_v2/active_collection \
+  --phase collect \
+  --manifest artifacts/discovery_v2/active_sampling/selected_conditions.jsonl \
+  --model "$MODEL_PATH"
+```
+
+The new Della workflow requests full 40 GB A100 GPUs for Qwen and neural-ceiling
+phases; tests, shard merging, and final tabulation use CPU-only jobs.
+
 ## Artifacts
 
 The run directory follows the PRD layout:
@@ -146,6 +191,21 @@ artifacts/discovery_v1/
   splits/                 fixed partition IDs
   analysis/               response surface, tournament, LOTO, residuals
   validation/             untouched sample, predictions, metrics
+  report.md
+  run_metadata.json
+```
+
+Round-2 artifacts follow the separate PRD layout:
+
+```text
+artifacts/discovery_v2/
+  audits/                 flexible recovery, hierarchy recovery, information audit
+  hierarchy/              M1–M4 comparison, LOTO, few-shot, task parameters
+  active_sampling/        candidate/selection manifests, scores, budget curves
+  active_collection/      Round-2 Qwen observations
+  final_validation/       untouched manifest, predictions, calibration, task metrics
+  residuals/              nested candidates and held-out confirmation
+  figures/                five registered Round-2 figures
   report.md
   run_metadata.json
 ```
