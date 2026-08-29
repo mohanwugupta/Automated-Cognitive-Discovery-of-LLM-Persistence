@@ -1,0 +1,13 @@
+.............................                                            [100%]
+=============================== warnings summary ===============================
+tests/test_analysis.py::test_loto_never_fits_target_task
+tests/test_analysis.py::test_residual_discovery_finds_cross_family_interaction
+tests/test_flexible.py::test_mlp_reaches_simple_teacher_ceiling
+tests/test_flexible.py::test_gru_reaches_simple_sequential_teacher_ceiling
+tests/test_models.py::test_dynamic_reevaluation_teacher_is_recovered
+tests/test_models.py::test_hierarchical_sharing_predicts_all_tasks
+  /scratch/gpfs/JORDANAT/mg9965/Automated-Cognitive-Discovery-of-LLM-Persistence/src/cognitive_discovery/models/synthetic.py:52: UserWarning: you are shuffling a 'ArrowStringArray' object which is not a subclass of 'Sequence'; `shuffle` is not guaranteed to behave correctly. E.g., non-numpy array/tensor objects with view semantics may contain duplicates after shuffling.
+    rng.shuffle(frame["task_family"].values)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+29 passed, 6 warnings in 8.09s

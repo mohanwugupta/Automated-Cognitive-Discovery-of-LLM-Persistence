@@ -1,0 +1,111 @@
+{
+  "observations": 3174,
+  "path": "artifacts/pilot_v1/behavior/standardized.parquet",
+  "gates": {
+    "bandit": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.51506501350459,
+      "persistence_logit_sd": 1.1234884933274787,
+      "mean_absolute_mapping_gap": 0.056817482726057425,
+      "top_token_action_rate": 1.0
+    },
+    "debugging": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.29806104279280826,
+      "persistence_logit_sd": 0.970382533135076,
+      "mean_absolute_mapping_gap": 0.05580221995839767,
+      "top_token_action_rate": 1.0
+    },
+    "effort": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.44696386340128397,
+      "persistence_logit_sd": 0.9508176052900114,
+      "mean_absolute_mapping_gap": 0.06378167951159848,
+      "top_token_action_rate": 1.0
+    },
+    "foraging": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.45547735366160746,
+      "persistence_logit_sd": 1.1063563395733704,
+      "mean_absolute_mapping_gap": 0.050007567622741646,
+      "top_token_action_rate": 1.0
+    },
+    "information_sampling": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.1970821710582856,
+      "persistence_logit_sd": 0.4172371703526729,
+      "mean_absolute_mapping_gap": 0.04823605633555238,
+      "top_token_action_rate": 1.0
+    },
+    "solvability": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.5387786490699431,
+      "persistence_logit_sd": 1.448797037773367,
+      "mean_absolute_mapping_gap": 0.07673724460649645,
+      "top_token_action_rate": 1.0
+    },
+    "waiting": {
+      "approved": true,
+      "checks": {
+        "parse_rate": true,
+        "behavioral_range": true,
+        "logit_variance": true,
+        "counterbalance": true,
+        "valid_semantic_tokens": true
+      },
+      "parse_rate": 1.0,
+      "mean_p_continue": 0.39074207569099567,
+      "persistence_logit_sd": 1.0747634032277362,
+      "mean_absolute_mapping_gap": 0.08662546501061223,
+      "top_token_action_rate": 1.0
+    }
+  }
+}
