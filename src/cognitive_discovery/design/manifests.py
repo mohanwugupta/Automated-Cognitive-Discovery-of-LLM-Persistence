@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pandas as pd
+
 from cognitive_discovery.ontology.histories import HistorySpec
 from cognitive_discovery.ontology.task_schema import ConditionSpec, ResponseMapping
 
@@ -11,6 +13,15 @@ from .sweetpea_design import declarative_spec
 
 
 def semantic_hash(condition) -> str:
+    contextual = (
+        {
+            key: value
+            for key, value in condition.contextual_history.items()
+            if key != "critical_contrast_id"
+        }
+        if condition.contextual_history is not None
+        else None
+    )
     payload = {
         "task": condition.task_family,
         "factors": condition.semantic_factors,
@@ -20,6 +31,7 @@ def semantic_hash(condition) -> str:
             "actions": condition.history.actions,
             "outcomes": condition.history.outcomes,
         },
+        "contextual_history": contextual,
     }
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, default=list).encode()
@@ -55,6 +67,17 @@ def semantic_hash_from_row(row) -> str:
             "outcomes": tuple(int(value) for value in outcomes),
         },
     }
+    context = {}
+    for name in row.index:
+        if not name.startswith("context_"):
+            continue
+        value = get(name)
+        if value is None or (not isinstance(value, (list, tuple, dict)) and pd.isna(value)):
+            continue
+        context[name.removeprefix("context_")] = value
+    if context:
+        context.pop("critical_contrast_id", None)
+        payload["contextual_history"] = context
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, default=list).encode()
     ).hexdigest()
@@ -74,6 +97,9 @@ def _history_valence(outcomes) -> str:
 def condition_from_dict(row: dict) -> ConditionSpec:
     history = row["history"]
     mapping = row["response_mapping"]
+    contextual = row.get("contextual_history")
+    if contextual is not None and not isinstance(contextual, dict):
+        contextual = None if pd.isna(contextual) else dict(contextual)
     if isinstance(mapping, str):
         mapping = json.loads(mapping)
     return ConditionSpec(
@@ -98,6 +124,7 @@ def condition_from_dict(row: dict) -> ConditionSpec:
         environment_seed=int(row["environment_seed"]),
         sampling_strategy=str(row.get("sampling_strategy", "coverage")),
         split=str(row.get("split", "unassigned")),
+        contextual_history=(dict(contextual) if contextual is not None else None),
     )
 
 

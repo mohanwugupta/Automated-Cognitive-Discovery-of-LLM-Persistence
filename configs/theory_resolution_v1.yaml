@@ -1,0 +1,146 @@
+protocol_version: behavioral_theory_resolution_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+base_seed: 380226
+design_seed: 380227
+split_seed: 380228
+response_labels: [X, Y]
+output_root: artifacts/theory_resolution_v1
+
+design:
+  backend: native
+  discovery_conditions: 2800
+  task_families:
+    - bandit
+    - foraging
+    - solvability
+    - information_sampling
+    - waiting
+    - effort
+    - debugging
+  core_crossing:
+    - task_family
+    - response_mapping
+    - continuation_advantage
+    - history_valence
+  factor_levels:
+    continuation_value: [low, medium, high]
+    disengagement_value: [low, medium, high]
+    continuation_cost: [low, medium, high]
+    progress_evidence: [negative, neutral, positive]
+    success_evidence: [low, medium, high]
+    uncertainty: [low, high]
+    prior_investment: [low, high]
+    controllability: [low, high]
+    environmental_stability: [stable, changing]
+    goal_continuity: [same, new]
+  history_lengths: [0, 1, 3, 5]
+  history_valences: [negative, neutral, mixed, positive]
+
+splits:
+  discovery: 0.60
+  interpolation_test: 0.20
+  structural_test: 0.20
+  structural_holdout:
+    - [continuation_value, high, continuation_cost, high]
+    - [progress_evidence, negative, uncertainty, high]
+
+collection:
+  sample_actions: true
+  # Round 3 probes the critical endpoint after prescribed A1→B history.
+  expand_history_prefixes: false
+  save_prompts_separately: true
+  shard_count: 8
+  batch_size: 1
+  pilot_probability_bounds: [0.05, 0.95]
+  minimum_logit_sd: 0.15
+  minimum_parse_rate: 0.99
+  minimum_top_token_action_rate: 0.90
+  maximum_mapping_gap: 0.25
+
+models:
+  sharing: [task_specific, fully_shared, hierarchical]
+  ridge_penalties: [0.001, 0.01, 0.1, 1.0, 10.0]
+  cognitive:
+    - immediate_state
+    - choice_perseveration
+    - outcome_history
+    - dual_history
+    - latent_context
+    - latent_motivation
+  flexible: [linear_interactions, mlp, gru]
+  flexible_sharing: [fully_shared, task_specific, hierarchical, task_embedding]
+  flexible_validation_minimum_r2: 0.90
+  round2_teacher_minimum_r2: 0.98
+  mlp:
+    hidden_size: 64
+    learning_rate: 0.001
+    max_epochs: 200
+    patience: 20
+  gru:
+    hidden_size: 64
+    learning_rate: 0.001
+    max_epochs: 200
+    patience: 20
+
+hierarchy:
+  architectures:
+    - immediate_state
+    - choice_perseveration
+    - outcome_history
+    - dual_history
+    - latent_context
+    - latent_motivation
+  variants: [M1, M2, M3, M4]
+  ridge_alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
+
+contextual_history:
+  task_families: [bandit, foraging, debugging]
+  phase_order: [A1, B, A2]
+  a_history_valence: [positive, negative, mixed]
+  b_history_valence: [positive, negative, mixed]
+  context_return: [A, B, novel_C]
+  cue_reliability: [low, medium, high]
+  change_point: [same_environment, change_point]
+
+theory_resolution:
+  candidate_architectures: [dual_history, latent_context, outcome_history]
+  audit_architectures:
+    - immediate_state
+    - choice_perseveration
+    - outcome_history
+    - dual_history
+    - latent_context
+    - latent_motivation
+  variants: [M1, M2, M3, M4]
+  primary_variant: M4
+  viability_delta_r2: 0.03
+  candidate_count: 20000
+  smoke_candidate_count: 120
+  contextual_fraction: 0.50
+  candidate_seed: 40300227
+  budget: 1200
+  smoke_budget: 30
+  score_weights:
+    disagreement: 0.50
+    uncertainty: 0.25
+    coverage: 0.25
+  allocation:
+    discriminating: 0.60
+    coverage: 0.20
+    random: 0.20
+  discrimination_fraction: 0.25
+  selection_seed: 380229
+  split_seed: 380230
+  uncertainty_bootstraps: 32
+  hierarchy_bootstraps: 500
+  comparison_bootstraps: 2000
+  parameter_bootstraps: 100
+  equivalence_margin_mse: 0.02
+  minimum_theory_r2: 0.0
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/llm-cognitive-discovery
+  gpu_constraint: gpu40

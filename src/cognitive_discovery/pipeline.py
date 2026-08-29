@@ -7,6 +7,7 @@ import pickle
 from dataclasses import replace
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -23,7 +24,11 @@ from cognitive_discovery.analysis.hierarchical_comparison import (
     run_hierarchical_analysis,
 )
 from cognitive_discovery.audits.calibration import calibration_tables
+from cognitive_discovery.audits.calibration import extreme_logit_residuals
+from cognitive_discovery.audits.hierarchy_uncertainty import paired_hierarchy_bootstrap
 from cognitive_discovery.audits.information_sampling import audit_information_sampling
+from cognitive_discovery.audits.parameter_consistency import parameter_sign_table
+from cognitive_discovery.audits.teacher_failures import classify_teacher_checks
 from cognitive_discovery.data.provenance import build_run_metadata
 from cognitive_discovery.data.splits import assign_condition_splits
 from cognitive_discovery.data.storage import read_records, write_records
@@ -39,6 +44,7 @@ from cognitive_discovery.experiments.collection import (
     expanded_render_conditions,
 )
 from cognitive_discovery.experiments.registry import get_renderer
+from cognitive_discovery.experiments.contextual_history import contextual_declarative_spec
 from cognitive_discovery.participants.base import DeterministicParticipant
 from cognitive_discovery.participants.qwen import QwenParticipant
 from cognitive_discovery.reporting.report import generate_report
@@ -47,6 +53,7 @@ from cognitive_discovery.models.flexible.recovery import validate_flexible_ceili
 from cognitive_discovery.models.flexible.recovery import (
     validate_matched_flexible_ceilings,
 )
+from cognitive_discovery.models.fitting import regression_metrics
 from cognitive_discovery.hierarchy.model_recovery import recover_hierarchy_variants
 from cognitive_discovery.hierarchy.task_descriptors import descriptor_frame
 from cognitive_discovery.reporting.round2 import (
@@ -58,10 +65,39 @@ from cognitive_discovery.sampling.candidate_pool import (
     condition_frame,
     generate_candidate_pool,
     observed_semantic_hashes,
+    generate_theory_candidate_pool,
 )
-from cognitive_discovery.sampling.coverage_score import coverage_scores
+from cognitive_discovery.sampling.coverage_score import coverage_scores, theory_coverage_scores
 from cognitive_discovery.sampling.disagreement_score import disagreement_scores
 from cognitive_discovery.sampling.information_score import information_scores
+from cognitive_discovery.sampling.discrimination_mixture import (
+    freeze_discrimination_split,
+    select_discrimination_mixture,
+)
+from cognitive_discovery.sampling.model_uncertainty import model_uncertainty_scores
+from cognitive_discovery.sampling.theory_disagreement import theory_disagreement_scores
+from cognitive_discovery.theory_resolution.equivalence import resolve_theory_outcome
+from cognitive_discovery.theory_resolution.frozen_predictions import (
+    freeze_surviving_models,
+    load_frozen_models,
+    predict_frozen_models,
+)
+from cognitive_discovery.theory_resolution.paired_model_test import (
+    compare_frozen_theories,
+    context_reinstatement_table,
+    semantic_prediction_errors,
+)
+from cognitive_discovery.theory_resolution.theory_report import (
+    generate_theory_figures,
+    generate_theory_report,
+    write_mechanistic_handoff,
+)
+from cognitive_discovery.analysis.parameter_structure import bootstrap_parameter_intervals
+from cognitive_discovery.hierarchy.random_effects import fit_hierarchical_model
+from cognitive_discovery.hierarchy.variance_decomposition import variance_decomposition
+from cognitive_discovery.analysis.hierarchical_comparison import (
+    compare_hierarchical_architectures,
+)
 
 
 def load_config(path: str | Path) -> dict:
@@ -726,3 +762,470 @@ def evaluate_round2_final(
     generate_round2_figures(root)
     generate_round2_report(root)
     return {"metrics": metrics, "efficiency": efficiency}
+
+
+def _prior_behavior(round1_output: str | Path, active_output: str | Path | None):
+    round1 = validate_records(_load_standardized(Path(round1_output))).copy()
+    frames = [round1]
+    if active_output is not None:
+        active = validate_records(_load_standardized(Path(active_output))).copy()
+        active["split"] = "discovery"
+        frames.append(active)
+    return pd.concat(frames, ignore_index=True, sort=False)
+
+
+def _fixed_hierarchy_inputs(records: pd.DataFrame):
+    train = records[records.split == "discovery"].reset_index(drop=True)
+    tests = {
+        split: records[records.split == split].reset_index(drop=True)
+        for split in ("interpolation_test", "structural_test")
+    }
+    if train.empty or any(frame.empty for frame in tests.values()):
+        raise ValueError("Round-3 preparation requires fixed discovery/interpolation/structural splits")
+    return train, tests
+
+
+def _factor_coverage_table(candidates: pd.DataFrame) -> pd.DataFrame:
+    columns = [
+        column
+        for column in candidates
+        if column.startswith("factor_") or column.startswith("context_")
+    ]
+    rows = []
+    for column in columns:
+        for value, count in candidates[column].fillna("__missing__").value_counts().items():
+            rows.append({"factor": column, "level": value, "count": int(count)})
+    return pd.DataFrame(rows)
+
+
+def _round3_hierarchy_sensitivity(
+    train: pd.DataFrame,
+    tests: dict[str, pd.DataFrame],
+    *,
+    architectures,
+    variants,
+    alphas,
+) -> pd.DataFrame:
+    rows = []
+    for label, source, target_tests in (
+        ("with_information_sampling", train, tests),
+        (
+            "without_information_sampling",
+            train[train.task_family != "information_sampling"].reset_index(drop=True),
+            {
+                name: frame[frame.task_family != "information_sampling"].reset_index(drop=True)
+                for name, frame in tests.items()
+            },
+        ),
+    ):
+        comparison, _ = compare_hierarchical_architectures(
+            source,
+            target_tests,
+            architectures=architectures,
+            variants=variants,
+            alphas=alphas,
+        )
+        comparison["sensitivity"] = label
+        rows.extend(comparison.to_dict("records"))
+    return pd.DataFrame(rows)
+
+
+def prepare_theory_resolution(
+    config: dict,
+    *,
+    round1_output: str | Path,
+    active_output: str | Path | None,
+    round2_output: str | Path,
+    output: str | Path | None = None,
+    smoke: bool = False,
+):
+    """Complete audits, freeze theories, and write the untouched Round-3 manifest."""
+
+    root = resolve_output(config, output)
+    root.mkdir(parents=True, exist_ok=True)
+    settings = config.get("theory_resolution", {})
+    records = _prior_behavior(round1_output, active_output)
+    train, tests = _fixed_hierarchy_inputs(records)
+    architectures = tuple(
+        settings.get(
+            "candidate_architectures",
+            ("dual_history", "latent_context", "outcome_history"),
+        )
+    )
+    audit_architectures = tuple(
+        settings.get("audit_architectures", config.get("hierarchy", {}).get("architectures", architectures))
+    )
+    variants = tuple(settings.get("variants", ("M1", "M2", "M3", "M4")))
+    alphas = tuple(config.get("hierarchy", {}).get("ridge_alphas", (0.01, 0.1, 1.0, 10.0, 100.0)))
+    comparison, fits = compare_hierarchical_architectures(
+        train,
+        tests,
+        architectures=audit_architectures,
+        variants=variants,
+        alphas=alphas,
+    )
+
+    audit_root = root / "audits"
+    audit_root.mkdir(parents=True, exist_ok=True)
+    recovery = validate_matched_flexible_ceilings(records, config, smoke=smoke)
+    expected_checks = None if smoke else 36
+    classified = classify_teacher_checks(recovery, expected_checks=expected_checks)
+    classified.to_csv(audit_root / "flexible_teacher_checks.csv", index=False)
+    if not smoke and len(classified) != 36:
+        raise RuntimeError("all 36 registered teacher checks must be reported")
+
+    draws, summaries = paired_hierarchy_bootstrap(
+        tests["interpolation_test"],
+        fits,
+        architectures=tuple(name for name in architectures if name in audit_architectures),
+        bootstraps=(20 if smoke else int(settings.get("hierarchy_bootstraps", 500))),
+        seed=int(config["base_seed"]) + 3001,
+    )
+    draws.to_csv(audit_root / "hierarchy_bootstrap.csv", index=False)
+    summaries.to_csv(audit_root / "hierarchy_bootstrap_summary.csv", index=False)
+
+    heldout = comparison[comparison.split == "interpolation_test"]
+    winner = heldout.sort_values(["macro_r2", "r2"], ascending=False).iloc[0]
+    winning_m4 = fits[(str(winner.architecture), "M4")]
+    variance_decomposition(winning_m4).to_csv(
+        audit_root / "parameter_variance.csv", index=False
+    )
+    dual_fit = fits.get(("dual_history", "M4"), winning_m4)
+    parameter_sign_table(dual_fit.task_parameters()).to_csv(
+        audit_root / "parameter_signs.csv", index=False
+    )
+    audit_information_sampling(records).to_csv(
+        audit_root / "information_sampling_audit.csv", index=False
+    )
+    _round3_hierarchy_sensitivity(
+        train,
+        tests,
+        architectures=architectures,
+        variants=("M2", "M3", "M4"),
+        alphas=alphas,
+    ).to_csv(audit_root / "information_sampling_hierarchy_sensitivity.csv", index=False)
+
+    round2_root = Path(round2_output)
+    validation_path = round2_root / "final_validation/predictions.csv"
+    if validation_path.exists():
+        final_predictions = pd.read_csv(validation_path)
+        calibration, deciles, per_task = calibration_tables(final_predictions)
+        calibration.to_csv(audit_root / "final_validation_calibration.csv", index=False)
+        deciles.to_csv(audit_root / "final_validation_deciles.csv", index=False)
+        per_task.to_csv(audit_root / "final_validation_per_task.csv", index=False)
+        pd.DataFrame(
+            [
+                {
+                    "macro_r2": float(per_task.r2.mean()),
+                    "macro_rmse": float(per_task.rmse.mean()),
+                    "macro_correlation": float(per_task.correlation.mean()),
+                    "calibration_intercept": float(calibration.calibration_intercept.iloc[0]),
+                    "calibration_slope": float(calibration.calibration_slope.iloc[0]),
+                    "recalibrated": False,
+                }
+            ]
+        ).to_csv(audit_root / "final_validation_macro_metrics.csv", index=False)
+        extreme_logit_residuals(final_predictions).to_csv(
+            audit_root / "final_validation_extreme_logits.csv", index=False
+        )
+
+    frozen_root = root / "frozen_models"
+    freeze = freeze_surviving_models(
+        train,
+        comparison,
+        fits,
+        frozen_root,
+        viability_delta=float(settings.get("viability_delta_r2", 0.03)),
+        candidate_architectures=architectures,
+        primary_variant=str(settings.get("primary_variant", "M4")),
+    )
+    survivors = freeze[freeze.survives].architecture.astype(str).tolist()
+    if len(survivors) < 2:
+        raise RuntimeError(
+            "fewer than two theories survived; a disagreement experiment is not identified"
+        )
+
+    candidate_count = int(
+        settings.get("smoke_candidate_count", 120)
+        if smoke
+        else settings.get("candidate_count", 20_000)
+    )
+    candidate_config = dict(config)
+    candidate_config["theory_resolution"] = dict(settings)
+    if smoke:
+        candidate_config["theory_resolution"]["allow_small_candidate_pool"] = True
+    conditions, candidates = generate_theory_candidate_pool(
+        candidate_config,
+        records,
+        candidate_count=candidate_count,
+        seed=int(settings.get("candidate_seed", int(config["design_seed"]) + 40_000_000)),
+    )
+    predictions = predict_frozen_models(candidates, frozen_root)
+    disagreement = theory_disagreement_scores(candidates, predictions)
+    uncertainty = model_uncertainty_scores(
+        train,
+        candidates,
+        architectures=tuple(survivors),
+        variant=str(settings.get("primary_variant", "M4")),
+        bootstraps=(3 if smoke else int(settings.get("uncertainty_bootstraps", 32))),
+        seed=int(config["base_seed"]) + 3002,
+    )
+    coverage = theory_coverage_scores(records, candidates)
+    scores = candidates.copy()
+    for table, columns in (
+        (
+            disagreement,
+            [
+                column
+                for column in disagreement
+                if column not in {"paired_condition_id", "semantic_hash", "task_family"}
+            ],
+        ),
+        (
+            uncertainty,
+            [
+                column
+                for column in uncertainty
+                if column not in {"paired_condition_id", "semantic_hash", "task_family"}
+            ],
+        ),
+        (
+            coverage,
+            [
+                column
+                for column in coverage
+                if column not in {"paired_condition_id", "semantic_hash", "task_family"}
+            ],
+        ),
+    ):
+        scores = scores.merge(
+            table[["paired_condition_id", *columns]],
+            on="paired_condition_id",
+            validate="one_to_one",
+        )
+    budget = int(
+        settings.get("smoke_budget", 30)
+        if smoke
+        else settings.get("budget", 1200)
+    )
+    selection = select_discrimination_mixture(
+        conditions,
+        scores,
+        budget=budget,
+        score_weights=settings.get(
+            "score_weights", {"disagreement": 0.50, "uncertainty": 0.25, "coverage": 0.25}
+        ),
+        allocation=settings.get(
+            "allocation", {"discriminating": 0.60, "coverage": 0.20, "random": 0.20}
+        ),
+        seed=int(settings.get("selection_seed", int(config["base_seed"]) + 3003)),
+    )
+    frozen_conditions = freeze_discrimination_split(
+        selection.conditions,
+        fraction=float(settings.get("discrimination_fraction", 0.25)),
+        seed=int(settings.get("split_seed", int(config["split_seed"]) + 3000)),
+    )
+    split_by_pair = {
+        condition.paired_condition_id: condition.split for condition in frozen_conditions
+    }
+    selected = selection.selected.copy()
+    selected["split"] = selected.paired_condition_id.map(split_by_pair)
+    annotated_scores = selection.scores.merge(
+        selected[["paired_condition_id", "sampling_strategy", "split"]],
+        on="paired_condition_id",
+        how="left",
+        validate="one_to_one",
+    )
+    annotated_scores["selected"] = annotated_scores.sampling_strategy.notna()
+
+    contextual_root = root / "contextual_history"
+    contextual_root.mkdir(parents=True, exist_ok=True)
+    active_root = root / "active_sampling"
+    active_root.mkdir(parents=True, exist_ok=True)
+    _write_frame(candidates, active_root / "candidate_pool.parquet")
+    scores.to_csv(active_root / "candidate_predictions.csv", index=False)
+    _write_frame(scores, active_root / "candidate_predictions.parquet")
+    annotated_scores.to_csv(active_root / "sampling_scores.csv", index=False)
+    _write_frame(annotated_scores, active_root / "sampling_scores.parquet")
+    selected.to_csv(active_root / "selected_allocations.csv", index=False)
+    manifest_path = write_records(
+        frozen_conditions, active_root / "selected_conditions.jsonl"
+    )
+    _write_frame(condition_frame(frozen_conditions), active_root / "selected_conditions.parquet")
+    contextual_frame = condition_frame(
+        [condition for condition in frozen_conditions if condition.contextual_history is not None]
+    )
+    _write_frame(contextual_frame, contextual_root / "condition_manifest.parquet")
+    write_records(
+        [condition for condition in frozen_conditions if condition.contextual_history is not None],
+        contextual_root / "condition_manifest.jsonl",
+    )
+    _factor_coverage_table(candidates).to_csv(
+        contextual_root / "factor_coverage.csv", index=False
+    )
+    (contextual_root / "sweetpea_spec.json").write_text(
+        json.dumps(contextual_declarative_spec(config), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    metadata = build_run_metadata(config, frozen_conditions, root=Path.cwd())
+    metadata.update(
+        {
+            "round1_output": str(round1_output),
+            "round2_output": str(round2_output),
+            "active_output": str(active_output) if active_output else None,
+            "candidate_semantic_conditions": len(candidates),
+            "selected_semantic_conditions": budget,
+            "frozen_architectures": survivors,
+            "round3_outcomes_used_for_scoring": False,
+        }
+    )
+    (root / "run_metadata.json").write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    generate_theory_figures(root)
+    generate_theory_report(root)
+    return {
+        "manifest": manifest_path,
+        "survivors": survivors,
+        "candidate_count": len(candidates),
+        "selected_count": budget,
+    }
+
+
+def evaluate_theory_resolution(
+    config: dict,
+    *,
+    round1_output: str | Path,
+    active_output: str | Path | None,
+    round3_output: str | Path,
+    output: str | Path | None = None,
+    smoke: bool = False,
+):
+    """Run frozen prediction, then post-comparison updating without test leakage."""
+
+    root = resolve_output(config, output)
+    settings = config.get("theory_resolution", {})
+    prior = _prior_behavior(round1_output, active_output)
+    round3 = validate_records(_load_standardized(Path(round3_output))).copy()
+    discrimination = round3[round3.split == "model_discrimination"].reset_index(drop=True)
+    round3_train = round3[round3.split == "round3_train"].reset_index(drop=True)
+    if discrimination.empty or round3_train.empty:
+        raise ValueError("Round-3 collection is missing its frozen train/test split")
+    frozen_models = load_frozen_models(root / "frozen_models")
+    frozen_predictions = {
+        architecture: fit.predict(discrimination)
+        for architecture, fit in frozen_models.items()
+    }
+    errors = semantic_prediction_errors(discrimination, frozen_predictions)
+    if not {"dual_history", "latent_context"} <= set(frozen_models):
+        raise RuntimeError("primary DH/LC frozen theories are required for comparison")
+    selected_scores = pd.read_csv(root / "active_sampling/selected_allocations.csv")
+    threshold = selected_scores.disagreement_raw.quantile(0.75)
+    high_ids = set(
+        selected_scores.loc[
+            selected_scores.disagreement_raw >= threshold, "paired_condition_id"
+        ].astype(str)
+    )
+    bootstrap, summary, metrics = compare_frozen_theories(
+        errors,
+        high_disagreement_ids=high_ids,
+        bootstraps=(100 if smoke else int(settings.get("comparison_bootstraps", 2_000))),
+        seed=int(config["base_seed"]) + 3010,
+    )
+    decision = resolve_theory_outcome(
+        summary,
+        metrics,
+        equivalence_margin=float(settings.get("equivalence_margin_mse", 0.02)),
+        minimum_r2=float(settings.get("minimum_theory_r2", 0.0)),
+    )
+    discrimination_root = root / "discrimination"
+    discrimination_root.mkdir(parents=True, exist_ok=True)
+    errors.to_csv(discrimination_root / "frozen_model_errors.csv", index=False)
+    bootstrap.to_csv(
+        discrimination_root / "model_difference_bootstrap.csv", index=False
+    )
+    summary.to_csv(
+        discrimination_root / "model_difference_summary.csv", index=False
+    )
+    summary[summary.scope == "task"].to_csv(
+        discrimination_root / "per_task_comparison.csv", index=False
+    )
+    metrics.to_csv(discrimination_root / "frozen_model_metrics.csv", index=False)
+    contrasts, reliability = context_reinstatement_table(errors)
+    contrasts.to_csv(discrimination_root / "context_reinstatement.csv", index=False)
+    reliability.to_csv(
+        discrimination_root / "context_reliability_effect.csv", index=False
+    )
+    (discrimination_root / "theory_decision.json").write_text(
+        json.dumps(decision, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+    combined_train = pd.concat(
+        [prior[prior.split == "discovery"], round3_train],
+        ignore_index=True,
+        sort=False,
+    )
+    if set(combined_train.paired_condition_id.astype(str)) & set(
+        discrimination.paired_condition_id.astype(str)
+    ):
+        raise RuntimeError("untouched discrimination conditions leaked into model updating")
+    updated_fits = {
+        architecture: fit_hierarchical_model(
+            combined_train,
+            architecture,
+            variant=str(settings.get("primary_variant", "M4")),
+        )
+        for architecture in frozen_models
+    }
+    updated_predictions = {
+        architecture: fit.predict(discrimination)
+        for architecture, fit in updated_fits.items()
+    }
+    updated_errors = semantic_prediction_errors(discrimination, updated_predictions)
+    updated_errors.to_csv(
+        discrimination_root / "post_update_model_errors.csv", index=False
+    )
+    updated_metric_rows = []
+    for architecture in ("dual_history", "latent_context"):
+        prediction = updated_errors[f"prediction_{architecture}"]
+        model_metric = regression_metrics(updated_errors.persistence_logit, prediction)
+        updated_metric_rows.append(
+            {
+                "architecture": architecture,
+                **model_metric,
+                "rmse": float(
+                    np.sqrt(updated_errors[f"squared_error_{architecture}"].mean())
+                ),
+            }
+        )
+    updated_metrics = pd.DataFrame(updated_metric_rows)
+    frozen_final = metrics.copy()
+    frozen_final["stage"] = "frozen_prediction"
+    updated_metrics["stage"] = "post_update"
+    final_comparison = pd.concat([frozen_final, updated_metrics], ignore_index=True)
+
+    theory_root = root / "theory"
+    theory_root.mkdir(parents=True, exist_ok=True)
+    final_comparison.to_csv(theory_root / "final_model_comparison.csv", index=False)
+    if decision.get("winner") in updated_fits:
+        handoff_architecture = str(decision["winner"])
+    else:
+        handoff_architecture = str(
+            metrics.sort_values("mse", ascending=True).iloc[0].architecture
+        )
+    handoff_fit = updated_fits[handoff_architecture]
+    intervals = bootstrap_parameter_intervals(
+        combined_train,
+        architecture=handoff_architecture,
+        bootstraps=(5 if smoke else int(settings.get("parameter_bootstraps", 100))),
+        seed=int(config["base_seed"]) + 3011,
+    )
+    write_mechanistic_handoff(decision, handoff_fit, intervals, theory_root)
+    generate_theory_figures(root)
+    report = generate_theory_report(root)
+    return {
+        "decision": decision,
+        "report": report,
+        "frozen_metrics": metrics,
+        "post_update_metrics": updated_metrics,
+    }

@@ -19,6 +19,12 @@ flexible ceilings, nested residual validation, and a 40/40/20 active sampler.
 Its specification is
 [`PRD_Active_Hierarchical_Discovery_of_Persistence_Computations.md`](PRD_Active_Hierarchical_Discovery_of_Persistence_Computations.md).
 
+Behavioral Theory Resolution (Round 3) completes the validity audits, freezes
+the surviving dual-history/latent-context theories, adds operational A→B→A
+context reinstatement in three domains, and runs a preregistered active
+discrimination test before any mechanistic analysis. Its specification is
+[`PRD_Behavioral_Theory_Resolution_Before_Mechanistic_Analysis.md`](PRD_Behavioral_Theory_Resolution_Before_Mechanistic_Analysis.md).
+
 Phase 1 is behavior only. The runner never requests activations and rejects a
 participant result containing hidden states.
 
@@ -178,6 +184,45 @@ cognitive-discovery-run \
 The new Della workflow requests full 40 GB A100 GPUs for Qwen and neural-ceiling
 phases; tests, shard merging, and final tabulation use CPU-only jobs.
 
+## Behavioral Theory Resolution Round 3
+
+Round 3 consumes the fixed Round‑1 behavior and Round‑2 active observations. It
+does not refit on the untouched Round‑3 discrimination subset until after the
+frozen comparison has been written. Run the entire Della dependency chain with:
+
+```bash
+export ROUND1_OUTPUT=artifacts/discovery_v1
+export ROUND2_OUTPUT=artifacts/discovery_v2
+export V2_ACTIVE_OUTPUT=artifacts/discovery_v2/active_collection
+export V3_OUTPUT=artifacts/theory_resolution_v1
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+export SCRATCH_ROOT=/scratch/gpfs/JORDANAT/$USER/llm-cognitive-discovery
+export CONDA_ENV=llm-cognitive-discovery
+
+bash scripts/submit_theory_resolution.sh
+```
+
+The dependency chain is:
+
+```text
+tests → 36 teacher/audit checks → M2/M3/M4 uncertainty → theory freeze
+      → ≥20,000 legal original/contextual candidates → 60/20/20 manifest
+      → 8-way Qwen collection → quality gate
+      → frozen comparison → post-comparison update → mechanistic handoff
+```
+
+SLURM resource routing is phase-specific. Qwen collection and neural-model
+audits/tournaments use GPU jobs. Tests, shard merging, quality gates,
+hierarchical updates, frozen comparisons, and reporting use CPU-only jobs. The
+runner exits immediately if a CPU-only phase is accidentally submitted with a
+GPU allocation, and every GPU phase verifies CUDA before beginning expensive
+work.
+
+The collector is still behavior-only: no hidden states or activations are
+requested or retained. To exercise every artifact boundary without loading
+Qwen, run preparation with `--smoke`, collect its manifest using
+`scripts/run_experiments.py --model-free`, then evaluate with `--smoke`.
+
 ## Artifacts
 
 The run directory follows the PRD layout:
@@ -206,6 +251,22 @@ artifacts/discovery_v2/
   final_validation/       untouched manifest, predictions, calibration, task metrics
   residuals/              nested candidates and held-out confirmation
   figures/                five registered Round-2 figures
+  report.md
+  run_metadata.json
+```
+
+Round‑3 artifacts are isolated under:
+
+```text
+artifacts/theory_resolution_v1/
+  audits/                 teacher failures, M2/M3/M4, parameters, calibration
+  frozen_models/          immutable specifications, fits, hashes, prediction code
+  contextual_history/     A→B→A manifest, SweetPea grammar, factor coverage
+  active_sampling/        20k candidate pool/predictions and 60/20/20 selection
+  round3_collection/      Qwen policy observations only
+  discrimination/         frozen errors, paired bootstrap, reinstatement effects
+  theory/                 updated comparison, coefficients, mechanistic targets
+  figures/                six registered theory-resolution figures
   report.md
   run_metadata.json
 ```

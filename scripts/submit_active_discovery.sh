@@ -10,7 +10,7 @@ if ! command -v sbatch >/dev/null 2>&1; then
   echo "sbatch is unavailable; run this helper on a Della login node" >&2
   exit 1
 fi
-if [ ! -f "$RUN_SCRIPT" ]; then
+if [ ! -f "$RUN_SCRIPT" ] || [ ! -f "$CPU_SCRIPT" ]; then
   echo "Run this helper from the repository root" >&2
   exit 1
 fi
@@ -39,7 +39,7 @@ active_finalize_submission=$(sbatch --parsable --job-name=cog_v2_active_gate --t
 active_finalize_job="${active_finalize_submission%%;*}"
 
 update_submission=$(sbatch --parsable --job-name=cog_v2_update \
-  --dependency="afterok:${active_finalize_job}" --export=ALL,PHASE=update "$RUN_SCRIPT")
+  --dependency="afterok:${active_finalize_job}" --export=ALL,PHASE=update "$CPU_SCRIPT")
 update_job="${update_submission%%;*}"
 
 final_submission=$(sbatch --parsable --job-name=cog_v2_final \

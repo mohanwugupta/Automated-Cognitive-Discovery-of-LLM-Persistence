@@ -104,6 +104,10 @@ class BaseTaskRenderer:
         )
 
     def _history_text(self, condition: ConditionSpec) -> str:
+        if condition.contextual_history is not None:
+            from .contextual_history.renderers import contextual_history_text
+
+            return contextual_history_text(condition)
         if condition.history.length == 0:
             return "There are no preceding decisions in this episode."
         return (

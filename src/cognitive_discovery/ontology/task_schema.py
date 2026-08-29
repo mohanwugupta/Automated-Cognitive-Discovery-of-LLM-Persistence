@@ -43,6 +43,7 @@ class ConditionSpec:
     environment_seed: int
     sampling_strategy: str = "coverage"
     split: str = "unassigned"
+    contextual_history: dict[str, object] | None = None
 
     def __post_init__(self) -> None:
         validate_factor_assignment(self.task_family, self.semantic_factors)
@@ -55,7 +56,7 @@ class ConditionSpec:
         return continuation_advantage(self.semantic_factors)
 
     def semantic_payload(self) -> dict:
-        return {
+        payload = {
             "task_family": self.task_family,
             "factors": self.semantic_factors,
             "factor_available": self.factor_available,
@@ -67,6 +68,9 @@ class ConditionSpec:
             },
             "environment_seed": self.environment_seed,
         }
+        if self.contextual_history is not None:
+            payload["contextual_history"] = self.contextual_history
+        return payload
 
     def to_dict(self) -> dict:
         return {
@@ -79,4 +83,3 @@ class ConditionSpec:
             "sampling_strategy": self.sampling_strategy,
             "split": self.split,
         }
-

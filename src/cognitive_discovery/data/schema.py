@@ -32,6 +32,7 @@ class Observation:
     sampling_strategy: str
     p_action_mass_raw: float | None = None
     top_token_is_action: bool | None = None
+    contextual_history: dict[str, object] | None = None
 
     def to_dict(self) -> dict:
         row = asdict(self)
@@ -39,9 +40,14 @@ class Observation:
         row["history_outcomes"] = json.dumps(self.history_outcomes)
         factors = row.pop("factors")
         available = row.pop("factor_available")
+        context = row.pop("contextual_history")
         row.update({f"factor_{name}": value for name, value in factors.items()})
         row.update(
             {f"factor_available_{name}": bool(value) for name, value in available.items()}
         )
+        if context is not None:
+            for name, value in context.items():
+                if isinstance(value, (tuple, list, dict)):
+                    value = json.dumps(value, sort_keys=True)
+                row[f"context_{name}"] = value
         return row
-

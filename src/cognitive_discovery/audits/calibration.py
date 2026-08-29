@@ -80,3 +80,24 @@ def calibration_tables(
         ]
     )
     return overall, deciles, per_task
+
+
+def extreme_logit_residuals(
+    predictions: pd.DataFrame,
+    *,
+    observed_column="persistence_logit",
+    prediction_column="predicted_persistence_logit",
+    quantile: float = 0.90,
+) -> pd.DataFrame:
+    """Return unmodified predictions in the most extreme observed-logit tail."""
+
+    if not 0.5 < float(quantile) < 1:
+        raise ValueError("extreme-logit quantile must lie between .5 and 1")
+    frame = predictions.copy()
+    threshold = float(frame[observed_column].abs().quantile(float(quantile)))
+    frame["residual"] = frame[observed_column] - frame[prediction_column]
+    frame["absolute_observed_logit"] = frame[observed_column].abs()
+    frame["extreme_threshold"] = threshold
+    return frame[frame.absolute_observed_logit >= threshold].sort_values(
+        "absolute_observed_logit", ascending=False
+    )

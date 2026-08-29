@@ -86,6 +86,64 @@ def _series(frame: pd.DataFrame, name: str) -> np.ndarray:
                     else float("nan")
                 )
         return np.asarray(values, dtype=float)
+    if name in {"context_relevant_action_kernel", "context_relevant_outcome_kernel"}:
+        history_kind = "actions" if "action" in name else "outcomes"
+        recent_name = (
+            "history_action_kernel" if history_kind == "actions" else "history_outcome_kernel"
+        )
+        recent_values = _series(frame, recent_name)
+        return_column = frame.get("context_context_return")
+        reliability_column = frame.get("context_cue_probability")
+        change_column = frame.get("context_change_point")
+        a_column = frame.get(f"context_a_history_{history_kind}")
+        b_column = frame.get(f"context_b_history_{history_kind}")
+        if any(
+            value is None
+            for value in (
+                return_column,
+                reliability_column,
+                change_column,
+                a_column,
+                b_column,
+            )
+        ):
+            return recent_values
+
+        def kernel(raw):
+            values = _history_array(raw)
+            if history_kind == "actions":
+                values = [
+                    1.0 if str(value).lower() == "continue" else -1.0
+                    for value in values
+                ]
+            else:
+                values = [_number(value) for value in values]
+            return (
+                sum((0.7**lag) * value for lag, value in enumerate(reversed(values)))
+                if values
+                else 0.0
+            )
+
+        contextual = []
+        for index in range(len(frame)):
+            context_return = str(return_column.iloc[index])
+            reliability = _number(reliability_column.iloc[index])
+            if not np.isfinite(reliability) or context_return in {"nan", "None"}:
+                contextual.append(recent_values[index])
+                continue
+            if str(change_column.iloc[index]) == "change_point":
+                matched = 0.0
+            elif context_return == "A":
+                matched = kernel(a_column.iloc[index])
+            elif context_return == "B":
+                matched = kernel(b_column.iloc[index])
+            else:
+                matched = 0.0
+            contextual.append(
+                float(reliability) * matched
+                + (1.0 - float(reliability)) * recent_values[index]
+            )
+        return np.asarray(contextual, dtype=float)
     if name == "latent_state":
         current = (
             _series(frame, "factor_continuation_value")

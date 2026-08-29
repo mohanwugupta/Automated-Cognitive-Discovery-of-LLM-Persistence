@@ -83,9 +83,9 @@ COGNITIVE_MODELS = {
         "H5",
         (
             *IMMEDIATE_FEATURES,
-            "history_outcome_kernel",
-            "history_outcome_kernel*factor_goal_continuity",
-            "history_outcome_kernel*factor_environmental_stability",
+            "context_relevant_outcome_kernel",
+            "context_relevant_outcome_kernel*factor_goal_continuity",
+            "context_relevant_outcome_kernel*factor_environmental_stability",
         ),
         "History is weighted by inferred continuity and environmental stability.",
     ),
@@ -141,4 +141,3 @@ GENERIC_SEQUENTIAL_MODEL = CognitiveModelSpec(
     "Ordinary history-sensitive sequential choice without persistence-specific constructs.",
 )
 COGNITIVE_MODELS[GENERIC_SEQUENTIAL_MODEL.name] = GENERIC_SEQUENTIAL_MODEL
-

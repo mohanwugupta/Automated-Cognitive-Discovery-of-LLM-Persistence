@@ -22,7 +22,9 @@ def _balanced_pick(levels, index: int, seed: int, salt: str):
     return levels[position]
 
 
-def _level_assignment(task: str, task_index: int, seed: int, configured: dict) -> dict:
+def balanced_factor_assignment(
+    task: str, task_index: int, seed: int, configured: dict
+) -> dict:
     available = TASK_FACTOR_AVAILABILITY[task]
     factors: dict[str, str | None] = {}
     for factor_index, (name, defaults) in enumerate(FACTOR_LEVELS.items()):
@@ -81,7 +83,7 @@ def compile_design(
         task = tasks[semantic_index % len(tasks)]
         candidate_index = task_attempts[task]
         task_attempts[task] += 1
-        factors = _level_assignment(task, candidate_index, seed, factor_levels)
+        factors = balanced_factor_assignment(task, candidate_index, seed, factor_levels)
         length = int(
             _balanced_pick(history_lengths, candidate_index, seed, f"{task}:history_length")
         )

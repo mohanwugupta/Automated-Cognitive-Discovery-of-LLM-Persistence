@@ -133,6 +133,7 @@ def collect_conditions(
                             if result.get("top_token_is_action") is not None
                             else None
                         ),
+                        contextual_history=condition.contextual_history,
                     )
                 )
     return observations

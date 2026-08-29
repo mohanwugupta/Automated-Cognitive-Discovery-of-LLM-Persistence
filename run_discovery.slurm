@@ -47,6 +47,23 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 mkdir -p logs "$HF_HOME" "$HF_DATASETS_CACHE" "$TORCH_HOME" "$XDG_CACHE_HOME" "$MPLCONFIGDIR"
 
+# Stop manual submissions from reserving a GPU for phases that cannot use one.
+case "$PHASE" in
+  tests|design|pilot_finalize|discovery_finalize)
+    if [ -n "${SLURM_JOB_GPUS:-}" ]; then
+      echo "PHASE=$PHASE is CPU-only but this job reserved GPU(s): $SLURM_JOB_GPUS" >&2
+      echo "Submit it through run_discovery_cpu.slurm." >&2
+      exit 3
+    fi
+    ;;
+esac
+
+case "$PHASE" in
+  pilot_collect|discovery_collect|analyze|validation|smoke)
+    python -c 'import torch; assert torch.cuda.is_available(), "CUDA is unavailable in a GPU phase"; print("CUDA preflight:", torch.cuda.get_device_name(0))'
+    ;;
+esac
+
 case "$PHASE" in
   tests)
     python -m pytest -q

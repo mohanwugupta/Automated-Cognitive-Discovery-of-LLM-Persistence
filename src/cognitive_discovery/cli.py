@@ -14,6 +14,8 @@ from .pipeline import (
     prepare_active_round,
     update_after_active_round,
     evaluate_round2_final,
+    prepare_theory_resolution,
+    evaluate_theory_resolution,
 )
 
 
@@ -182,4 +184,51 @@ def active_discovery_main(argv=None):
             output=args.output,
         )
         printable = result["metrics"]
+    print(json.dumps(printable, indent=2, sort_keys=True))
+
+
+def theory_resolution_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Discovery Round-3 behavioral theory-resolution workflow"
+    )
+    parser.add_argument("--config", default="configs/theory_resolution_v1.yaml")
+    parser.add_argument("--output")
+    parser.add_argument("--round1-output", required=True)
+    parser.add_argument("--active-output")
+    parser.add_argument("--round2-output")
+    parser.add_argument("--round3-output")
+    parser.add_argument("--phase", choices=("prepare", "evaluate"), required=True)
+    parser.add_argument("--smoke", action="store_true")
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    if args.phase == "prepare":
+        if not args.round2_output:
+            parser.error("--round2-output is required for prepare")
+        result = prepare_theory_resolution(
+            config,
+            round1_output=args.round1_output,
+            active_output=args.active_output,
+            round2_output=args.round2_output,
+            output=args.output,
+            smoke=args.smoke,
+        )
+        printable = {
+            **result,
+            "manifest": str(result["manifest"]),
+        }
+    else:
+        if not args.round3_output:
+            parser.error("--round3-output is required for evaluate")
+        result = evaluate_theory_resolution(
+            config,
+            round1_output=args.round1_output,
+            active_output=args.active_output,
+            round3_output=args.round3_output,
+            output=args.output,
+            smoke=args.smoke,
+        )
+        printable = {
+            "decision": result["decision"],
+            "report": str(result["report"]),
+        }
     print(json.dumps(printable, indent=2, sort_keys=True))

@@ -83,6 +83,19 @@ def validate_matched_flexible_ceilings(
         boundary = max(1, int(0.75 * len(records)))
         train = records.iloc[:boundary].reset_index(drop=True)
         test = records.iloc[boundary:].reset_index(drop=True)
+    if smoke:
+        # Preserve every task and the real feature matrix while keeping a laptop
+        # plumbing check distinct from the registered full 36-check audit.
+        train = (
+            train.groupby("task_family", group_keys=False)
+            .head(80)
+            .reset_index(drop=True)
+        )
+        test = (
+            test.groupby("task_family", group_keys=False)
+            .head(30)
+            .reset_index(drop=True)
+        )
     teachers = {}
     for architecture in ("dual_history", "latent_context"):
         teacher = fit_hierarchical_model(train, architecture, variant="M4")

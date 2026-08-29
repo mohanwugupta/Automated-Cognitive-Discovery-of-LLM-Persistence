@@ -73,3 +73,42 @@ def coverage_scores(observed: pd.DataFrame, candidates: pd.DataFrame) -> pd.Data
     ].mean(axis=1)
     result["coverage_score"] = _rank01(raw)
     return result
+
+
+def theory_coverage_scores(
+    observed: pd.DataFrame, candidates: pd.DataFrame
+) -> pd.DataFrame:
+    """Round-3 coverage including contextual-history cells."""
+
+    result = coverage_scores(observed, candidates)
+    context_columns = tuple(
+        column
+        for column in (
+            "context_a_history_valence",
+            "context_b_history_valence",
+            "context_context_return",
+            "context_cue_reliability",
+            "context_change_point",
+        )
+        if column in candidates
+    )
+    if not context_columns:
+        result["coverage_contextual"] = 0.5
+        return result
+    counts = Counter(
+        tuple(_cell(row.get(column)) for column in context_columns)
+        for _, row in observed.iterrows()
+    )
+    raw = np.asarray(
+        [
+            1.0
+            / np.sqrt(
+                1.0
+                + counts[tuple(_cell(row.get(column)) for column in context_columns)]
+            )
+            for _, row in candidates.iterrows()
+        ]
+    )
+    result["coverage_contextual"] = _rank01(raw)
+    result["coverage_score"] = 0.75 * result.coverage_score + 0.25 * result.coverage_contextual
+    return result
