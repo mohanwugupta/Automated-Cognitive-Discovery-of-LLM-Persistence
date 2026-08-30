@@ -72,6 +72,18 @@ def write_mechanistic_handoff(
             ]
         )
     ]
+    target_normalization = {}
+    encoder_features = tuple(getattr(fit.encoder, "features", ()))
+    encoder_means = getattr(fit.encoder, "means", None)
+    encoder_scales = getattr(fit.encoder, "scales", None)
+    if encoder_means is not None and encoder_scales is not None:
+        for index, feature in enumerate(encoder_features):
+            # FeatureEncoder expands every scientific value into
+            # [standardized value, availability]. Interventions use the value.
+            target_normalization[str(feature)] = {
+                "mean": float(encoder_means[2 * index]),
+                "scale": float(encoder_scales[2 * index]),
+            }
     handoff = {
         "theory_outcome": outcome,
         "winner": decision.get("winner"),
@@ -93,6 +105,7 @@ def write_mechanistic_handoff(
                 "ci_high",
             ]
         ].to_dict("records"),
+        "computational_target_normalization": target_normalization,
         "mechanistic_analysis_ready": outcome
         in {"dual_history", "latent_context", "observational_equivalence"},
     }
@@ -113,7 +126,6 @@ def generate_theory_report(root: str | Path) -> Path:
     freeze = _csv(root / "frozen_models/freeze_decisions.csv")
     scores = _csv(root / "active_sampling/sampling_scores.csv")
     comparison = _csv(root / "discrimination/model_difference_summary.csv")
-    per_task = _csv(root / "discrimination/per_task_comparison.csv")
     targets_path = root / "theory/mechanistic_targets.json"
     targets = json.loads(targets_path.read_text()) if targets_path.exists() else None
     failed = teacher[~teacher.passed.astype(bool)] if not teacher.empty else teacher
@@ -157,11 +169,19 @@ def generate_theory_report(root: str | Path) -> Path:
         ),
         f"2. **Flexible-ceiling validity.** {'Valid for all registered checks.' if len(teacher) and not len(failed) else 'Not an upper bound where a registered check fails.'}",
         f"3. **M2/M3/M4 uncertainty.** {len(macro_hierarchy)} paired summaries are available; intervals, medians, and win probabilities are in the audit table.",
-        f"4. **Ontology variance.** Median ontology fraction Q={q:.3f}." if np.isfinite(q) else "4. **Ontology variance.** Pending.",
+        (
+            f"4. **Ontology variance.** Median ontology fraction Q={q:.3f}."
+            if np.isfinite(q)
+            else "4. **Ontology variance.** Pending."
+        ),
         f"5. **Stable parameter signs.** {', '.join(stable) if stable else 'None established or pending.'}",
         f"6. **Information Sampling.** {len(info)} semantic/mask/scale/mapping rows audited; with/without sensitivity is preserved.",
         f"7. **Frozen theories.** {', '.join(survivors) if survivors else 'Pending.'}",
-        f"8. **Disagreement space.** {len(scores)} candidates scored across original and contextual domains." if len(scores) else "8. **Disagreement space.** Pending.",
+        (
+            f"8. **Disagreement space.** {len(scores)} candidates scored across original and contextual domains."
+            if len(scores)
+            else "8. **Disagreement space.** Pending."
+        ),
         (
             f"9. **Targeted discrimination.** Overall mean Δerror(DH−LC)={overall.iloc[0].mean_delta_error_dh_minus_lc:.4f}."
             if len(overall)
@@ -210,55 +230,93 @@ def generate_theory_figures(root: str | Path):
 
     parameters = _csv(root / "theory/final_parameters.csv")
     if not parameters.empty:
-        summary = parameters.groupby("parameter", as_index=False).estimate.mean().head(12)
+        summary = (
+            parameters.groupby("parameter", as_index=False).estimate.mean().head(12)
+        )
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.barh(summary.parameter, summary.estimate)
         ax.axvline(0, color="black", linewidth=0.8)
         ax.set_title("Figure 1 — shared form with task-specific weights")
         path = output / "figure1_parameter_architecture.png"
-        fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+        fig.tight_layout()
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        written.append(path)
 
     signs = _csv(root / "audits/parameter_signs.csv")
     if not signs.empty:
         fig, ax = plt.subplots(figsize=(8, 4))
         ax.barh(signs.parameter, signs.probability_positive)
         ax.axvline(0.5, color="black", linewidth=0.8)
-        ax.set_xlim(0, 1); ax.set_title("Figure 2 — parameter sign consistency")
+        ax.set_xlim(0, 1)
+        ax.set_title("Figure 2 — parameter sign consistency")
         path = output / "figure2_parameter_consistency.png"
-        fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+        fig.tight_layout()
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        written.append(path)
 
     predictions = _csv(root / "active_sampling/candidate_predictions.csv")
     if not predictions.empty and "context_cue_probability" in predictions:
         data = predictions[predictions.context_phase_order.notna()].copy()
         if len(data):
             fig, ax = plt.subplots(figsize=(7, 5))
-            ax.scatter(data.prediction_dual_history, data.prediction_latent_context, s=5, alpha=.3)
-            ax.set_xlabel("Dual history"); ax.set_ylabel("Latent context")
+            ax.scatter(
+                data.prediction_dual_history,
+                data.prediction_latent_context,
+                s=5,
+                alpha=0.3,
+            )
+            ax.set_xlabel("Dual history")
+            ax.set_ylabel("Latent context")
             ax.set_title("Figure 3 — A→B→A frozen predictions")
             path = output / "figure3_context_reinstatement_predictions.png"
-            fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+            fig.tight_layout()
+            fig.savefig(path, dpi=180)
+            plt.close(fig)
+            written.append(path)
 
     errors = _csv(root / "discrimination/frozen_model_errors.csv")
     if not errors.empty:
         fig, ax = plt.subplots(figsize=(7, 5))
-        means = errors[["squared_error_dual_history", "squared_error_latent_context"]].mean()
+        means = errors[
+            ["squared_error_dual_history", "squared_error_latent_context"]
+        ].mean()
         ax.bar(["dual history", "latent context"], means)
         ax.set_ylabel("Mean squared frozen prediction error")
         ax.set_title("Figure 4 — untouched frozen discrimination")
         path = output / "figure4_frozen_discrimination.png"
-        fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+        fig.tight_layout()
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        written.append(path)
 
         if "context_cue_reliability" in errors:
             context = errors[errors.contextual_history.astype(bool)]
             if len(context):
-                reliability = context.groupby("context_cue_reliability", as_index=False).delta_error_dh_minus_lc.mean()
+                reliability = context.groupby(
+                    "context_cue_reliability", as_index=False
+                ).delta_error_dh_minus_lc.mean()
                 fig, ax = plt.subplots(figsize=(7, 5))
-                order = [x for x in ("low", "medium", "high") if x in set(reliability.context_cue_reliability)]
-                values = [reliability.set_index("context_cue_reliability").loc[x, "delta_error_dh_minus_lc"] for x in order]
-                ax.plot(order, values, marker="o"); ax.axhline(0, color="black", linewidth=.8)
+                order = [
+                    x
+                    for x in ("low", "medium", "high")
+                    if x in set(reliability.context_cue_reliability)
+                ]
+                values = [
+                    reliability.set_index("context_cue_reliability").loc[
+                        x, "delta_error_dh_minus_lc"
+                    ]
+                    for x in order
+                ]
+                ax.plot(order, values, marker="o")
+                ax.axhline(0, color="black", linewidth=0.8)
                 ax.set_title("Figure 5 — context reliability effect")
                 path = output / "figure5_context_reliability.png"
-                fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+                fig.tight_layout()
+                fig.savefig(path, dpi=180)
+                plt.close(fig)
+                written.append(path)
 
     final = _csv(root / "theory/final_model_comparison.csv")
     if not final.empty:
@@ -268,5 +326,8 @@ def generate_theory_figures(root: str | Path):
         ax.set_title("Figure 6 — final theory comparison")
         ax.tick_params(axis="x", rotation=30)
         path = output / "figure6_final_theory_comparison.png"
-        fig.tight_layout(); fig.savefig(path, dpi=180); plt.close(fig); written.append(path)
+        fig.tight_layout()
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        written.append(path)
     return written

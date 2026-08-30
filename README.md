@@ -28,6 +28,12 @@ discrimination test before any mechanistic analysis. Its specification is
 Phase 1 is behavior only. The runner never requests activations and rejects a
 participant result containing hidden states.
 
+The mechanistic follow-up is isolated from that collector. It freezes the
+Round-3 targets, streams final-prompt-token residual states through paired
+sufficient statistics, and only permits steering and projection patching after
+the representation gate. Its specification is
+[`PRD_Mechanistic_Implementation_Context_Sensitive_Outcome_History_Integration.md`](PRD_Mechanistic_Implementation_Context_Sensitive_Outcome_History_Integration.md).
+
 ## What is implemented
 
 - A declarative ten-factor ontology with explicit construct availability.
@@ -223,6 +229,51 @@ requested or retained. To exercise every artifact boundary without loading
 Qwen, run preparation with `--smoke`, collect its manifest using
 `scripts/run_experiments.py --model-free`, then evaluate with `--smoke`.
 
+## Mechanistic outcome-history workflow
+
+This stage consumes the immutable Round-3 handoff. It does not refit behavioral
+coefficients from activations or intervention outcomes. On Della:
+
+```bash
+export THEORY_OUTPUT=artifacts/theory_resolution_v1
+export MECH_OUTPUT=artifacts/mechanistic_v1
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+export MECH_SCRATCH=/scratch/gpfs/JORDANAT/$USER/persistence_mech
+export CONDA_ENV=llm-cognitive-discovery
+
+bash scripts/submit_mechanistic.sh
+```
+
+The resource-separated dependency chain is:
+
+```text
+CPU tests → CPU target/dataset freeze
+          → GPU paired direction scan → GPU scalar projection scan
+          → CPU probes, LOTO, controls, and representation gate
+          → GPU calibrated steering and projection patching
+          → CPU causal aggregation, figures, report, and artifact-size check
+```
+
+GPU phases verify CUDA before loading Qwen. CPU phases are submitted through
+`run_mechanistic_cpu.slurm`, which has no GPU directive; the runner rejects an
+accidental GPU allocation for those phases. Hooks observe only the final prompt
+token and request `output_hidden_states=False`. Full activation banks are never
+written. Temporary storage and model caches live under `MECH_SCRATCH`.
+
+The CPU-only preparation boundary can be checked locally:
+
+```bash
+cognitive-discovery-mechanistic \
+  --config configs/mechanistic_v1.yaml \
+  --theory-output artifacts/theory_resolution_v1 \
+  --output /tmp/mechanistic_v1_smoke \
+  --phase prepare --smoke
+```
+
+Run `python scripts/check_artifact_sizes.py` before committing. It rejects any
+tracked file over 10 MB unless explicitly reviewed in
+`config/artifact_allowlist.txt`, and rejects tracked mechanistic scratch banks.
+
 ## Artifacts
 
 The run directory follows the PRD layout:
@@ -267,6 +318,21 @@ artifacts/theory_resolution_v1/
   discrimination/         frozen errors, paired bootstrap, reinstatement effects
   theory/                 updated comparison, coefficients, mechanistic targets
   figures/                six registered theory-resolution figures
+  report.md
+  run_metadata.json
+```
+
+Mechanistic artifacts are compact and isolated under:
+
+```text
+artifacts/mechanistic_v1/
+  manifests/              matched conditions, splits, prompt hashes
+  directions/             per-layer safetensors directions and metadata
+  representation/         scalar projections, decoding, LOTO, controls, gates
+  calibration/            frozen behavioral coefficients and neural calibration
+  steering/               dose response and predicted-versus-observed effects
+  patching/                projection-only patches and mediation summaries
+  figures/                 six registered mechanistic figures
   report.md
   run_metadata.json
 ```

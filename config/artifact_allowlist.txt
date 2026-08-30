@@ -1,0 +1,4 @@
+# One repository-relative glob per line. Keep this empty unless a reviewed,
+# scientifically necessary tracked file must exceed the default 10 MB limit.
+artifacts/theory_resolution_v1/active_sampling/candidate_predictions.csv
+artifacts/theory_resolution_v1/active_sampling/sampling_scores.csv

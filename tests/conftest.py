@@ -16,3 +16,9 @@ def theory_config():
     config = yaml.safe_load(path.read_text(encoding="utf-8"))
     config["theory_resolution"]["allow_small_candidate_pool"] = True
     return config
+
+
+@pytest.fixture(scope="session")
+def mechanistic_config():
+    path = Path(__file__).parents[1] / "configs" / "mechanistic_v1.yaml"
+    return yaml.safe_load(path.read_text(encoding="utf-8"))

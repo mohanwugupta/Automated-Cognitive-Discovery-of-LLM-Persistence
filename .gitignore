@@ -7,3 +7,7 @@ build/
 dist/
 *.egg-info/
 
+# Mechanistic scratch data must never enter the repository.
+temporary_activations/
+temporary_batches/
+model_cache/

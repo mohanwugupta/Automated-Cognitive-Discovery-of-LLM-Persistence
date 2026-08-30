@@ -1,0 +1,71 @@
+protocol_version: mechanistic_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 73001
+response_labels: [X, Y]
+output_root: artifacts/mechanistic_v1
+
+activation:
+  token_position: final_prompt_token
+  layers: all
+  save_full_activations: false
+
+scratch:
+  env_var: MECH_SCRATCH
+  delete_temporary_activations: true
+
+dataset:
+  contrasts: 1200
+  smoke_contrasts: 35
+
+targets:
+  - outcome_history
+  - contextual_outcome_history
+  - action_history
+
+representations:
+  ranks: [1, 2, 4]
+  ridge_alpha: 1.0
+  random_controls: 100
+  preliminary_layers_per_target: 4
+  candidate_layers: 4
+  minimum_validation_r2: 0.0
+  minimum_validation_pearson_r: 0.1
+  minimum_loto_r2: 0.0
+  earlier_layer_r2_tolerance: 0.02
+  minimum_contrast_sign_accuracy: 0.6
+  maximum_response_mapping_r2: 0.1
+
+discovery_tasks:
+  - bandit
+  - foraging
+  - solvability
+  - debugging
+
+heldout_tasks:
+  - waiting
+  - effort
+  - information_sampling
+
+steering:
+  examples_per_task: 8
+  computational_doses: [-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0]
+  control_doses: [-1.0, 1.0]
+
+patching:
+  projection_only: true
+  contrasts_per_family: 16
+
+mechanistic_gates:
+  minimum_computational_alignment_correlation: 0.95
+  minimum_causal_correlation: 0.3
+  minimum_monotonic_rho: 0.5
+
+artifact_limits:
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_mech
+  gpu_constraint: gpu40

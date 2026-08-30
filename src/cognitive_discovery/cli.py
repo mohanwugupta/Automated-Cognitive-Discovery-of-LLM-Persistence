@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 
 from .pipeline import (
     analyze_run,
@@ -16,6 +17,14 @@ from .pipeline import (
     evaluate_round2_final,
     prepare_theory_resolution,
     evaluate_theory_resolution,
+)
+from .mechanistic.pipeline import (
+    analyze_representations,
+    finalize_mechanistic_run,
+    prepare_mechanistic_run,
+    run_causal_interventions,
+    scan_directions,
+    scan_projections,
 )
 
 
@@ -232,3 +241,74 @@ def theory_resolution_main(argv=None):
             "report": str(result["report"]),
         }
     print(json.dumps(printable, indent=2, sort_keys=True))
+
+
+def mechanistic_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Mechanistic context-sensitive outcome-history workflow"
+    )
+    parser.add_argument("--config", default="configs/mechanistic_v1.yaml")
+    parser.add_argument("--output")
+    parser.add_argument("--theory-output", default="artifacts/theory_resolution_v1")
+    parser.add_argument(
+        "--phase",
+        choices=("prepare", "scan", "project", "analyze", "intervene", "report"),
+        required=True,
+    )
+    parser.add_argument("--model")
+    parser.add_argument("--revision")
+    parser.add_argument("--online", action="store_true")
+    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--limit", type=int)
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    if args.phase == "prepare":
+        result = prepare_mechanistic_run(
+            config,
+            theory_output=args.theory_output,
+            output=args.output,
+            smoke=args.smoke,
+        )
+    elif args.phase == "scan":
+        result = scan_directions(
+            config,
+            output=args.output,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+        )
+    elif args.phase == "project":
+        result = scan_projections(
+            config,
+            output=args.output,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+        )
+    elif args.phase == "analyze":
+        result = analyze_representations(config, output=args.output)
+    elif args.phase == "intervene":
+        result = run_causal_interventions(
+            config,
+            theory_output=args.theory_output,
+            output=args.output,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+        )
+    else:
+        result = finalize_mechanistic_run(config, output=args.output)
+    print(
+        json.dumps(
+            {
+                key: str(value) if isinstance(value, Path) else value
+                for key, value in result.items()
+            },
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
+    )
