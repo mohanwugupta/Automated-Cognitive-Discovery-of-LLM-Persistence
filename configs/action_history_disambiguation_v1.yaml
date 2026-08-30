@@ -1,0 +1,58 @@
+protocol_version: action_history_disambiguation_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 73001
+source_mechanistic_root: artifacts/mechanistic_v1
+output_root: artifacts/action_history_disambiguation_v1
+
+activation:
+  token_position: final_prompt_token
+  save_full_activations: false
+
+layers:
+  primary: [8, 30]
+  diagnostic: [4, 12, 20, 28, 31]
+  unrestricted_search: false
+
+directions:
+  ridge_alpha: 1.0
+  reproduction_min_cosine: 0.999
+  fitting_split: train
+  gradient_examples: all_training_examples
+
+matching:
+  decision_caliper: 0.15
+  history_min_delta: 1.0
+  history_caliper: 1.0e-8
+  decision_min_delta: 0.75
+  nuisance_max_distance: 2.5
+
+steering:
+  examples_per_task: 8
+  doses: [-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0]
+  primary_units: matched_neural_norm
+  secondary_action_units: frozen_behavioral_standard_deviations
+
+random_null:
+  count: 100
+  examples_per_task: 2
+  shard_count: 10
+
+patching:
+  enabled: true
+  projection_only: true
+  pairs: 21
+
+gates:
+  minimum_matched_sign_accuracy: 0.60
+  minimum_behavioral_correlation: 0.30
+
+artifact_limits:
+  save_full_activations: false
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_action_history
+  random_array_concurrency: 2

@@ -42,6 +42,7 @@ def test_cpu_wrappers_have_no_gpu_directive():
         "run_active_cpu.slurm",
         "run_theory_cpu.slurm",
         "run_mechanistic_cpu.slurm",
+        "run_action_history_cpu.slurm",
     ):
         text = _text(script)
         assert "--gres" not in text
@@ -54,5 +55,15 @@ def test_mechanistic_gpu_is_reserved_only_for_model_forward_phases():
         line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
         assert '"$CPU_SCRIPT"' in line
     for phase in ("scan", "project", "intervene"):
+        line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
+        assert '"$GPU_SCRIPT"' in line
+
+
+def test_action_history_gpu_is_reserved_only_for_qwen_forward_phases():
+    submit = _text("scripts/submit_action_history_disambiguation.sh")
+    for phase in ("tests", "prepare", "analyze", "report"):
+        line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
+        assert '"$CPU_SCRIPT"' in line
+    for phase in ("fit", "project", "steer", "random", "patch"):
         line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
         assert '"$GPU_SCRIPT"' in line

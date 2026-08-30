@@ -26,6 +26,16 @@ from .mechanistic.pipeline import (
     scan_directions,
     scan_projections,
 )
+from .action_history.pipeline import (
+    analyze_action_history_representations,
+    finalize_action_history_run,
+    fit_action_history_directions,
+    prepare_action_history_run,
+    project_action_history_directions,
+    run_action_history_steering,
+    run_matched_projection_patching,
+    run_random_direction_null,
+)
 
 
 DEFAULT_CONFIG = "configs/discovery_v1.yaml"
@@ -301,6 +311,70 @@ def mechanistic_main(argv=None):
         )
     else:
         result = finalize_mechanistic_run(config, output=args.output)
+    print(
+        json.dumps(
+            {
+                key: str(value) if isinstance(value, Path) else value
+                for key, value in result.items()
+            },
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
+    )
+
+
+def action_history_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Disambiguate action-history computation from persistence readout"
+    )
+    parser.add_argument(
+        "--config", default="configs/action_history_disambiguation_v1.yaml"
+    )
+    parser.add_argument("--output")
+    parser.add_argument("--source", default="artifacts/mechanistic_v1")
+    parser.add_argument(
+        "--phase",
+        choices=("prepare", "fit", "project", "analyze", "steer", "random", "patch", "report"),
+        required=True,
+    )
+    parser.add_argument("--model")
+    parser.add_argument("--revision")
+    parser.add_argument("--online", action="store_true")
+    parser.add_argument("--limit", type=int)
+    parser.add_argument("--shard-index", type=int, default=0)
+    parser.add_argument("--shard-count", type=int, default=1)
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    common = {"output": args.output}
+    gpu = {
+        **common,
+        "model_path": args.model,
+        "revision": args.revision,
+        "online": args.online,
+        "limit": args.limit,
+    }
+    if args.phase == "prepare":
+        result = prepare_action_history_run(config, source=args.source, **common)
+    elif args.phase == "fit":
+        result = fit_action_history_directions(config, **gpu)
+    elif args.phase == "project":
+        result = project_action_history_directions(config, **gpu)
+    elif args.phase == "analyze":
+        result = analyze_action_history_representations(config, **common)
+    elif args.phase == "steer":
+        result = run_action_history_steering(config, **gpu)
+    elif args.phase == "random":
+        result = run_random_direction_null(
+            config,
+            **gpu,
+            shard_index=args.shard_index,
+            shard_count=args.shard_count,
+        )
+    elif args.phase == "patch":
+        result = run_matched_projection_patching(config, **gpu)
+    else:
+        result = finalize_action_history_run(config, **common)
     print(
         json.dumps(
             {

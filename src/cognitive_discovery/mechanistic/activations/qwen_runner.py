@@ -14,7 +14,9 @@ from cognitive_discovery.participants.token_mapping import (
 
 from .hooks import (
     decision_token_positions,
+    hidden_tensor,
     locate_transformer_layers,
+    replace_hidden_state,
     stream_layer_states,
 )
 
@@ -24,6 +26,16 @@ class MechanisticForward:
     persistence_logit: float
     p_continue: float
     states: dict[int, np.ndarray]
+
+
+@dataclass
+class MechanisticGradient:
+    """One final-prompt residual state and its semantic-logit gradient."""
+
+    persistence_logit: float
+    state: np.ndarray
+    gradient: np.ndarray
+    layer: int
 
 
 class MechanisticQwenRunner:
@@ -120,3 +132,78 @@ class MechanisticQwenRunner:
             - output.weight[token_ids[negative_label]]
         )
         return vector.detach().float().cpu().numpy().copy()
+
+    def state_and_persistence_gradient(
+        self,
+        messages,
+        labels,
+        *,
+        positive_label: str,
+        layer: int,
+    ) -> MechanisticGradient:
+        """Differentiate ``CONTINUE - DISENGAGE`` at one residual-stream state.
+
+        The hook detaches the selected block output from upstream computation, then
+        differentiates through every downstream block. Only the final prompt-token
+        row is returned or persisted. Calling this method separately for each layer
+        avoids one layer's detached leaf cutting the gradient path of another.
+        """
+
+        import torch
+
+        layer = int(layer)
+        if layer < 0 or layer >= self.layer_count:
+            raise ValueError(f"layer {layer} is outside [0, {self.layer_count})")
+        labels = tuple(labels)
+        token_ids = verify_chat_choice_tokens(self.tokenizer, messages, labels)
+        negative_label = next(label for label in labels if label != positive_label)
+        inputs = self.participant._tokenize(messages)
+        if "attention_mask" in inputs:
+            positions = decision_token_positions(inputs["attention_mask"])
+        else:
+            positions = torch.full(
+                (inputs["input_ids"].shape[0],),
+                inputs["input_ids"].shape[1] - 1,
+                dtype=torch.long,
+                device=inputs["input_ids"].device,
+            )
+        captured: dict[str, object] = {}
+
+        def make_leaf(_module, _inputs, output):
+            hidden = hidden_tensor(output)
+            leaf = hidden.detach().requires_grad_(True)
+            captured["leaf"] = leaf
+            return replace_hidden_state(output, leaf)
+
+        handle = self.layers[layer].register_forward_hook(make_leaf)
+        try:
+            with torch.enable_grad():
+                outputs = self.model(
+                    **inputs, output_hidden_states=False, use_cache=False
+                )
+                leaf = captured.get("leaf")
+                if leaf is None:
+                    raise RuntimeError(
+                        "gradient hook did not observe the requested layer"
+                    )
+                position = int(positions[0].item())
+                logits = outputs.logits[0, position]
+                persistence = (
+                    logits[token_ids[positive_label]]
+                    - logits[token_ids[negative_label]]
+                )
+                gradient = torch.autograd.grad(
+                    persistence, leaf, retain_graph=False, create_graph=False
+                )[0]
+                state = leaf[0, position]
+                selected_gradient = gradient[0, position]
+        finally:
+            handle.remove()
+        if not torch.isfinite(selected_gradient).all():
+            raise RuntimeError("persistence-logit gradient contains a non-finite value")
+        return MechanisticGradient(
+            persistence_logit=float(persistence.detach().float().cpu()),
+            state=state.detach().float().cpu().numpy().copy(),
+            gradient=selected_gradient.detach().float().cpu().numpy().copy(),
+            layer=layer,
+        )

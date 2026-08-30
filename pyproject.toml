@@ -34,6 +34,7 @@ cognitive-discovery-validate = "cognitive_discovery.cli:validate_predictions_mai
 cognitive-discovery-active = "cognitive_discovery.cli:active_discovery_main"
 cognitive-discovery-theory = "cognitive_discovery.cli:theory_resolution_main"
 cognitive-discovery-mechanistic = "cognitive_discovery.cli:mechanistic_main"
+cognitive-discovery-action-history = "cognitive_discovery.cli:action_history_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

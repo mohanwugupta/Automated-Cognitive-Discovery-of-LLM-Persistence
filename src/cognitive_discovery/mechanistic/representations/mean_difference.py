@@ -62,7 +62,7 @@ def save_directions(
     }
     if not tensors:
         raise ValueError("no directions were supplied")
-    header = {"protocol": "mechanistic_v1"}
+    header = {"protocol": str((metadata or {}).get("protocol", "mechanistic_v1"))}
     if metadata is not None:
         header["run_metadata"] = json.dumps(metadata, sort_keys=True)
     save_file(tensors, str(path), metadata=header)

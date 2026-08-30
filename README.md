@@ -339,3 +339,61 @@ artifacts/mechanistic_v1/
 
 Parquet is preferred; collection falls back to compressed CSV if a Parquet
 engine is unavailable.
+
+## Action-history direction disambiguation
+
+The follow-up in `PRD_Action_History_Direction_Disambiguation.md` is implemented
+as a separate, read-only extension of `artifacts/mechanistic_v1`. It freezes the
+exact original layer-30 vector, residualizes action history using training rows
+only, and compares raw, output-subspace-orthogonal, statistically residualized,
+persistence-probe, and direct semantic-logit-gradient directions at layers 8 and
+30. Full residual-stream activations are never saved.
+
+Run the CPU preparation phase locally after the original mechanistic artifacts
+have been copied into the repository:
+
+```bash
+python scripts/action_history_disambiguation.py \
+  --config configs/action_history_disambiguation_v1.yaml \
+  --source artifacts/mechanistic_v1 \
+  --phase prepare
+```
+
+On a Della login node, submit the complete resource-separated workflow with:
+
+```bash
+export CONDA_ENV=llm-cognitive-discovery
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+bash scripts/submit_action_history_disambiguation.sh
+```
+
+Its dependency graph is:
+
+```text
+CPU tests → CPU freeze/residualization/matching
+          → GPU probe and gradient fit → GPU scalar projections
+          → CPU representation analysis
+          ├→ GPU primary steering → GPU optional patching ─┐
+          └→ GPU random-null array (10 shards, max 2 live) ├→ CPU report
+```
+
+The CPU wrapper has no GPU directive. Every GPU phase performs Qwen forwards
+and a CUDA preflight; this prevents CPU-only jobs from consuming a GPU allocation.
+The random-null array runs all 100 directions at both primary layers on the full
+seven-dose grid, while limiting simultaneous jobs by default.
+
+The new artifact root is:
+
+```text
+artifacts/action_history_disambiguation_v1/
+  directions/             frozen and controlled safetensors vectors
+  targets/                train-only residual targets and residualizer manifest
+  representation/         scalar projections, matches, decoding, geometry
+  calibration/            frozen coefficients and matched-norm scales
+  steering/               primary curves, random null, behavioral correspondence
+  patching/                optional decision-matched projection patches
+  figures/                 seven preregistered figures
+  gates.json
+  report.md
+  run_metadata.json
+```
