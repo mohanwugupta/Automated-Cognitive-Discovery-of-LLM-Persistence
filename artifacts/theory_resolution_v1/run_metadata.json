@@ -1,0 +1,32 @@
+{
+  "active_output": "artifacts/discovery_v2/active_collection",
+  "candidate_semantic_conditions": 20000,
+  "config_hash": "c03df4917549b3359a3ddf358ce8fbeaeef09ec0287eee87cf83bd2b5deecd23",
+  "dependency_versions": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1",
+    "sweetpea": "0.2.14",
+    "torch": "2.13.0",
+    "transformers": "5.16.1"
+  },
+  "design_hash": "bda31656619ad5ae613209cda4e7381de2ee22afbe6b1317fe6701caff6f1a70",
+  "design_seed": 380227,
+  "frozen_architectures": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "git_commit": "1197763ce18f98206e36bf28475b397f41cb6e75",
+  "model_identifier": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "protocol_version": "behavioral_theory_resolution_v1",
+  "round1_output": "artifacts/discovery_v1",
+  "round2_output": "artifacts/discovery_v2",
+  "round3_outcomes_used_for_scoring": false,
+  "selected_semantic_conditions": 1200,
+  "task_renderer_version": "0.1.0",
+  "timestamp": "2026-08-29T22:12:04.448843+00:00"
+}

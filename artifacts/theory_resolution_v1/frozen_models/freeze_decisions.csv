@@ -1,0 +1,4 @@
+architecture,macro_r2,delta_from_best,predictively_viable,distinct_interpretation,survives
+dual_history,0.7375325250009402,0.0,True,True,True
+latent_context,0.7355152892738376,0.002017235727102662,True,True,True
+outcome_history,0.7349457062106418,0.0025868187902984285,True,True,True

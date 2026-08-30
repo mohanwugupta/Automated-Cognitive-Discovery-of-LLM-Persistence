@@ -1,0 +1,7 @@
+parameter,tasks,probability_positive,probability_negative,median_absolute_estimate,classification
+factor_success_evidence,7,1.0,0.0,0.5344842401324402,shared_sign
+factor_progress_evidence,7,0.8571428571428571,0.14285714285714285,0.2825736572584384,shared_sign
+factor_continuation_cost,7,0.0,1.0,0.13899425626573952,shared_sign
+factor_disengagement_value,7,0.0,1.0,0.42954552207396096,shared_sign
+history_action_kernel,7,0.14285714285714285,0.8571428571428571,0.06086473452578975,shared_sign
+history_outcome_kernel,7,1.0,0.0,0.21230803104862633,shared_sign

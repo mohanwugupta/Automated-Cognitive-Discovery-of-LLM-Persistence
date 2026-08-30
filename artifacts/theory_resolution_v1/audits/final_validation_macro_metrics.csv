@@ -1,0 +1,2 @@
+macro_r2,macro_rmse,macro_correlation,calibration_intercept,calibration_slope,recalibrated
+0.7631155743593886,0.4834613520516557,0.8795331512527393,-0.08496145951610964,0.8237169605670581,False

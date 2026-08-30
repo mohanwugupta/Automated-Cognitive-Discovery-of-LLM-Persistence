@@ -1,0 +1,37 @@
+teacher_architecture,student_architecture,sharing_structure,teacher_r2,student_r2,delta_r2,training_r2,threshold,passed,failure_category,failure_reason
+fitted_dual_history,linear_interactions,fully_shared,1.0,0.8006635233810686,-0.1993364766189314,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_dual_history,linear_interactions,task_specific,1.0,0.9999999999999792,-2.0761170560490427e-14,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,linear_interactions,hierarchical,1.0,0.9999999999999936,-6.439293542825908e-15,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,linear_interactions,task_embedding,1.0,0.9999999999999992,-7.771561172376096e-16,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,mlp,fully_shared,1.0,0.7923085454289281,-0.20769145457107185,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_dual_history,mlp,task_specific,1.0,0.9995055498119266,-0.0004944501880733698,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,mlp,hierarchical,1.0,0.9995055498119266,-0.0004944501880733698,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,mlp,task_embedding,1.0,0.9993822609356172,-0.0006177390643827829,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,gru,fully_shared,1.0,0.7911755423368905,-0.20882445766310953,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_dual_history,gru,task_specific,1.0,0.9988593153466967,-0.0011406846533033033,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,gru,hierarchical,1.0,0.9988593153466967,-0.0011406846533033033,,0.98,True,passed,student met the registered recovery threshold
+fitted_dual_history,gru,task_embedding,1.0,0.9988507105996289,-0.0011492894003710674,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,linear_interactions,fully_shared,1.0,0.8050596144524809,-0.19494038554751913,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_latent_context,linear_interactions,task_specific,1.0,0.9999999999999752,-2.475797344914099e-14,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,linear_interactions,hierarchical,1.0,0.9999999999999928,-7.216449660063518e-15,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,linear_interactions,task_embedding,1.0,0.9999999999999991,-8.881784197001252e-16,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,mlp,fully_shared,1.0,0.7963071758494209,-0.2036928241505791,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_latent_context,mlp,task_specific,1.0,0.99915483425597,-0.0008451657440300409,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,mlp,hierarchical,1.0,0.99915483425597,-0.0008451657440300409,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,mlp,task_embedding,1.0,0.9992063309534666,-0.0007936690465334406,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,gru,fully_shared,1.0,0.7942546661705187,-0.20574533382948135,,0.98,False,sharing_mismatch,fully shared student cannot reproduce task-varying teacher parameters
+fitted_latent_context,gru,task_specific,1.0,0.9985944939673859,-0.0014055060326141344,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,gru,hierarchical,1.0,0.9985944939673859,-0.0014055060326141344,,0.98,True,passed,student met the registered recovery threshold
+fitted_latent_context,gru,task_embedding,1.0,0.9988244771709803,-0.0011755228290196706,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,linear_interactions,fully_shared,1.0,0.9999999999999964,-3.552713678800501e-15,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,linear_interactions,task_specific,1.0,0.9999999999997614,-2.3858692799194614e-13,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,linear_interactions,hierarchical,1.0,0.9999999999999956,-4.440892098500626e-15,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,linear_interactions,task_embedding,1.0,0.999999999999996,-3.9968028886505635e-15,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,mlp,fully_shared,1.0,0.989948741127084,-0.010051258872916025,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,mlp,task_specific,1.0,0.9940142015709299,-0.005985798429070099,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,mlp,hierarchical,1.0,0.9940142015709299,-0.005985798429070099,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,mlp,task_embedding,1.0,0.9944765000920848,-0.00552349990791523,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,gru,fully_shared,1.0,0.9969133070667541,-0.003086692933245927,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,gru,task_specific,1.0,0.9973552670528845,-0.0026447329471155356,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,gru,hierarchical,1.0,0.9973552670528845,-0.0026447329471155356,,0.98,True,passed,student met the registered recovery threshold
+nonlinear_interaction,gru,task_embedding,1.0,0.9953332720797572,-0.004666727920242808,,0.98,True,passed,student met the registered recovery threshold

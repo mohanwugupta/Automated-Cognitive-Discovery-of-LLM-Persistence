@@ -1,0 +1,30 @@
+{
+  "architecture": "dual_history",
+  "description": "Action and outcome traces contribute separately.",
+  "features": [
+    "factor_continuation_value",
+    "factor_disengagement_value",
+    "factor_continuation_cost",
+    "factor_progress_evidence",
+    "factor_success_evidence",
+    "factor_uncertainty",
+    "factor_prior_investment",
+    "factor_controllability",
+    "factor_environmental_stability",
+    "factor_goal_continuity",
+    "history_action_1",
+    "history_action_kernel",
+    "history_outcome_1",
+    "history_outcome_kernel"
+  ],
+  "fit_sha256": "e3d28601388991cf336b031c6a9350c19a0dba8b4cec06ab753a12c0e376c88e",
+  "hypothesis": "H2+H3",
+  "preserved_variants": [
+    "M2",
+    "M4"
+  ],
+  "primary_variant": "M4",
+  "round3_outcomes_used": false,
+  "training_condition_count": 3080,
+  "viability_delta_macro_r2": 0.0
+}

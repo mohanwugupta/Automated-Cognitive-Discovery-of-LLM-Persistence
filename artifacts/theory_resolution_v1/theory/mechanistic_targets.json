@@ -1,0 +1,64 @@
+{
+  "behavioral_equation": "D_t = beta_task,X X_t + beta_task,H H_t(context; z_t)",
+  "computational_variables": [
+    "history_integration",
+    "contextual_history_relevance"
+  ],
+  "decision_reason": "paired interval crosses zero outside the equivalence margin",
+  "intervention_prediction": "delta_D_task = beta_task,j * delta_computational_variable_j",
+  "mechanistic_analysis_ready": false,
+  "parameterization": "latent_context/M4",
+  "task_specific_interventions": [
+    {
+      "ci_high": 0.4382733544917984,
+      "ci_low": 0.3910789512244327,
+      "intervention_derivative": 0.4102088269524974,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "bandit"
+    },
+    {
+      "ci_high": 0.2911353404291058,
+      "ci_low": 0.24330720845302584,
+      "intervention_derivative": 0.2655681115381593,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "debugging"
+    },
+    {
+      "ci_high": 0.3400272175365098,
+      "ci_low": 0.31189819418484105,
+      "intervention_derivative": 0.32362604869252315,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "effort"
+    },
+    {
+      "ci_high": 0.2949879751146569,
+      "ci_low": 0.24010635967259425,
+      "intervention_derivative": 0.268285648248432,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "foraging"
+    },
+    {
+      "ci_high": 0.030062480878263676,
+      "ci_low": 0.0004984189039057501,
+      "intervention_derivative": 0.020701743028723116,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "information_sampling"
+    },
+    {
+      "ci_high": 0.5345805031061704,
+      "ci_low": 0.46796253846343533,
+      "intervention_derivative": 0.4880443628785467,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "solvability"
+    },
+    {
+      "ci_high": 0.24140562144431577,
+      "ci_low": 0.20816158765821854,
+      "intervention_derivative": 0.2191453683751278,
+      "parameter": "context_relevant_outcome_kernel",
+      "task_family": "waiting"
+    }
+  ],
+  "theory_outcome": "unresolved",
+  "winner": null
+}

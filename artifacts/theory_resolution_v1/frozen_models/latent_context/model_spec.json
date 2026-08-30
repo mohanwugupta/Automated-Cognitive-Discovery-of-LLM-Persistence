@@ -1,0 +1,29 @@
+{
+  "architecture": "latent_context",
+  "description": "History is weighted by inferred continuity and environmental stability.",
+  "features": [
+    "factor_continuation_value",
+    "factor_disengagement_value",
+    "factor_continuation_cost",
+    "factor_progress_evidence",
+    "factor_success_evidence",
+    "factor_uncertainty",
+    "factor_prior_investment",
+    "factor_controllability",
+    "factor_environmental_stability",
+    "factor_goal_continuity",
+    "context_relevant_outcome_kernel",
+    "context_relevant_outcome_kernel*factor_goal_continuity",
+    "context_relevant_outcome_kernel*factor_environmental_stability"
+  ],
+  "fit_sha256": "975f8057a5078438407abe464c903f7c3d11a0ff2ea09a05589721eff70a62c4",
+  "hypothesis": "H5",
+  "preserved_variants": [
+    "M2",
+    "M4"
+  ],
+  "primary_variant": "M4",
+  "round3_outcomes_used": false,
+  "training_condition_count": 3080,
+  "viability_delta_macro_r2": 0.002017235727102662
+}
