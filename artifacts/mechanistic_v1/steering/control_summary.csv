@@ -1,0 +1,6 @@
+target,layer,control,mean_effect,mean_absolute_effect,observations
+action_history,30,candidate,-0.01371173469387755,0.05963010204081633,392
+action_history,30,generic_value,-0.018973214285714284,0.11049107142857142,112
+action_history,30,orthogonal,-0.008928571428571428,0.05133928571428571,112
+action_history,30,persistence_output,-0.04799107142857143,0.9720982142857143,112
+action_history,30,random,-0.010044642857142858,0.0546875,112

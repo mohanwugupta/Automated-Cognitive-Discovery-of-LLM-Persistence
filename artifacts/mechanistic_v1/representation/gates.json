@@ -1,0 +1,18 @@
+{
+  "causal_prediction_correlation": 0.5380096062441978,
+  "computational_alignment_correlation": 0.9999999505464655,
+  "computational_alignment_passed": true,
+  "mean_monotonic_rho": -0.9640991037866121,
+  "mediation_passed": true,
+  "projection_patch_specificity_passed": true,
+  "representation_passed": true,
+  "selected_layers": [
+    {
+      "layer": 30,
+      "target": "action_history"
+    }
+  ],
+  "steering_authorized": true,
+  "steering_causality_passed": false,
+  "steering_specificity_passed": true
+}

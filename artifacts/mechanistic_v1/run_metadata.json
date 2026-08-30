@@ -1,0 +1,42 @@
+{
+  "activation_position": "final_prompt_token",
+  "behavioral_handoff_ready_flag": false,
+  "behavioral_model_hash": "d2e5d28c0bcd27d7b1b6624aab3a50507e01ab6b2f83d67f083e8fe31b43c4aa",
+  "behavioral_theory_outcome": "unresolved",
+  "computational_target_normalization": {
+    "action_history": {
+      "mean": 0.5753207391519941,
+      "scale": 1.042597020564452
+    },
+    "contextual_outcome_history": {
+      "mean": 0.08726028708133965,
+      "scale": 1.3951854428980035
+    },
+    "outcome_history": {
+      "mean": 0.08726028708133965,
+      "scale": 1.3951854428980035
+    }
+  },
+  "direction_fitting_split": "train",
+  "full_activation_artifacts": [],
+  "full_activations_saved": false,
+  "git_commit": "d1effb13032d4723efecc82f5208c2e9cb1d78cf",
+  "layer_count": 32,
+  "layer_index_convention": "zero_based_block_output",
+  "mechanistic_condition_hash": "a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "observed_model_id": "/scratch/gpfs/JORDANAT/mg9965/models/Qwen--Qwen3.5-4B",
+  "observed_model_revision": null,
+  "protocol_version": "mechanistic_v1",
+  "random_seed": 73001,
+  "report_generated": true,
+  "selected_direction_layers": [
+    {
+      "layer": 30,
+      "target": "action_history"
+    }
+  ],
+  "smoke": false,
+  "steering_calibration": "train-only standardized computational units"
+}

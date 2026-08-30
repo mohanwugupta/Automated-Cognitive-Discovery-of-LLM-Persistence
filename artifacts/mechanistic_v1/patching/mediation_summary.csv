@@ -1,0 +1,15 @@
+task_family,target,layer,control,total_effect,mediated_effect,projection_mediated_intervention_fraction,contrasts
+bandit,action_history,30,candidate,0.875,-0.041666666666666664,-0.03968253968253968,6
+bandit,action_history,30,random,0.875,-0.020833333333333332,-0.027777777777777776,6
+debugging,action_history,30,candidate,0.75,-0.017857142857142856,-0.024891774891774892,7
+debugging,action_history,30,random,0.75,0.017857142857142856,0.017857142857142856,7
+effort,action_history,30,candidate,1.375,0.0,0.0025252525252525276,3
+effort,action_history,30,random,1.375,0.0,0.0,3
+foraging,action_history,30,candidate,0.9375,-0.046875,-0.05327380952380952,8
+foraging,action_history,30,random,0.9375,0.015625,0.018601190476190476,8
+information_sampling,action_history,30,candidate,-0.20833333333333334,0.0,0.0,3
+information_sampling,action_history,30,random,-0.20833333333333334,0.041666666666666664,-0.16666666666666666,3
+solvability,action_history,30,candidate,2.0,0.0,0.0,2
+solvability,action_history,30,random,2.0,0.0,0.0,2
+waiting,action_history,30,candidate,0.6666666666666666,-0.041666666666666664,-0.047619047619047616,3
+waiting,action_history,30,random,0.6666666666666666,0.0,0.0,3

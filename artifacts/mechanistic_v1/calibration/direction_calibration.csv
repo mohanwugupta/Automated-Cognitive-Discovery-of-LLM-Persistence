@@ -1,0 +1,2 @@
+target,layer,intercept,slope,target_mean,target_scale,heldout_r2,heldout_pearson_r,heldout_mse,fitting_split,computational_units
+action_history,30,-0.6681950614288846,0.3988177992429314,0.5753207391519941,1.042597020564452,0.40191738453472725,0.6368945887150751,0.5817708923194103,train,frozen_behavioral_standard_deviations

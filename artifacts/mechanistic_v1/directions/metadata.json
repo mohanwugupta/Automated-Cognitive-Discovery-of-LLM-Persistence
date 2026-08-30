@@ -1,0 +1,802 @@
+{
+  "activation_position": "final_prompt_token",
+  "direction_statistics": [
+    {
+      "layer": 0,
+      "mean_difference_norm": 0.011244499140872817,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 1,
+      "mean_difference_norm": 0.018285695784264363,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 2,
+      "mean_difference_norm": 0.02870623707481855,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 3,
+      "mean_difference_norm": 0.06616716585118873,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 4,
+      "mean_difference_norm": 0.11592649816169665,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 5,
+      "mean_difference_norm": 0.12779521107394995,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 6,
+      "mean_difference_norm": 0.13761155282537352,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 7,
+      "mean_difference_norm": 0.18047935989012373,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 8,
+      "mean_difference_norm": 0.191584629785953,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 9,
+      "mean_difference_norm": 0.21220194238734977,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 10,
+      "mean_difference_norm": 0.24851766104554948,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 11,
+      "mean_difference_norm": 0.26352049908522684,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 12,
+      "mean_difference_norm": 0.2897084235242552,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 13,
+      "mean_difference_norm": 0.3278984738615308,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 14,
+      "mean_difference_norm": 0.3623332891897752,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 15,
+      "mean_difference_norm": 0.5326863941545984,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 16,
+      "mean_difference_norm": 0.5686066639253343,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 17,
+      "mean_difference_norm": 0.5957591433630474,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 18,
+      "mean_difference_norm": 0.7049811609898674,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 19,
+      "mean_difference_norm": 1.0882703947439174,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 20,
+      "mean_difference_norm": 1.133906985176476,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 21,
+      "mean_difference_norm": 1.2169239309347841,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 22,
+      "mean_difference_norm": 1.3614493846637594,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 23,
+      "mean_difference_norm": 1.5680345020811952,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 24,
+      "mean_difference_norm": 1.5371096348712803,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 25,
+      "mean_difference_norm": 1.5954942906265501,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 26,
+      "mean_difference_norm": 1.7085149045694628,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 27,
+      "mean_difference_norm": 2.3955818224830594,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 28,
+      "mean_difference_norm": 2.60293899868136,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 29,
+      "mean_difference_norm": 2.883464519244052,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 30,
+      "mean_difference_norm": 3.793683718789085,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 31,
+      "mean_difference_norm": 5.687621868858278,
+      "pairs": 85,
+      "target": "action_history"
+    },
+    {
+      "layer": 0,
+      "mean_difference_norm": 0.006269056621201766,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 1,
+      "mean_difference_norm": 0.008608136257602931,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 2,
+      "mean_difference_norm": 0.011615363191632404,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 3,
+      "mean_difference_norm": 0.0198183551505758,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 4,
+      "mean_difference_norm": 0.038799051021558145,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 5,
+      "mean_difference_norm": 0.04741688092795234,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 6,
+      "mean_difference_norm": 0.05297085362022184,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 7,
+      "mean_difference_norm": 0.06656475459788483,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 8,
+      "mean_difference_norm": 0.08319592724526449,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 9,
+      "mean_difference_norm": 0.10205258545336632,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 10,
+      "mean_difference_norm": 0.12206652794407141,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 11,
+      "mean_difference_norm": 0.12962574307554078,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 12,
+      "mean_difference_norm": 0.158393511089114,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 13,
+      "mean_difference_norm": 0.1954792500437667,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 14,
+      "mean_difference_norm": 0.22459100192834577,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 15,
+      "mean_difference_norm": 0.3478291639815891,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 16,
+      "mean_difference_norm": 0.41001529607613674,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 17,
+      "mean_difference_norm": 0.5817707349023756,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 18,
+      "mean_difference_norm": 0.7103744869373753,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 19,
+      "mean_difference_norm": 0.9965987382245262,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 20,
+      "mean_difference_norm": 1.088501163169025,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 21,
+      "mean_difference_norm": 1.155412010712155,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 22,
+      "mean_difference_norm": 1.3726930470154188,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 23,
+      "mean_difference_norm": 1.3916953597930422,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 24,
+      "mean_difference_norm": 1.4213796486066406,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 25,
+      "mean_difference_norm": 1.431422521243083,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 26,
+      "mean_difference_norm": 1.4484167086087223,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 27,
+      "mean_difference_norm": 1.5827016949800936,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 28,
+      "mean_difference_norm": 1.7180586677826724,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 29,
+      "mean_difference_norm": 1.8765776124649676,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 30,
+      "mean_difference_norm": 2.1770968936158708,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 31,
+      "mean_difference_norm": 3.10605373637058,
+      "pairs": 177,
+      "target": "contextual_outcome_history"
+    },
+    {
+      "layer": 0,
+      "mean_difference_norm": 0.004522658024220487,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 1,
+      "mean_difference_norm": 0.006790280960238304,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 2,
+      "mean_difference_norm": 0.00961006946729635,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 3,
+      "mean_difference_norm": 0.018575369284312103,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 4,
+      "mean_difference_norm": 0.03112630924291355,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 5,
+      "mean_difference_norm": 0.03323847158012985,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 6,
+      "mean_difference_norm": 0.03473527433000765,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 7,
+      "mean_difference_norm": 0.04372548303585746,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 8,
+      "mean_difference_norm": 0.049847467887329286,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 9,
+      "mean_difference_norm": 0.06273218227742859,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 10,
+      "mean_difference_norm": 0.07504742285552798,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 11,
+      "mean_difference_norm": 0.09218824437673002,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 12,
+      "mean_difference_norm": 0.10273991735269751,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 13,
+      "mean_difference_norm": 0.1855420812950632,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 14,
+      "mean_difference_norm": 0.2193132805378824,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 15,
+      "mean_difference_norm": 0.3647707600013669,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 16,
+      "mean_difference_norm": 0.4661304544803174,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 17,
+      "mean_difference_norm": 0.8165554867269861,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 18,
+      "mean_difference_norm": 0.9102336065920473,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 19,
+      "mean_difference_norm": 1.957291233996367,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 20,
+      "mean_difference_norm": 2.332540416351361,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 21,
+      "mean_difference_norm": 2.442954577075388,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 22,
+      "mean_difference_norm": 2.9890560993726303,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 23,
+      "mean_difference_norm": 2.937312317581644,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 24,
+      "mean_difference_norm": 2.9408944165432644,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 25,
+      "mean_difference_norm": 2.9432464722806673,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 26,
+      "mean_difference_norm": 2.9360611651566173,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 27,
+      "mean_difference_norm": 3.0552190120537945,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 28,
+      "mean_difference_norm": 3.2327728664861883,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 29,
+      "mean_difference_norm": 3.4827746240556037,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 30,
+      "mean_difference_norm": 3.970865734297167,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 31,
+      "mean_difference_norm": 5.4831191853766175,
+      "pairs": 93,
+      "target": "generic_value"
+    },
+    {
+      "layer": 0,
+      "mean_difference_norm": 0.008034885935737932,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 1,
+      "mean_difference_norm": 0.01208867242739993,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 2,
+      "mean_difference_norm": 0.01722011677107927,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 3,
+      "mean_difference_norm": 0.029821845292567588,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 4,
+      "mean_difference_norm": 0.0494222746169384,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 5,
+      "mean_difference_norm": 0.051258890340729536,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 6,
+      "mean_difference_norm": 0.05894124133284175,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 7,
+      "mean_difference_norm": 0.10393220184889827,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 8,
+      "mean_difference_norm": 0.11832309816358623,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 9,
+      "mean_difference_norm": 0.14877280471954196,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 10,
+      "mean_difference_norm": 0.2017425226620228,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 11,
+      "mean_difference_norm": 0.20664603246346425,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 12,
+      "mean_difference_norm": 0.22923781278110905,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 13,
+      "mean_difference_norm": 0.29518703301380333,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 14,
+      "mean_difference_norm": 0.3522121554585644,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 15,
+      "mean_difference_norm": 0.45642957616415514,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 16,
+      "mean_difference_norm": 0.6118145114071756,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 17,
+      "mean_difference_norm": 1.0299391375219673,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 18,
+      "mean_difference_norm": 1.1363065565539738,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 19,
+      "mean_difference_norm": 1.971214656731297,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 20,
+      "mean_difference_norm": 2.129841200956609,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 21,
+      "mean_difference_norm": 2.220437381284536,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 22,
+      "mean_difference_norm": 2.618140130944004,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 23,
+      "mean_difference_norm": 2.6101553347176845,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 24,
+      "mean_difference_norm": 2.6183195377507995,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 25,
+      "mean_difference_norm": 2.6129447696247516,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 26,
+      "mean_difference_norm": 2.6362914855581403,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 27,
+      "mean_difference_norm": 2.95849135965522,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 28,
+      "mean_difference_norm": 3.1586819637696055,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 29,
+      "mean_difference_norm": 3.415583707595095,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 30,
+      "mean_difference_norm": 3.9601587932299362,
+      "pairs": 94,
+      "target": "outcome_history"
+    },
+    {
+      "layer": 31,
+      "mean_difference_norm": 5.672619879068899,
+      "pairs": 94,
+      "target": "outcome_history"
+    }
+  ],
+  "full_activations_saved": false,
+  "layer_count": 32,
+  "layer_index_convention": "zero_based_block_output",
+  "preliminary_candidate_layers": {
+    "action_history": [
+      31,
+      30,
+      29,
+      28
+    ],
+    "contextual_outcome_history": [
+      31,
+      30,
+      29,
+      28
+    ],
+    "generic_value": [
+      31,
+      30,
+      29,
+      28
+    ],
+    "outcome_history": [
+      31,
+      30,
+      29,
+      28
+    ]
+  }
+}
