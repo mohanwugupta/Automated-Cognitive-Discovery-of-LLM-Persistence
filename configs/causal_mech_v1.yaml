@@ -1,0 +1,81 @@
+protocol_version: counterfactual_causal_mechanistic_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 73001
+theory_output: artifacts/theory_resolution_v1
+mechanistic_output: artifacts/mechanistic_v1
+output_root: artifacts/causal_mech_v1
+
+entry_criteria:
+  minimum_heldout_r2: 0.60
+  retain_all_viable_theories: true
+
+theory_targets:
+  outcome_history: [dual_history, outcome_history]
+  contextual_outcome_history: [latent_context]
+
+counterfactuals:
+  pairs_per_task_split: 6
+  control_pairs_per_task_split: 2
+  continuous_semantic_logits: true
+  active_selection_terms: [predicted_effect_magnitude, theory_disagreement, coverage]
+
+diagnostic_scan:
+  layers: all
+  interpretation: information_access_only
+
+localization:
+  layers: all
+  candidate_layers_per_target: 3
+  minimum_validation_correlation: 0.15
+  minimum_validation_cfr: -0.25
+
+das:
+  ranks: [1, 2, 4, 8]
+  epochs: 3
+  learning_rate: 0.03
+  activation_change_penalty: 1.0e-4
+  rank_penalty: 1.0e-5
+  smallest_rank_mse_tolerance: 0.05
+  minimum_validation_correlation: 0.20
+  minimum_validation_cfr: 0.0
+  task_specific_enabled: true
+  task_specific_ranks: [1, 4]
+  minimum_task_pairs: 4
+  train_splits: [mech_pair_train]
+  hyperparameter_split: mech_pair_validation
+
+validation:
+  claim_splits: [mech_pair_test, mech_task_holdout]
+  random_subspaces: 100
+  random_pairs_per_task_mapping: 2
+  controls:
+    - shuffled_source
+    - shuffled_target
+    - persistence_output
+    - generic_value
+    - task_id
+    - response_mapping
+    - unrelated_variables
+  necessity: neutral_coordinate_replacement
+
+gates:
+  minimum_test_correlation: 0.30
+  minimum_test_cfr: 0.0
+
+circuits:
+  pairs_per_task_mapping: 1
+  minimum_mediated_fraction: 0.10
+  component_types: [attention, mlp]
+
+artifact_policy:
+  save_full_activations: false
+  temporary_activation_cache_only: true
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_causal_mech
+  localization_array_concurrency: 2
+  das_array_concurrency: 2

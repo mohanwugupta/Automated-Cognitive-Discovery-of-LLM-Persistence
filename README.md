@@ -397,3 +397,53 @@ artifacts/action_history_disambiguation_v1/
   report.md
   run_metadata.json
 ```
+
+## Counterfactual causal mechanistic discovery
+
+`PRD_Counterfactual_Causal_Mechanistic_Discovery.md` is implemented as the
+counterfactual-first workflow in
+`src/cognitive_discovery/causal_mechanistic/`. It treats the complete frozen
+behavioral theory bank as immutable, computes quantitative source/base
+counterfactuals before any neural optimization, and labels all probe results as
+information access rather than mechanism.
+
+The causal stages are:
+
+```text
+frozen theory bank → deterministic counterfactual pair manifest
+→ all-layer information diagnostic (Level 2)
+→ all-layer whole-state patching (Level 3)
+→ rank 1/2/4/8 shared and task-specific DAS
+→ untouched test/task-holdout validation (Level 4)
+→ random, shuffled, output, value, task, mapping, and unrelated-variable controls
+→ causal specificity (Level 5) plus a separately reported necessity test
+→ gated attention/linear-token-mixer and MLP tracing (Level 6)
+```
+
+On a Della login node:
+
+```bash
+conda activate llm-cognitive-discovery
+pip install -e '.[qwen,parquet]'
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+bash scripts/submit_causal_mechanistic.sh
+```
+
+The submission uses CPU jobs for theory freezing, diagnostics, summaries,
+selection, and reporting. GPU allocations are restricted to phases that execute
+Qwen forwards. Conditional CPU dispatchers inspect the completed localization
+and DAS gates before submitting exact-size GPU arrays, so a stop rule never
+creates an idle GPU job.
+
+Circuit analysis is deliberately separate and is submitted only after the
+specificity gate marks it eligible:
+
+```bash
+bash scripts/submit_causal_circuits.sh
+```
+
+If it is not eligible, that command exits without reserving a GPU. Outputs are
+isolated under `artifacts/causal_mech_v1/` using the PRD directories:
+`behavioral_handoff`, `counterfactuals`, `localization`, `representations`,
+`validation`, `circuits`, and `figures`. Only compact alignments, scalar causal
+results, hashes, and summaries are retained; full activation banks are forbidden.

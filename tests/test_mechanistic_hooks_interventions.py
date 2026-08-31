@@ -32,11 +32,17 @@ def test_hook_extracts_and_edits_only_decision_position():
     hidden = torch.arange(24, dtype=torch.float32).reshape(2, 4, 3)
     positions = torch.tensor([1, 3])
     captured = {}
+    editor_calls = []
+
+    def edit_once(state):
+        editor_calls.append(state.clone())
+        return state + torch.tensor([10.0, 0.0, 0.0])
+
     handles = stream_layer_states(
         [layer],
         positions,
         lambda index, state: captured.setdefault(index, state.clone()),
-        editors={0: lambda state: state + torch.tensor([10.0, 0.0, 0.0])},
+        editors={0: edit_once},
     )
     output = layer(hidden)[0]
     for handle in handles:
@@ -46,6 +52,7 @@ def test_hook_extracts_and_edits_only_decision_position():
     expected[1, 3, 0] += 10.0
     assert torch.equal(output, expected)
     assert torch.equal(captured[0], expected[torch.arange(2), positions])
+    assert len(editor_calls) == 1
 
 
 def test_steering_zero_and_reverse_change_projection_exactly():

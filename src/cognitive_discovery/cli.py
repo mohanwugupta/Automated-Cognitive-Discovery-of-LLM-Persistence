@@ -36,6 +36,17 @@ from .action_history.pipeline import (
     run_matched_projection_patching,
     run_random_direction_null,
 )
+from .causal_mechanistic.pipeline import (
+    finalize_causal_mechanistic_run,
+    localize_whole_state_layer,
+    prepare_causal_mechanistic_run,
+    prepare_diagnostic_information_scan,
+    run_circuit_localization,
+    select_das_alignments,
+    summarize_whole_state_localization,
+    train_das_search_job,
+    validate_selected_alignments,
+)
 
 
 DEFAULT_CONFIG = "configs/discovery_v1.yaml"
@@ -335,7 +346,16 @@ def action_history_main(argv=None):
     parser.add_argument("--source", default="artifacts/mechanistic_v1")
     parser.add_argument(
         "--phase",
-        choices=("prepare", "fit", "project", "analyze", "steer", "random", "patch", "report"),
+        choices=(
+            "prepare",
+            "fit",
+            "project",
+            "analyze",
+            "steer",
+            "random",
+            "patch",
+            "report",
+        ),
         required=True,
     )
     parser.add_argument("--model")
@@ -375,6 +395,87 @@ def action_history_main(argv=None):
         result = run_matched_projection_patching(config, **gpu)
     else:
         result = finalize_action_history_run(config, **common)
+    print(
+        json.dumps(
+            {
+                key: str(value) if isinstance(value, Path) else value
+                for key, value in result.items()
+            },
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
+    )
+
+
+def causal_mechanistic_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Counterfactual-first causal mechanistic discovery"
+    )
+    parser.add_argument("--config", default="configs/causal_mech_v1.yaml")
+    parser.add_argument("--output")
+    parser.add_argument("--theory-output", default="artifacts/theory_resolution_v1")
+    parser.add_argument("--mechanistic-output", default="artifacts/mechanistic_v1")
+    parser.add_argument(
+        "--phase",
+        choices=(
+            "prepare",
+            "diagnostic",
+            "localize",
+            "summarize",
+            "das",
+            "select",
+            "validate",
+            "circuit",
+            "report",
+        ),
+        required=True,
+    )
+    parser.add_argument("--layer", type=int)
+    parser.add_argument("--job-index", type=int)
+    parser.add_argument("--model")
+    parser.add_argument("--revision")
+    parser.add_argument("--online", action="store_true")
+    parser.add_argument("--limit", type=int)
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    common = {"output": args.output}
+    gpu = {
+        **common,
+        "model_path": args.model,
+        "revision": args.revision,
+        "online": args.online,
+        "limit": args.limit,
+    }
+    if args.phase == "prepare":
+        result = prepare_causal_mechanistic_run(
+            config,
+            theory_output=args.theory_output,
+            mechanistic_output=args.mechanistic_output,
+            **common,
+        )
+    elif args.phase == "diagnostic":
+        result = prepare_diagnostic_information_scan(
+            config, mechanistic_output=args.mechanistic_output, **common
+        )
+    elif args.phase == "localize":
+        if args.layer is None:
+            parser.error("--layer is required for localize")
+        result = localize_whole_state_layer(config, layer=args.layer, **gpu)
+    elif args.phase == "summarize":
+        result = summarize_whole_state_localization(config, **common)
+    elif args.phase == "das":
+        if args.job_index is None:
+            parser.error("--job-index is required for das")
+        result = train_das_search_job(config, job_index=args.job_index, **gpu)
+    elif args.phase == "select":
+        result = select_das_alignments(config, **common)
+    elif args.phase == "validate":
+        result = validate_selected_alignments(config, **gpu)
+    elif args.phase == "circuit":
+        result = run_circuit_localization(config, **gpu)
+    else:
+        result = finalize_causal_mechanistic_run(config, **common)
     print(
         json.dumps(
             {

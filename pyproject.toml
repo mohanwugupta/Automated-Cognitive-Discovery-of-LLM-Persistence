@@ -13,7 +13,8 @@ dependencies = [
   "pandas>=2.0",
   "pyyaml>=6.0",
   "scipy>=1.10",
-  "scikit-learn>=1.3",
+  # Frozen behavioral RidgeCV packages were serialized with this version.
+  "scikit-learn==1.9.0",
   "torch>=2.1",
   "matplotlib>=3.8",
   "safetensors>=0.4",
@@ -35,6 +36,7 @@ cognitive-discovery-active = "cognitive_discovery.cli:active_discovery_main"
 cognitive-discovery-theory = "cognitive_discovery.cli:theory_resolution_main"
 cognitive-discovery-mechanistic = "cognitive_discovery.cli:mechanistic_main"
 cognitive-discovery-action-history = "cognitive_discovery.cli:action_history_main"
+cognitive-discovery-causal-mech = "cognitive_discovery.cli:causal_mechanistic_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

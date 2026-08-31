@@ -13,7 +13,7 @@ def test_round1_cpu_only_phases_never_request_a_gpu():
     for phase in ("tests", "pilot_finalize", "discovery_finalize"):
         assert f'PHASE={phase} "$CPU_SCRIPT"' in submit
     for phase in ("pilot_collect", "discovery_collect", "analyze", "validation"):
-        assert f'PHASE={phase}' in submit
+        assert f"PHASE={phase}" in submit
         line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
         assert '"$RUN_SCRIPT"' in line
 
@@ -43,6 +43,7 @@ def test_cpu_wrappers_have_no_gpu_directive():
         "run_theory_cpu.slurm",
         "run_mechanistic_cpu.slurm",
         "run_action_history_cpu.slurm",
+        "run_causal_mechanistic_cpu.slurm",
     ):
         text = _text(script)
         assert "--gres" not in text
@@ -67,3 +68,23 @@ def test_action_history_gpu_is_reserved_only_for_qwen_forward_phases():
     for phase in ("fit", "project", "steer", "random", "patch"):
         line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
         assert '"$GPU_SCRIPT"' in line
+
+
+def test_counterfactual_mechanistic_gpu_phases_all_run_qwen_forwards():
+    runner = _text("run_causal_mechanistic.slurm")
+    for phase in ("localize", "das", "validate", "circuit"):
+        marker = f"\n  {phase})\n"
+        assert marker in runner
+        block = runner.split(marker, 1)[1].split(";;", 1)[0]
+        assert "scripts/causal_mechanistic.py" in block
+        assert '"$MODEL_PATH"' in block
+    cpu = _text("run_causal_mechanistic_cpu.slurm")
+    assert "--gres" not in cpu
+    assert "--gpus" not in cpu
+
+
+def test_counterfactual_dispatchers_do_not_submit_empty_gpu_arrays():
+    das = _text("scripts/dispatch_causal_das.sh")
+    validation = _text("scripts/dispatch_causal_validation.sh")
+    assert 'if [ "$job_count" -eq 0 ]' in das
+    assert 'if [ "$selected_count" -eq 0 ]' in validation
