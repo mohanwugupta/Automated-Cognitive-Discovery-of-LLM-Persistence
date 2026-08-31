@@ -1,0 +1,7 @@
+layer,direction,intercept,slope,target_mean,target_scale,fitting_split,units
+8,action_orthogonal,-6.4161171403016,12.670395621737741,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations
+8,action_raw,-6.251700981618157,12.981909284288198,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations
+8,action_residualized,-8.736456578235323,21.83777917281634,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations
+30,action_orthogonal,-0.6703734403393822,0.39356966203227156,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations
+30,action_raw,-0.6415803180549726,0.3850777124651045,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations
+30,action_residualized,2.9951794535119176,3.40666285421363,0.5753207391519941,1.042597020564452,train,frozen_action_history_standard_deviations

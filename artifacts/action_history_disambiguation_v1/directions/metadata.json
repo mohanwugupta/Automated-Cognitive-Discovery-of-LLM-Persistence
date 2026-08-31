@@ -1,0 +1,39 @@
+{
+  "complete_action_contrast_pairs": 85,
+  "direction_rows": [
+    {
+      "action_contrast_pairs": 85,
+      "engineering_reproduction_checked": true,
+      "engineering_reproduction_passed": true,
+      "gradient_examples": 2536,
+      "layer": 8,
+      "orthogonal_dot_gradient": 3.2959746043559335e-17,
+      "orthogonal_dot_persistence": 2.5153490401663703e-17,
+      "raw_dot_gradient": -0.0226507318010681,
+      "raw_dot_persistence": 0.0992313167357513,
+      "reproduction_cosine": 0.9999999999999999,
+      "reproduction_threshold": 0.999,
+      "training_examples": 2536
+    },
+    {
+      "action_contrast_pairs": 85,
+      "engineering_reproduction_checked": true,
+      "engineering_reproduction_passed": true,
+      "gradient_examples": 2536,
+      "layer": 30,
+      "orthogonal_dot_gradient": 2.7755575615628914e-17,
+      "orthogonal_dot_persistence": 6.808789643208968e-17,
+      "raw_dot_gradient": 0.01475956103692742,
+      "raw_dot_persistence": 0.06358074825425004,
+      "reproduction_cosine": 0.9999999999999998,
+      "reproduction_threshold": 0.999,
+      "training_examples": 2536
+    }
+  ],
+  "full_activations_saved": false,
+  "primary_layers": [
+    8,
+    30
+  ],
+  "training_records": 2536
+}

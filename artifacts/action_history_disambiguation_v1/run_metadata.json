@@ -1,0 +1,49 @@
+{
+  "activation_position": "final_prompt_token",
+  "behavioral_coefficients_frozen": true,
+  "direction_fitting_split": "train",
+  "figure_count": 7,
+  "full_activations_saved": false,
+  "gate_results": {
+    "gate_1": true,
+    "gate_2": true,
+    "gate_3": false,
+    "gate_4": false
+  },
+  "git_commit": "b748b4e3dc536602854dee34abaaabb35b95d03c",
+  "layer_index_convention": "zero_based_block_output",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "optional_diagnostic_layers": [
+    4,
+    12,
+    20,
+    28,
+    31
+  ],
+  "original_action_history_L30_vector_sha256": "b2c776dd7f8b62c6d5cab6748c54b1dc9b9303a1aee1afb3793f49da91af4c10",
+  "outcome_classification": "H4_mixed_representation",
+  "primary_layers": [
+    8,
+    30
+  ],
+  "protocol_version": "action_history_disambiguation_v1",
+  "random_direction_count": 100,
+  "random_direction_count_observed": 100,
+  "report_generated": true,
+  "residualizer_fit_row_hash": "cbb410661c07a23b4706dcaaf962d816e712fde135d7e9a618afeabc93842b39",
+  "source_action_direction_sha256": "d133135f874b4c4041269734da22e93c0edd41719cdde699d2ed79edf086c127",
+  "source_artifacts_immutable": true,
+  "source_manifest_sha256": "a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342",
+  "source_mechanistic_root": "artifacts/mechanistic_v1",
+  "source_run_metadata_sha256": "961ca4f4fd78925ddd02e2bde6c955b35df6fdef04d792729a1aec5966706f86",
+  "steering_doses": [
+    -2.0,
+    -1.0,
+    -0.5,
+    0.0,
+    0.5,
+    1.0,
+    2.0
+  ]
+}

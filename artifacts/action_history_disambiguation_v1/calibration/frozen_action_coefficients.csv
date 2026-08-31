@@ -1,0 +1,8 @@
+target,task_family,behavioral_coefficient,source,computational_mean,computational_scale,normalization_source
+action_history,bandit,-0.0663305549562136,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,debugging,-0.0068218330930218,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,effort,-0.0810053890804208,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,foraging,-0.0279268956942435,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,information_sampling,0.0608647345257897,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,solvability,-0.1664033951514311,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl
+action_history,waiting,-0.0035162010376193,frozen_models/dual_history/parameters.csv,0.5753207391519941,1.042597020564452,frozen_models/dual_history/model.pkl

@@ -1,0 +1,101 @@
+{
+  "gate_1_representational_independence": {
+    "layers": [
+      {
+        "layer": 8,
+        "passed": true,
+        "random_r2_95": 0.004721598608202888,
+        "residual_validation_r2": 0.9430828183391485
+      },
+      {
+        "layer": 30,
+        "passed": true,
+        "random_r2_95": 0.027178531983979643,
+        "residual_validation_r2": 0.9870896578943462
+      }
+    ],
+    "passed": true
+  },
+  "gate_2_matched_state_specificity": {
+    "layers": [
+      {
+        "best_sign_accuracy": 1.0,
+        "layer": 8,
+        "passed": true
+      },
+      {
+        "best_sign_accuracy": 1.0,
+        "layer": 30,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "gate_3_causal_specificity": {
+    "comparisons": [
+      {
+        "absolute_slope": 0.0025510204081632655,
+        "direction": "action_orthogonal",
+        "layer": 8,
+        "passed": false,
+        "random_absolute_slope_95": 0.007653061224489797
+      },
+      {
+        "absolute_slope": 0.001806972789115646,
+        "direction": "action_residualized",
+        "layer": 8,
+        "passed": false,
+        "random_absolute_slope_95": 0.007653061224489797
+      },
+      {
+        "absolute_slope": 0.001488095238095238,
+        "direction": "action_orthogonal",
+        "layer": 30,
+        "passed": false,
+        "random_absolute_slope_95": 0.007227891156462586
+      },
+      {
+        "absolute_slope": 0.0009566326530612248,
+        "direction": "action_residualized",
+        "layer": 30,
+        "passed": false,
+        "random_absolute_slope_95": 0.007227891156462586
+      }
+    ],
+    "passed": false
+  },
+  "gate_4_computational_correspondence": {
+    "comparisons": [
+      {
+        "direction": "action_orthogonal",
+        "layer": 8,
+        "passed": false,
+        "predicted_observed_correlation": 0.02704869603768718,
+        "task_slope_beta_correlation": -0.13432792649764444
+      },
+      {
+        "direction": "action_residualized",
+        "layer": 8,
+        "passed": false,
+        "predicted_observed_correlation": -0.021308573454614132,
+        "task_slope_beta_correlation": -0.04674644727991101
+      },
+      {
+        "direction": "action_orthogonal",
+        "layer": 30,
+        "passed": false,
+        "predicted_observed_correlation": -0.04154084648185623,
+        "task_slope_beta_correlation": 0.0080053471607872
+      },
+      {
+        "direction": "action_residualized",
+        "layer": 30,
+        "passed": false,
+        "predicted_observed_correlation": -0.049051302047215695,
+        "task_slope_beta_correlation": -0.4939217716949562
+      }
+    ],
+    "minimum_correlation": 0.3,
+    "passed": false
+  }
+}
