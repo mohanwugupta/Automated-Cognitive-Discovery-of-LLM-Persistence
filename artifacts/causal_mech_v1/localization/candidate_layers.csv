@@ -1,0 +1,10 @@
+target_variable,theory,layer,validation_correlation,validation_mean_cfr
+outcome_history,dual_history,30,0.7057890642638717,0.8938182681710064
+outcome_history,dual_history,29,0.6815406514370623,0.8591488607627713
+outcome_history,dual_history,28,0.6666083730973773,0.8561985780780833
+outcome_history,outcome_history,30,0.7056957712811714,0.8934811324592915
+outcome_history,outcome_history,29,0.6817365192299363,0.8596538897570014
+outcome_history,outcome_history,28,0.6665945813971034,0.8567245345238981
+contextual_outcome_history,latent_context,31,0.42467026261987717,0.7091598555162795
+contextual_outcome_history,latent_context,30,0.4905862562475352,0.643161471050695
+contextual_outcome_history,latent_context,29,0.5133943692373566,0.5156402311381574

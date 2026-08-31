@@ -1,0 +1,39 @@
+{
+  "architectures": [
+    {
+      "architecture": "dual_history",
+      "counterfactual_predictions_required_next": true,
+      "heldout_r2": 0.6939187841176062,
+      "operational_definition_frozen": true,
+      "robustness_across_tasks": true,
+      "strong_heldout_prediction": true,
+      "training_dataset_frozen": true
+    },
+    {
+      "architecture": "latent_context",
+      "counterfactual_predictions_required_next": true,
+      "heldout_r2": 0.7323256825631543,
+      "operational_definition_frozen": true,
+      "robustness_across_tasks": true,
+      "strong_heldout_prediction": true,
+      "training_dataset_frozen": true
+    },
+    {
+      "architecture": "outcome_history",
+      "counterfactual_predictions_required_next": true,
+      "heldout_r2": 0.7349457062106418,
+      "operational_definition_frozen": true,
+      "robustness_across_tasks": true,
+      "strong_heldout_prediction": true,
+      "training_dataset_frozen": true
+    }
+  ],
+  "minimum_heldout_r2": 0.6,
+  "passed": true,
+  "retained_theories": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "theory_ambiguity_retained": true
+}

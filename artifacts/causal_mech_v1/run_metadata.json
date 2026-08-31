@@ -1,0 +1,87 @@
+{
+  "activation_position": "final_prompt_token",
+  "behavioral_validation_used": false,
+  "entry_criteria": {
+    "architectures": [
+      {
+        "architecture": "dual_history",
+        "counterfactual_predictions_required_next": true,
+        "heldout_r2": 0.6939187841176062,
+        "operational_definition_frozen": true,
+        "robustness_across_tasks": true,
+        "strong_heldout_prediction": true,
+        "training_dataset_frozen": true
+      },
+      {
+        "architecture": "latent_context",
+        "counterfactual_predictions_required_next": true,
+        "heldout_r2": 0.7323256825631543,
+        "operational_definition_frozen": true,
+        "robustness_across_tasks": true,
+        "strong_heldout_prediction": true,
+        "training_dataset_frozen": true
+      },
+      {
+        "architecture": "outcome_history",
+        "counterfactual_predictions_required_next": true,
+        "heldout_r2": 0.7349457062106418,
+        "operational_definition_frozen": true,
+        "robustness_across_tasks": true,
+        "strong_heldout_prediction": true,
+        "training_dataset_frozen": true
+      }
+    ],
+    "minimum_heldout_r2": 0.6,
+    "passed": true,
+    "retained_theories": [
+      "dual_history",
+      "latent_context",
+      "outcome_history"
+    ],
+    "theory_ambiguity_retained": true
+  },
+  "figure_count": 5,
+  "frozen_theory_hashes": {
+    "dual_history/model.pkl": "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3",
+    "dual_history/model_spec.json": "ac7e11f49f69862e3a99a5ba03be31ef57efceee6d8c46b82d3470af2f95fe24",
+    "dual_history/parameters.csv": "7b2d7d1f14d132a895fbaec48ee77268c75d2854a1e1c0f8fc539c85875f362e",
+    "dual_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "latent_context/model.pkl": "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f",
+    "latent_context/model_spec.json": "9403ffffea563eafb4c54ab879d660b0936490e9bfe92d5761c41690997b1664",
+    "latent_context/parameters.csv": "b49fa311467abff542b9bbc1fab621318b243221b1cfd0ea639386c2d9f488a5",
+    "latent_context/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "outcome_history/model.pkl": "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667",
+    "outcome_history/model_spec.json": "a39bb985f3050e28b3504240fee0665b2504dd49ee7331c522adcf0d1d4fd8d2",
+    "outcome_history/parameters.csv": "52e0c0f0781f4a4b617ac160fb4080f7fa6e48e950bdf4224eb53f255c8b8008",
+    "outcome_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25"
+  },
+  "full_activations_saved": false,
+  "git_commit": "7bccb22aed35f4c962471568a6085ca2e6b19d0b",
+  "highest_evidence_level": 4,
+  "layer_index_convention": "zero_based_block_output",
+  "mechanistic_source_root": "artifacts/mechanistic_v1",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "neural_implementation_hypothesis": "Neural_H1_shared_coordinates",
+  "neural_learning_splits": [
+    "mech_pair_train",
+    "mech_pair_validation"
+  ],
+  "protocol_version": "counterfactual_causal_mechanistic_v1",
+  "report_generated": true,
+  "scientific_claim_splits": [
+    "mech_pair_test",
+    "mech_task_holdout"
+  ],
+  "source_manifest_sha256": "a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342",
+  "theory_root": "artifacts/theory_resolution_v1",
+  "theory_targets": {
+    "contextual_outcome_history": [
+      "latent_context"
+    ],
+    "outcome_history": [
+      "dual_history",
+      "outcome_history"
+    ]
+  }
+}

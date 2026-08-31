@@ -1,0 +1,15 @@
+{
+  "all_layers_present": true,
+  "interpretation": "information-access results only",
+  "methods": [
+    "linear_paired_direction",
+    "ridge_probe",
+    "LOTO",
+    "matched_specificity"
+  ],
+  "source_hashes": {
+    "layer_metrics": "b661cd24fc0a5d90d606c7b5ee672bc80a6bb7eb81f659678398e5990b7ad145",
+    "loto": "46205ed242e939a38585e99f3bbf120b8cc442f5f935bf7025c7fac635d6b867",
+    "specificity": "f463addc16d87ca2e5b96d4b099f4f77cc7510693dde44f71ac9602b9347fbc6"
+  }
+}

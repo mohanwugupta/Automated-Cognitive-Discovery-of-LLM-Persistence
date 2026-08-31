@@ -1,0 +1,6 @@
+case,expected,passed,correlation,slope,intercept,rmse,sign_accuracy,mean_cfr,median_cfr,fraction_behavioral_effect_recovered,examples,rank1_rmse,rank4_rmse,shared_mean_cfr,task_specific_mean_cfr,probe_r2
+A_1D_causal,rank1_recovered,True,0.9999999996489781,1.0000012636873445,4.87202185902636e-06,3.888641633781155e-05,1.0,0.9999955453458355,0.9999999992747539,1.000000215785775,192.0,,,,,
+B_4D_distributed,rank4_beats_rank1,True,,,,,,,,,,1.2029811578953935,5.594065218122868e-16,,,
+C_task_specific_rotations,task_specific_beats_shared,True,,,,,,,,,,,,-125.36747136504461,1.0,
+D_decodable_noncausal,high_decoding_low_causal_recovery,True,,,,,,1.8245270304752027e-06,,,,,,,,0.9979519662541713
+E_downstream_decision,causal_effect_without_theory_correspondence,True,0.3593074689152505,0.41949115813883425,0.026663542763353955,0.6322824372954569,0.6666666666666666,-18.3687270105187,-7.999998083480676,0.6666666666666667,192.0,,,,,

@@ -1,0 +1,49 @@
+[
+  {
+    "behavioral_validation_rows": 0,
+    "pair_split": "mech_pair_test",
+    "pairs": 230,
+    "selected_for_neural": 90,
+    "tasks": [
+      "bandit",
+      "debugging",
+      "foraging",
+      "solvability"
+    ]
+  },
+  {
+    "behavioral_validation_rows": 0,
+    "pair_split": "mech_pair_train",
+    "pairs": 898,
+    "selected_for_neural": 58,
+    "tasks": [
+      "bandit",
+      "debugging",
+      "foraging",
+      "solvability"
+    ]
+  },
+  {
+    "behavioral_validation_rows": 0,
+    "pair_split": "mech_pair_validation",
+    "pairs": 180,
+    "selected_for_neural": 56,
+    "tasks": [
+      "bandit",
+      "debugging",
+      "foraging",
+      "solvability"
+    ]
+  },
+  {
+    "behavioral_validation_rows": 0,
+    "pair_split": "mech_task_holdout",
+    "pairs": 816,
+    "selected_for_neural": 72,
+    "tasks": [
+      "effort",
+      "information_sampling",
+      "waiting"
+    ]
+  }
+]

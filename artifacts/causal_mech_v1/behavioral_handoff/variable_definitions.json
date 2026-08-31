@@ -1,0 +1,99 @@
+{
+  "action_history": "Exponentially weighted semantic action history A_t; specificity control.",
+  "contextual_outcome_history": "Cue-weighted context-relevant outcome history O*_t.",
+  "frozen_model_definitions": {
+    "dual_history": {
+      "architecture": "dual_history",
+      "description": "Action and outcome traces contribute separately.",
+      "features": [
+        "factor_continuation_value",
+        "factor_disengagement_value",
+        "factor_continuation_cost",
+        "factor_progress_evidence",
+        "factor_success_evidence",
+        "factor_uncertainty",
+        "factor_prior_investment",
+        "factor_controllability",
+        "factor_environmental_stability",
+        "factor_goal_continuity",
+        "history_action_1",
+        "history_action_kernel",
+        "history_outcome_1",
+        "history_outcome_kernel"
+      ],
+      "fit_sha256": "e3d28601388991cf336b031c6a9350c19a0dba8b4cec06ab753a12c0e376c88e",
+      "hypothesis": "H2+H3",
+      "preserved_variants": [
+        "M2",
+        "M4"
+      ],
+      "primary_variant": "M4",
+      "round3_outcomes_used": false,
+      "training_condition_count": 3080,
+      "viability_delta_macro_r2": 0.0
+    },
+    "latent_context": {
+      "architecture": "latent_context",
+      "description": "History is weighted by inferred continuity and environmental stability.",
+      "features": [
+        "factor_continuation_value",
+        "factor_disengagement_value",
+        "factor_continuation_cost",
+        "factor_progress_evidence",
+        "factor_success_evidence",
+        "factor_uncertainty",
+        "factor_prior_investment",
+        "factor_controllability",
+        "factor_environmental_stability",
+        "factor_goal_continuity",
+        "context_relevant_outcome_kernel",
+        "context_relevant_outcome_kernel*factor_goal_continuity",
+        "context_relevant_outcome_kernel*factor_environmental_stability"
+      ],
+      "fit_sha256": "975f8057a5078438407abe464c903f7c3d11a0ff2ea09a05589721eff70a62c4",
+      "hypothesis": "H5",
+      "preserved_variants": [
+        "M2",
+        "M4"
+      ],
+      "primary_variant": "M4",
+      "round3_outcomes_used": false,
+      "training_condition_count": 3080,
+      "viability_delta_macro_r2": 0.002017235727102662
+    },
+    "outcome_history": {
+      "architecture": "outcome_history",
+      "description": "Recent successes and failures are integrated.",
+      "features": [
+        "factor_continuation_value",
+        "factor_disengagement_value",
+        "factor_continuation_cost",
+        "factor_progress_evidence",
+        "factor_success_evidence",
+        "factor_uncertainty",
+        "factor_prior_investment",
+        "factor_controllability",
+        "factor_environmental_stability",
+        "factor_goal_continuity",
+        "history_outcome_1",
+        "history_outcome_kernel"
+      ],
+      "fit_sha256": "cbb7efaa3dc337583d688fc51d3e865184e9505564431d388a7274978ab52e80",
+      "hypothesis": "H3",
+      "preserved_variants": [
+        "M2",
+        "M4"
+      ],
+      "primary_variant": "M4",
+      "round3_outcomes_used": false,
+      "training_condition_count": 3080,
+      "viability_delta_macro_r2": 0.0025868187902984285
+    }
+  },
+  "generic_value": "Current success-evidence intervention; specificity control.",
+  "outcome_history": "Exponentially weighted raw semantic outcome history O_t.",
+  "primary_variables": [
+    "outcome_history",
+    "contextual_outcome_history"
+  ]
+}

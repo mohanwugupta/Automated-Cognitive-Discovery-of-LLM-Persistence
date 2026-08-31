@@ -1,0 +1,300 @@
+[
+  {
+    "job_index": 0,
+    "layer": 30,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "dual_history",
+    "validation_correlation": 0.7057890642638717,
+    "validation_mean_cfr": 0.8938182681710064
+  },
+  {
+    "job_index": 1,
+    "layer": 29,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "dual_history",
+    "validation_correlation": 0.6815406514370623,
+    "validation_mean_cfr": 0.8591488607627713
+  },
+  {
+    "job_index": 2,
+    "layer": 28,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "dual_history",
+    "validation_correlation": 0.6666083730973773,
+    "validation_mean_cfr": 0.8561985780780833
+  },
+  {
+    "job_index": 3,
+    "layer": 30,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "outcome_history",
+    "validation_correlation": 0.7056957712811714,
+    "validation_mean_cfr": 0.8934811324592915
+  },
+  {
+    "job_index": 4,
+    "layer": 29,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "outcome_history",
+    "validation_correlation": 0.6817365192299363,
+    "validation_mean_cfr": 0.8596538897570014
+  },
+  {
+    "job_index": 5,
+    "layer": 28,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "outcome_history",
+    "validation_correlation": 0.6665945813971034,
+    "validation_mean_cfr": 0.8567245345238981
+  },
+  {
+    "job_index": 6,
+    "layer": 31,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "contextual_outcome_history",
+    "task_family": null,
+    "theory": "latent_context",
+    "validation_correlation": 0.42467026261987717,
+    "validation_mean_cfr": 0.7091598555162795
+  },
+  {
+    "job_index": 7,
+    "layer": 30,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "contextual_outcome_history",
+    "task_family": null,
+    "theory": "latent_context",
+    "validation_correlation": 0.4905862562475352,
+    "validation_mean_cfr": 0.643161471050695
+  },
+  {
+    "job_index": 8,
+    "layer": 29,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "scope": "shared",
+    "target_variable": "contextual_outcome_history",
+    "task_family": null,
+    "theory": "latent_context",
+    "validation_correlation": 0.5133943692373566,
+    "validation_mean_cfr": 0.5156402311381574
+  },
+  {
+    "job_index": 9,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "bandit",
+    "theory": "dual_history",
+    "validation_correlation": 0.7057890642638717,
+    "validation_mean_cfr": 0.8938182681710064
+  },
+  {
+    "job_index": 10,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "debugging",
+    "theory": "dual_history",
+    "validation_correlation": 0.7057890642638717,
+    "validation_mean_cfr": 0.8938182681710064
+  },
+  {
+    "job_index": 11,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "foraging",
+    "theory": "dual_history",
+    "validation_correlation": 0.7057890642638717,
+    "validation_mean_cfr": 0.8938182681710064
+  },
+  {
+    "job_index": 12,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "solvability",
+    "theory": "dual_history",
+    "validation_correlation": 0.7057890642638717,
+    "validation_mean_cfr": 0.8938182681710064
+  },
+  {
+    "job_index": 13,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "bandit",
+    "theory": "outcome_history",
+    "validation_correlation": 0.7056957712811714,
+    "validation_mean_cfr": 0.8934811324592915
+  },
+  {
+    "job_index": 14,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "debugging",
+    "theory": "outcome_history",
+    "validation_correlation": 0.7056957712811714,
+    "validation_mean_cfr": 0.8934811324592915
+  },
+  {
+    "job_index": 15,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "foraging",
+    "theory": "outcome_history",
+    "validation_correlation": 0.7056957712811714,
+    "validation_mean_cfr": 0.8934811324592915
+  },
+  {
+    "job_index": 16,
+    "layer": 30,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "outcome_history",
+    "task_family": "solvability",
+    "theory": "outcome_history",
+    "validation_correlation": 0.7056957712811714,
+    "validation_mean_cfr": 0.8934811324592915
+  },
+  {
+    "job_index": 17,
+    "layer": 31,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "contextual_outcome_history",
+    "task_family": "bandit",
+    "theory": "latent_context",
+    "validation_correlation": 0.42467026261987717,
+    "validation_mean_cfr": 0.7091598555162795
+  },
+  {
+    "job_index": 18,
+    "layer": 31,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "contextual_outcome_history",
+    "task_family": "debugging",
+    "theory": "latent_context",
+    "validation_correlation": 0.42467026261987717,
+    "validation_mean_cfr": 0.7091598555162795
+  },
+  {
+    "job_index": 19,
+    "layer": 31,
+    "ranks": [
+      1,
+      4
+    ],
+    "scope": "task_specific",
+    "target_variable": "contextual_outcome_history",
+    "task_family": "foraging",
+    "theory": "latent_context",
+    "validation_correlation": 0.42467026261987717,
+    "validation_mean_cfr": 0.7091598555162795
+  }
+]
