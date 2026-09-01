@@ -215,6 +215,9 @@ def prepare_ood_run(
     json_write(hashes_path, hashes)
     metadata = {
         "protocol_version": config.get("protocol_version", "ood_free_generation_v1"),
+        "execution_profile": config.get(
+            "execution_profile", "compute_efficient_initial"
+        ),
         "git_commit": _git_commit(),
         "source_abstraction_root": str(source_root),
         "primary_artifact_id": frozen["primary"]["artifact_id"],
@@ -230,7 +233,6 @@ def prepare_ood_run(
         "application_output_cap": None,
         "full_activations_saved": False,
     }
-    json_write(root / "run_metadata.json", metadata)
     json_write(
         root / "gates.json",
         {
@@ -244,6 +246,50 @@ def prepare_ood_run(
             "ood_generalization": {"status": "awaiting_frozen_evaluation"},
         },
     )
+    full_generation_runs = sum(
+        len(job.get("prompt_ids", ()))
+        * len(job.get("seeds", ()))
+        * len(job.get("doses", ()))
+        for job in jobs
+        if job.get("mode") == "generation"
+    )
+    maximum_generations_per_job = max(
+        (
+            len(job.get("prompt_ids", ()))
+            * len(job.get("seeds", ()))
+            * len(job.get("doses", ()))
+            for job in jobs
+            if job.get("mode") == "generation"
+        ),
+        default=0,
+    )
+    generation_timeout = float(
+        config.get("runtime", {}).get("generation_timeout_seconds", 300)
+    )
+    maximum_guarded_generation_seconds_per_job = (
+        maximum_generations_per_job * generation_timeout
+    )
+    immediate_control_forwards = sum(
+        len(job.get("prompt_ids", ()))
+        * len(job.get("doses", ()))
+        * (
+            len(job.get("random_indices", ()))
+            + (1 if 0 in job.get("random_indices", ()) else 0)
+        )
+        for job in jobs
+        if job.get("mode") == "immediate_control"
+    )
+    metadata.update(
+        {
+            "full_generation_runs": full_generation_runs,
+            "immediate_control_forwards": immediate_control_forwards,
+            "maximum_generations_per_job": maximum_generations_per_job,
+            "maximum_guarded_generation_seconds_per_job": (
+                maximum_guarded_generation_seconds_per_job
+            ),
+        }
+    )
+    json_write(root / "run_metadata.json", metadata)
     return {
         "output": root,
         "evaluation_jobs": len(jobs),
@@ -253,6 +299,12 @@ def prepare_ood_run(
             if job.get("control_role") == "frozen_E"
             and job.get("regime") == "continuous"
             and job.get("prompt_family") == "open_ended"
+        ),
+        "full_generation_runs": full_generation_runs,
+        "immediate_control_forwards": immediate_control_forwards,
+        "maximum_generations_per_job": maximum_generations_per_job,
+        "maximum_guarded_generation_hours_per_job": (
+            maximum_guarded_generation_seconds_per_job / 3600
         ),
         "orientation_rows": frozen["orientation"]["orientation_rows"],
         "orientation_sha256": frozen["primary"]["orientation_sha256"],

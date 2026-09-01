@@ -532,11 +532,12 @@ The GPU phase uses a custom KV-cached autoregressive loop. It intervenes only
 on the newly processed final-token residual, leaves every canonical EOS token
 sampleable, and has no application-level output-token cap. EOS is an event;
 architectural context exhaustion, infrastructure timeout, and resource
-exhaustion are recorded as distinct right-censoring reasons. The primary
-battery contains 6 prompts × 100 matched seeds × 5 doses = 3,000 generations.
-Fixed-topic prompts, pulse interventions, 100 immediate random-subspace
-controls, 10 full-generation random controls, and direct EOS-logit controls are
-kept secondary.
+exhaustion are recorded as distinct right-censoring reasons. The default
+compute-efficient profile uses the PRD-permitted first stage of 6 prompts × 50
+matched seeds × 5 doses = 1,500 primary generations. Small pulse, fixed-topic,
+full-generation random, and direct-EOS batteries bring the total to 2,380 full
+generations, down from 7,600 in the original all-secondary configuration. All
+100 random directions still receive the inexpensive immediate EOS-logit test.
 
 After the abstraction artifacts are present on Della, run:
 
@@ -553,3 +554,5 @@ The dependency chain is CPU tests → CPU protocol freeze → CPU dispatcher →
 GPU evaluation array (maximum two live by default) → CPU survival analysis and
 reporting. CUDA placement is enforced inside every evaluation shard, while the
 test, freeze, dispatch, and aggregation jobs reject accidental GPU allocations.
+Each GPU shard requests at most six hours (rather than the earlier 24-hour
+ceiling) and exits immediately when its assigned generations finish.

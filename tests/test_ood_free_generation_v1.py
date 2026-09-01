@@ -261,7 +261,12 @@ def test_real_pre_ood_artifacts_freeze_and_hash_verify(tmp_path):
     config = load_config(repository / "configs/ood_free_generation_v1.yaml")
     result = prepare_ood_run(config, abstraction_output=source, output=tmp_path / "ood")
     manifest = verify_frozen_protocol(tmp_path / "ood")
-    assert result["primary_generation_runs"] == 3000
+    assert result["evaluation_jobs"] == 66
+    assert result["primary_generation_runs"] == 1500
+    assert result["full_generation_runs"] == 2380
+    assert result["immediate_control_forwards"] == 3030
+    assert result["maximum_generations_per_job"] == 54
+    assert result["maximum_guarded_generation_hours_per_job"] == 4.5
     assert result["orientation_rows"] > 1000
     assert manifest["rank"] == 2
     assert manifest["layer"] == 28

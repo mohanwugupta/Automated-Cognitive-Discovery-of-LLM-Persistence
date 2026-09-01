@@ -310,6 +310,9 @@ def freeze_protocol(config: dict, source_root: Path, root: Path) -> dict:
             "frozen intervention doses must be unique, sorted, and include zero"
         )
     analysis_plan = {
+        "execution_profile": config.get(
+            "execution_profile", "compute_efficient_initial"
+        ),
         "model": config.get("model"),
         "model_revision": config.get("model_revision"),
         "seed": int(config.get("seed", 94001)),

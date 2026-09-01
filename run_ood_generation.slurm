@@ -6,7 +6,7 @@
 #SBATCH --mem=64G
 #SBATCH --gres=gpu:1
 #SBATCH --constraint="nomig&gpu40"
-#SBATCH --time=24:00:00
+#SBATCH --time=06:00:00
 #SBATCH --output=logs/cognitive_ood_%A_%a.out
 #SBATCH --error=logs/cognitive_ood_%A_%a.err
 

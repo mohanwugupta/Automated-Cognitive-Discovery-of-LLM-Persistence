@@ -1,4 +1,5 @@
 protocol_version: ood_free_generation_v1
+execution_profile: compute_efficient_initial
 model: Qwen/Qwen3.5-4B
 model_revision: null
 seed: 94001
@@ -53,18 +54,21 @@ intervention:
   scale: structured_signed_coordinate_sd
 
 design:
-  primary_seeds_per_prompt: 100
+  # The PRD explicitly permits 50 seeds/prompt as a preregistered first stage
+  # when uncapped generation is computationally expensive.
+  primary_seeds_per_prompt: 50
   seeds_per_job: 10
   seed_start: 1
   matched_seeds_across_doses: true
 
 pulse:
   enabled: true
-  seeds_per_prompt: 50
+  # Secondary diagnostic: deliberately small in the initial compute profile.
+  seeds_per_prompt: 5
 
 secondary:
   fixed_topic: true
-  fixed_topic_seeds_per_prompt: 50
+  fixed_topic_seeds_per_prompt: 5
   continuation: false
   continuation_seeds_per_prompt: 50
 
@@ -72,15 +76,15 @@ controls:
   random_subspaces: 100
   neural_random_directions_per_job: 10
   behavioral_random_subspaces: 10
-  behavioral_seeds_per_prompt: 10
+  behavioral_seeds_per_prompt: 3
   behavioral_random_doses: [-2, 0, 2]
-  eos_seeds_per_prompt: 10
+  eos_seeds_per_prompt: 3
   eos_logit_scale: 2.0
   match_intervention_norm: true
 
 runtime:
   # This is infrastructure censoring, never an EOS or scientific length cap.
-  generation_timeout_seconds: 600
+  generation_timeout_seconds: 300
 
 analysis:
   primary: eos_hazard
