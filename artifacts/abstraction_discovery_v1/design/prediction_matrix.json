@@ -1,0 +1,25 @@
+{
+  "frozen_before_neural": true,
+  "same_context_different_raw": {
+    "O": "change",
+    "O_star": "no_change"
+  },
+  "same_effect_different_cause": {
+    "E_effect": "matched",
+    "upstream_route": "different"
+  },
+  "same_history_contribution": {
+    "H": "no_change"
+  },
+  "same_history_different_evidence": {
+    "E": "change",
+    "H": "no_change"
+  },
+  "same_raw_different_context": {
+    "O": "no_change",
+    "O_star": "change"
+  },
+  "same_total_evidence": {
+    "E": "no_change"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "behavioral_theory_root": "artifacts/theory_resolution_v1",
+  "candidate_conditions": 50000,
+  "causal_abstraction_passed": false,
+  "circuit_eligible": false,
+  "coverage_semantic_conditions": 1184,
+  "figure_count": 7,
+  "full_activations_saved": false,
+  "git_commit": "c5f1895266baec20e118bee82faf6cebe0e06d06",
+  "identifiability": {
+    "contrast_families": 6,
+    "contrast_rows": 1400,
+    "maximum_absolute_delta_correlation": 0.8489523789080325,
+    "minimum_discriminating_effect_sd": 1.5505031926364874,
+    "minimum_family_count": 200,
+    "semantic_conditions": 2400
+  },
+  "mechanistic_outcome": "no_candidate_abstraction_passed",
+  "primary_artifact_id": "das_001_outcome_history_dual_history_L28_r2",
+  "primary_layer": 28,
+  "primary_rank": 2,
+  "primary_retrained": false,
+  "primary_sha256": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+  "protocol_version": "causal_abstraction_v1",
+  "selected_semantic_conditions": 2400,
+  "source_mechanistic_outcome": "DAS_controller_without_variable_identity",
+  "source_specificity_root": "artifacts/causal_specificity_v2",
+  "winner": "E"
+}

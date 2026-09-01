@@ -1,0 +1,10 @@
+{
+  "claim_pair_row_sha256": "62905ceaa9ee5bb35817b0d69335b25fe6e0c276a855cbbb0064276671129a7b",
+  "computational_targets_frozen_before_neural": true,
+  "contrast_family": "same_history_contribution",
+  "full_activations_saved": false,
+  "gpu_forward_phases_only": true,
+  "job_index": 2,
+  "primary_alignment_sha256": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+  "primary_retrained": false
+}

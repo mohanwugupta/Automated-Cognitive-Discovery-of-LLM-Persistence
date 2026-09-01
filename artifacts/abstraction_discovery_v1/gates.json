@@ -1,0 +1,54 @@
+{
+  "causal_abstraction": {
+    "neighbor_dissociations_passed": true,
+    "outcome": "no_candidate_abstraction_passed",
+    "passed": false,
+    "persistence_controls_passed": true,
+    "random_p": 0.6672212978369384,
+    "random_subspaces_passed": false,
+    "recovery_passed": true,
+    "shuffled_target_passed": true,
+    "task_general": true,
+    "winner": "E"
+  },
+  "circuit": {
+    "status": "not_eligible",
+    "submitted": false
+  },
+  "depth_transformation": {
+    "sequence": [
+      {
+        "abstraction": "E",
+        "layer": 16
+      },
+      {
+        "abstraction": "E",
+        "layer": 20
+      },
+      {
+        "abstraction": "E",
+        "layer": 24
+      },
+      {
+        "abstraction": "E",
+        "layer": 28
+      },
+      {
+        "abstraction": "E",
+        "layer": 30
+      }
+    ],
+    "systematic": true
+  },
+  "design": {
+    "contrast_families": 6,
+    "contrast_rows": 1400,
+    "maximum_absolute_delta_correlation": 0.8489523789080325,
+    "minimum_discriminating_effect_sd": 1.5505031926364874,
+    "minimum_family_count": 200,
+    "passed": true,
+    "semantic_conditions": 2400
+  },
+  "highest_evidence": "B",
+  "source_level4": true
+}

@@ -1,0 +1,73 @@
+{
+  "abstractions": [
+    "O",
+    "O_star",
+    "H",
+    "E"
+  ],
+  "definitions": {
+    "A": "Frozen exponentially weighted action history.",
+    "D": "Frozen reference persistence logit; numerically E in this parameterization.",
+    "E": "Full pre-decision prediction of the frozen reference model.",
+    "H": "Reference-model prediction minus its prediction with action and outcome history regressors fixed to zero.",
+    "O": "Frozen exponentially weighted raw outcome history.",
+    "O_star": "Frozen cue-weighted context-relevant outcome history."
+  },
+  "definitions_frozen_before_neural_intervention": true,
+  "file_sha256": {
+    "dual_history/model.pkl": "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3",
+    "dual_history/model_spec.json": "ac7e11f49f69862e3a99a5ba03be31ef57efceee6d8c46b82d3470af2f95fe24",
+    "dual_history/parameters.csv": "7b2d7d1f14d132a895fbaec48ee77268c75d2854a1e1c0f8fc539c85875f362e",
+    "dual_history/prediction_function.py": "3dac5ccf6b6e6e0c5a8264eaefe680015d5adba21ce53240633d0f0c1a4e8d5d",
+    "dual_history/task_parameter_table.csv": "7b2d7d1f14d132a895fbaec48ee77268c75d2854a1e1c0f8fc539c85875f362e",
+    "dual_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "dual_history/variants/M2.pkl": "72fd37addbe86ab45aad6c31b4c7e4282af8b1a4d99f549c35579535ebb55626",
+    "dual_history/variants/M4.pkl": "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3",
+    "freeze_decisions.csv": "203b23dd83d29bb243adbee1fb57ada901ef9ebdf4d9edd2dfd85e39df0dbec8",
+    "frozen_architectures.json": "e8c600954352d9c8448329e19216f650fb8cef7343fc0e5790a4a1541d1f50f6",
+    "latent_context/model.pkl": "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f",
+    "latent_context/model_spec.json": "9403ffffea563eafb4c54ab879d660b0936490e9bfe92d5761c41690997b1664",
+    "latent_context/parameters.csv": "b49fa311467abff542b9bbc1fab621318b243221b1cfd0ea639386c2d9f488a5",
+    "latent_context/prediction_function.py": "3dac5ccf6b6e6e0c5a8264eaefe680015d5adba21ce53240633d0f0c1a4e8d5d",
+    "latent_context/task_parameter_table.csv": "b49fa311467abff542b9bbc1fab621318b243221b1cfd0ea639386c2d9f488a5",
+    "latent_context/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "latent_context/variants/M2.pkl": "68d7715816a2aea71d29011ff47e9ec05eca8dc17ff95d359173443a7c937b8f",
+    "latent_context/variants/M4.pkl": "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f",
+    "outcome_history/model.pkl": "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667",
+    "outcome_history/model_spec.json": "a39bb985f3050e28b3504240fee0665b2504dd49ee7331c522adcf0d1d4fd8d2",
+    "outcome_history/parameters.csv": "52e0c0f0781f4a4b617ac160fb4080f7fa6e48e950bdf4224eb53f255c8b8008",
+    "outcome_history/prediction_function.py": "3dac5ccf6b6e6e0c5a8264eaefe680015d5adba21ce53240633d0f0c1a4e8d5d",
+    "outcome_history/task_parameter_table.csv": "52e0c0f0781f4a4b617ac160fb4080f7fa6e48e950bdf4224eb53f255c8b8008",
+    "outcome_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "outcome_history/variants/M2.pkl": "706f50681a7d9260f84f3a6e72662b80b5f6b67821f3f6cce656a9aed7e5ace8",
+    "outcome_history/variants/M4.pkl": "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667"
+  },
+  "reference_architecture": "dual_history",
+  "theory_bank": {
+    "architectures": [
+      "dual_history",
+      "latent_context",
+      "outcome_history"
+    ],
+    "file_sha256": {
+      "dual_history/model.pkl": "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3",
+      "dual_history/model_spec.json": "ac7e11f49f69862e3a99a5ba03be31ef57efceee6d8c46b82d3470af2f95fe24",
+      "dual_history/parameters.csv": "7b2d7d1f14d132a895fbaec48ee77268c75d2854a1e1c0f8fc539c85875f362e",
+      "dual_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+      "latent_context/model.pkl": "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f",
+      "latent_context/model_spec.json": "9403ffffea563eafb4c54ab879d660b0936490e9bfe92d5761c41690997b1664",
+      "latent_context/parameters.csv": "b49fa311467abff542b9bbc1fab621318b243221b1cfd0ea639386c2d9f488a5",
+      "latent_context/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+      "outcome_history/model.pkl": "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667",
+      "outcome_history/model_spec.json": "a39bb985f3050e28b3504240fee0665b2504dd49ee7331c522adcf0d1d4fd8d2",
+      "outcome_history/parameters.csv": "52e0c0f0781f4a4b617ac160fb4080f7fa6e48e950bdf4224eb53f255c8b8008",
+      "outcome_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25"
+    },
+    "in_memory_model_sha256": {
+      "dual_history": "f5b1fed26d7478fc3d2ab707ee11ef28edf0b7bf1f0fcce8209aeb41448e8505",
+      "latent_context": "21bbf675b6a90b0e30fd4b07faa99c43452ddfb5fdcff63ff6e8eb626934ee79",
+      "outcome_history": "1eaf6bbdd23ca75b95d1613e3e8469aed769293d444dcb4073bb6a5a9eb0721f"
+    },
+    "prediction_only": true
+  }
+}
