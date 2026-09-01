@@ -1,0 +1,83 @@
+protocol_version: causal_abstraction_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 73001
+theory_output: artifacts/theory_resolution_v1
+specificity_output: artifacts/causal_specificity_v2
+output_root: artifacts/abstraction_discovery_v1
+response_labels: [X, Y]
+
+behavioral:
+  reference_architecture: dual_history
+  abstractions: [O, O_star, H, E]
+  freeze_before_neural: true
+
+frozen_das:
+  primary_artifact_id: das_001_outcome_history_dual_history_L28_r2
+  expected_primary_sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0
+  retrain_primary: false
+
+design:
+  candidate_conditions: 50000
+  minimum_candidate_conditions: 50000
+  target_semantic_conditions: 2400
+  maximum_semantic_conditions: 4000
+  contrasts_per_family: 200
+  prediction_chunk_size: 5000
+  match_bin_width_sd: 0.12
+  task_families:
+    - bandit
+    - foraging
+    - solvability
+    - information_sampling
+    - waiting
+    - effort
+    - debugging
+
+cfr:
+  primary_metric: global_cfr
+  threshold: 0.10
+
+bootstrap:
+  samples: 2000
+  confidence: 0.95
+  cluster: semantic_contrast_id
+  stratify: task_family
+  response_mappings_together: true
+
+controls:
+  random_subspaces: 100
+  random_pairs_per_family: 5
+  shuffle_magnitude_strata: 5
+  matched_persistence_state: true
+  direct_output_gradient: true
+
+depth:
+  layers: [16, 20, 24, 28, 30]
+  unrestricted_search: false
+
+secondary_das:
+  enabled: false
+  targets: [H, E]
+  primary_claim_eligible: false
+
+gates:
+  maximum_delta_correlation: 0.90
+  minimum_effect_sd: 0.10
+  random_p_max: 0.05
+  minimum_task_fraction: 0.60
+  require_recovery_ci_above_zero: true
+  require_neighbor_dissociations: true
+  require_shuffled_target_ci: true
+  require_persistence_controls: true
+
+artifact_policy:
+  save_full_activations: false
+  temporary_activation_cache_only: true
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_causal_abstraction
+  evaluation_array_concurrency: 2

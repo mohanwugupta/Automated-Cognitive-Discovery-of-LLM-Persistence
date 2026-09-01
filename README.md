@@ -485,3 +485,36 @@ and build the final report. The dispatcher submits an exact three-candidate GPU
 array (or the exact frozen candidate count) only for Qwen intervention forwards.
 Outputs are written under `artifacts/causal_specificity_v2/`; no full activation
 bank is stored.
+
+## Causal abstraction discovery
+
+`PRD_Causal_Abstraction_Level_Persistence_Computation.md` is implemented by
+`src/cognitive_discovery/causal_abstraction/`. This stage starts from the
+completed Level-4 result and its unresolved variable-specificity finding. It
+hash-freezes the existing layer-28/rank-2 DAS controller and all behavioral
+models before constructing a dedicated 50,000-condition candidate pool.
+
+The CPU design stage selects at least 200 contrasts from each of six factorial
+dissociation families, balances the predicted effect distribution, and freezes
+competing raw-history (O), contextual-history (O*), integrated-history (H), and
+total-evidence (E) predictions. The same untouched neural interventions are
+then scored against all four abstractions. Natural-state geometry, matched
+persistence/output/random controls, shuffled targets, held-out tasks, and only
+the preregistered layers 16/20/24/28/30 are analyzed without retraining the
+primary DAS rotation.
+
+Run the workflow on a Della login node after `causal_specificity_v2` is complete:
+
+```bash
+conda activate llm-cognitive-discovery
+pip install --upgrade -e '.[qwen,parquet]'
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+bash scripts/submit_causal_abstraction.sh
+```
+
+Candidate generation, behavioral prediction, bootstrap inference, figures, and
+the final report use CPU-only jobs. The dispatcher submits an exact six-element
+GPU array only for Qwen natural-state and intervention forwards. Results are
+isolated under `artifacts/abstraction_discovery_v1/`, and circuit work remains
+blocked unless one abstraction passes every neighboring-dissociation and
+matched-control gate.
