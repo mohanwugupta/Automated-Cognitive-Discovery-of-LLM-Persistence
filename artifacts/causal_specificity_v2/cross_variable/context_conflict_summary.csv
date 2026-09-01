@@ -1,0 +1,7 @@
+artifact_id,raw_theory,conflict_quantile,examples,mean_delta_mse_raw_minus_contextual,ci_lower,ci_upper,positive_favors_contextual_history,same_frozen_neural_results_scored_against_both_theories
+das_000_contextual_outcome_history_latent_context_L30_r8,dual_history,0.75,6,0.9021873931517809,0.7444327457535552,1.1927880594116704,True,True
+das_000_contextual_outcome_history_latent_context_L30_r8,outcome_history,0.75,6,0.9021873931517809,0.7444327457535552,1.1927880594116704,True,True
+das_001_outcome_history_dual_history_L28_r2,dual_history,0.75,6,-0.7832964711555782,-0.8995367376595333,-0.7251763379036006,True,True
+das_001_outcome_history_dual_history_L28_r2,outcome_history,0.75,6,-0.7832964711555782,-0.8995367376595333,-0.7251763379036006,True,True
+das_002_outcome_history_outcome_history_L30_r2,dual_history,0.75,6,-0.6670562046516224,-0.8127924387809555,-0.5508159381476664,True,True
+das_002_outcome_history_outcome_history_L30_r2,outcome_history,0.75,6,-0.6670562046516224,-0.8123565377815665,-0.5508159381476663,True,True

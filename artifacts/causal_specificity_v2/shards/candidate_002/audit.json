@@ -1,0 +1,10 @@
+{
+  "artifact_id": "das_002_outcome_history_outcome_history_L30_r2",
+  "candidate_control_row_identity": true,
+  "frozen_alignment_sha256": "f1646812228a22d47601e51d7d3593b46006929b427e5c7156f552a7a2f2169b",
+  "full_activations_saved": false,
+  "primary_reanalysis_retrained": false,
+  "random_subspaces": 500,
+  "target_test_row_sha256": "a01b72def64b1899c8a9acf5ff68985d66f74135093d3d341b80719e4b55042a",
+  "target_test_rows": 24
+}

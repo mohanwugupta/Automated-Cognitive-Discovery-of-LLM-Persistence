@@ -1,0 +1,19 @@
+{
+  "bootstrap_unit": "semantic contrast/source-base pair",
+  "figure_count": 7,
+  "frozen_das_count": 3,
+  "full_activations_saved": false,
+  "git_commit": "029600ae71385a41e9762ecdcaaead8ac589659d",
+  "highest_evidence_level": "4",
+  "mechanistic_outcome": "DAS_controller_without_variable_identity",
+  "primary_reanalysis_retrained": false,
+  "protocol_version": "causal_specificity_v2",
+  "random_subspaces": 500,
+  "report_generated": true,
+  "response_mapping_rows_resampled_together": true,
+  "source_highest_evidence_level": 4,
+  "source_necessity_passed": false,
+  "source_neural_hypothesis": "Neural_H1_shared_coordinates",
+  "source_root": "artifacts/causal_mech_v1",
+  "source_specificity_passed": false
+}

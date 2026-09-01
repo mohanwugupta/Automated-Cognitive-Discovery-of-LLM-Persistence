@@ -1,0 +1,4 @@
+artifact_id,target_variable,theory,vsi,ci_lower,ci_upper,bootstrap_valid,bootstrap_samples
+das_000_contextual_outcome_history_latent_context_L30_r8,contextual_outcome_history,latent_context,0.5059102563772487,0.3095467678087163,0.6535461854995138,2000,2000
+das_001_outcome_history_dual_history_L28_r2,outcome_history,dual_history,0.40030064666260134,0.3604656163144903,0.4376044274113084,2000,2000
+das_002_outcome_history_outcome_history_L30_r2,outcome_history,outcome_history,0.36304798926660975,0.3193136039375545,0.4053412852206801,2000,2000

@@ -1,0 +1,8 @@
+{
+  "counterfactuals/mechanistic_conditions.jsonl": "a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342",
+  "counterfactuals/pair_manifest.parquet": "6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4",
+  "counterfactuals/predicted_effects.parquet": "dc87d567f8560c079f6671c24d25df81f13f6990b795daf9f7ac4f44ef681351",
+  "gates.json": "a6bc47860757dc1b1478607c7603dbfda5f88a752f0f143db50feb25c78668da",
+  "localization/whole_state_patching.parquet": "3746cb8bff87761acb96678437dc80157ac295c09e7137836830406a77a1b5af",
+  "validation/counterfactual_recovery.parquet": "ae9ce371c6536639f83f869bdfbb3b94de85adfb69f4b64be825732ced91cd94"
+}

@@ -1,0 +1,32 @@
+{
+  "circuit": {
+    "status": "not_eligible",
+    "submitted": false
+  },
+  "corrected_level3": {
+    "completed": true,
+    "rows": 768
+  },
+  "corrected_level4": {
+    "candidate_count": 2,
+    "criteria": "CFR_G and correlation bootstrap lower bounds exceed zero",
+    "passed": true
+  },
+  "frozen_source_state": {
+    "circuit_not_eligible": true,
+    "level4_passed": true,
+    "necessity_unresolved": true,
+    "specificity_unresolved": true
+  },
+  "highest_evidence_level": "4",
+  "level5a_specificity": {
+    "all_six_primary_criteria_required": true,
+    "candidate_count": 0,
+    "passed": false
+  },
+  "level5b_necessity": {
+    "evaluated_only_after_specificity": true,
+    "passed": false
+  },
+  "mechanistic_outcome": "DAS_controller_without_variable_identity"
+}
