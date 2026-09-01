@@ -24,6 +24,7 @@ from cognitive_discovery.causal_abstraction.variables import (
     ABSTRACTIONS,
     FrozenAbstractionBank,
 )
+from cognitive_discovery.causal_mechanistic.pipeline import _forward, _trial
 from cognitive_discovery.data.storage import write_records
 
 
@@ -115,6 +116,48 @@ def test_candidate_generator_uses_legal_existing_grammar_and_contexts():
     assert metadata.semantic_sha256.nunique() == 280
     assert metadata.contextual_condition.any()
     assert all(condition.history.length == 3 for condition in conditions)
+
+
+def test_bare_abstraction_condition_uses_shared_mechanistic_forward_adapter():
+    config = {
+        "seed": 4,
+        "design": {
+            "candidate_conditions": 1,
+            "minimum_candidate_conditions": 1,
+        },
+    }
+    conditions, _ = generate_candidate_conditions(config)
+    condition = conditions[0]
+    trial = _trial(condition)
+
+    class RecordingRunner:
+        def forward(
+            self,
+            messages,
+            labels,
+            *,
+            positive_label,
+            editors,
+            capture_layers,
+        ):
+            self.call = {
+                "messages": messages,
+                "labels": labels,
+                "positive_label": positive_label,
+                "editors": editors,
+                "capture_layers": capture_layers,
+            }
+            return "forward-result"
+
+    runner = RecordingRunner()
+    result = _forward(runner, condition, capture_layers=(16, 28))
+
+    assert result == "forward-result"
+    assert runner.call["messages"] == list(trial.messages)
+    assert runner.call["labels"] == condition.response_mapping.labels
+    assert runner.call["positive_label"] == condition.response_mapping.continue_label
+    assert runner.call["editors"] is None
+    assert runner.call["capture_layers"] == (16, 28)
 
 
 def test_shuffled_targets_preserve_marginals_and_pair_response_mappings():

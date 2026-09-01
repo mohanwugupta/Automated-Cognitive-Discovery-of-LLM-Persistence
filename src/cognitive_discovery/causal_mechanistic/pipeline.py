@@ -113,19 +113,27 @@ def _make_runner(config, *, model_path=None, revision=None, online=False):
     )
 
 
+def _condition(record):
+    """Return the condition carried by either supported manifest record shape."""
+
+    return getattr(record, "condition", record)
+
+
 def _trial(record):
-    return get_renderer(record.condition.task_family).render(record.condition)
+    condition = _condition(record)
+    return get_renderer(condition.task_family).render(condition)
 
 
 def _forward(runner, record, *, layer=None, editor=None, capture_layers=None):
+    condition = _condition(record)
     trial = _trial(record)
     editors = {int(layer): editor} if layer is not None and editor is not None else None
     if capture_layers is None:
         capture_layers = () if layer is None else (int(layer),)
     return runner.forward(
         list(trial.messages),
-        record.condition.response_mapping.labels,
-        positive_label=record.condition.response_mapping.continue_label,
+        condition.response_mapping.labels,
+        positive_label=condition.response_mapping.continue_label,
         editors=editors,
         capture_layers=capture_layers,
     )
