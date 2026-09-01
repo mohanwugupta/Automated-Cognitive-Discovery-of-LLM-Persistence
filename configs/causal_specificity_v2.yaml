@@ -1,0 +1,68 @@
+protocol_version: causal_specificity_v2
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 73001
+source_root: artifacts/causal_mech_v1
+output_root: artifacts/causal_specificity_v2
+
+cfr:
+  primary_metric: global_cfr
+  threshold: 0.10
+  thresholded_cfr_is_diagnostic_only: true
+
+bootstrap:
+  samples: 2000
+  confidence: 0.95
+  cluster: contrast_id
+  stratify: task_family
+  response_mapping_rows_resampled_together: true
+
+controls:
+  random_subspaces: 500
+  match_layer: true
+  match_rank: true
+  match_intervention_norm: true
+  identical_test_rows: true
+  shuffled_source_strata: [task_family, response_mapping, current_state_bin]
+  shuffled_target_strata: [task_family]
+  named:
+    - persistence_state
+    - persistence_output
+    - generic_value
+    - task_id
+    - response_mapping
+
+cross_variable:
+  variables: [outcome_history, contextual_outcome_history, action_history]
+  context_conflict_quantile: 0.75
+  primary_functional_not_geometric: true
+  no_retraining: true
+
+necessity:
+  neutral_reference: task_conditioned_training_mean
+  features:
+    - success_evidence
+    - progress_evidence
+    - disengagement_value
+    - action_history
+    - outcome_history
+    - contextual_outcome_history
+  separate_level: 5B
+
+gates:
+  require_global_cfr_ci_above_zero: true
+  require_correlation_ci_above_zero: true
+  random_p_max: 0.05
+  require_paired_control_ci_above_zero: true
+  require_vsi_ci_above_zero: true
+
+artifact_policy:
+  save_full_activations: false
+  temporary_activation_cache_only: true
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_causal_specificity
+  evaluation_array_concurrency: 2

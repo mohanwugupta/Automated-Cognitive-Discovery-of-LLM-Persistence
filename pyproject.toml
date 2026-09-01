@@ -37,6 +37,7 @@ cognitive-discovery-theory = "cognitive_discovery.cli:theory_resolution_main"
 cognitive-discovery-mechanistic = "cognitive_discovery.cli:mechanistic_main"
 cognitive-discovery-action-history = "cognitive_discovery.cli:action_history_main"
 cognitive-discovery-causal-mech = "cognitive_discovery.cli:causal_mechanistic_main"
+cognitive-discovery-specificity = "cognitive_discovery.cli:causal_specificity_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

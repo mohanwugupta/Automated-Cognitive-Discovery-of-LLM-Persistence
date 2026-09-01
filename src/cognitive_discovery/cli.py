@@ -47,6 +47,13 @@ from .causal_mechanistic.pipeline import (
     train_das_search_job,
     validate_selected_alignments,
 )
+from .causal_specificity.pipeline import (
+    aggregate_specificity_run,
+    evaluate_specificity_candidate,
+    evaluate_specificity_necessity,
+    finalize_specificity_run,
+    prepare_specificity_reanalysis,
+)
 
 
 DEFAULT_CONFIG = "configs/discovery_v1.yaml"
@@ -476,6 +483,69 @@ def causal_mechanistic_main(argv=None):
         result = run_circuit_localization(config, **gpu)
     else:
         result = finalize_causal_mechanistic_run(config, **common)
+    print(
+        json.dumps(
+            {
+                key: str(value) if isinstance(value, Path) else value
+                for key, value in result.items()
+            },
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
+    )
+
+
+def causal_specificity_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Frozen-DAS causal specificity with stable global CFR"
+    )
+    parser.add_argument("--config", default="configs/causal_specificity_v2.yaml")
+    parser.add_argument("--source", default="artifacts/causal_mech_v1")
+    parser.add_argument("--output")
+    parser.add_argument(
+        "--phase",
+        choices=("prepare", "evaluate", "aggregate", "necessity", "finalize"),
+        required=True,
+    )
+    parser.add_argument("--job-index", type=int)
+    parser.add_argument("--model")
+    parser.add_argument("--revision")
+    parser.add_argument("--online", action="store_true")
+    parser.add_argument("--limit", type=int)
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    common = {"source": args.source, "output": args.output}
+    if args.phase == "prepare":
+        result = prepare_specificity_reanalysis(config, **common)
+    elif args.phase == "evaluate":
+        if args.job_index is None:
+            parser.error("--job-index is required for evaluate")
+        result = evaluate_specificity_candidate(
+            config,
+            job_index=args.job_index,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+            **common,
+        )
+    elif args.phase == "aggregate":
+        result = aggregate_specificity_run(config, **common)
+    elif args.phase == "necessity":
+        if args.job_index is None:
+            parser.error("--job-index is required for necessity")
+        result = evaluate_specificity_necessity(
+            config,
+            job_index=args.job_index,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+            **common,
+        )
+    else:
+        result = finalize_specificity_run(config, **common)
     print(
         json.dumps(
             {

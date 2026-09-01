@@ -447,3 +447,41 @@ isolated under `artifacts/causal_mech_v1/` using the PRD directories:
 `behavioral_handoff`, `counterfactuals`, `localization`, `representations`,
 `validation`, `circuits`, and `figures`. Only compact alignments, scalar causal
 results, hashes, and summaries are retained; full activation banks are forbidden.
+
+## Stable-CFR DAS causal specificity
+
+`PRD_DAS_Causal_Specificity_Stable_CFR.md` is implemented by the frozen-DAS
+reanalysis in `src/cognitive_discovery/causal_specificity/`. It does not retrain
+the three Level-4 alignments. It freezes their exact safetensors and hashes, then
+replaces unstable mean per-example recovery with aggregate global CFR:
+
+```text
+CFR_G = 1 - Σ(neural effect - frozen counterfactual effect)²
+            / Σ(baseline effect - frozen counterfactual effect)²
+```
+
+The workflow recomputes Level 3, bootstraps Level 4 at the semantic-pair level,
+and evaluates every frozen candidate against 500 matched random subspaces,
+shuffled sources and targets, direct persistence, output, generic-value,
+task-ID, response-mapping, and cross-variable controls. It also produces the
+functional specificity matrix, principal-angle diagnostics, context-conflict
+theory comparison, and task-transfer results. Only Level-5A-passing candidates
+receive a subsequent task-conditioned necessity job. Level 5A specificity and
+Level 5B necessity are reported as separate gates; circuit work remains blocked
+unless specificity passes.
+
+Run the isolated reanalysis from a Della login node after `causal_mech_v1` is
+complete:
+
+```bash
+conda activate llm-cognitive-discovery
+pip install --upgrade -e '.[qwen,parquet]'
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+bash scripts/submit_causal_specificity.sh
+```
+
+CPU jobs freeze inputs, calculate corrected summaries and bootstrap intervals,
+and build the final report. The dispatcher submits an exact three-candidate GPU
+array (or the exact frozen candidate count) only for Qwen intervention forwards.
+Outputs are written under `artifacts/causal_specificity_v2/`; no full activation
+bank is stored.

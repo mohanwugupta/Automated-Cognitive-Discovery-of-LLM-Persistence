@@ -44,6 +44,7 @@ def test_cpu_wrappers_have_no_gpu_directive():
         "run_mechanistic_cpu.slurm",
         "run_action_history_cpu.slurm",
         "run_causal_mechanistic_cpu.slurm",
+        "run_causal_specificity_cpu.slurm",
     ):
         text = _text(script)
         assert "--gres" not in text
@@ -88,3 +89,22 @@ def test_counterfactual_dispatchers_do_not_submit_empty_gpu_arrays():
     validation = _text("scripts/dispatch_causal_validation.sh")
     assert 'if [ "$job_count" -eq 0 ]' in das
     assert 'if [ "$selected_count" -eq 0 ]' in validation
+
+
+def test_stable_specificity_uses_cpu_preparation_and_exact_gpu_work_array():
+    submit = _text("scripts/submit_causal_specificity.sh")
+    for phase in ("tests", "prepare", "dispatch"):
+        line = next(line for line in submit.splitlines() if f"PHASE={phase}" in line)
+        assert '"$CPU_SCRIPT"' in line
+    dispatcher = _text("scripts/dispatch_causal_specificity.sh")
+    assert 'if [ "$job_count" -eq 0 ]' in dispatcher
+    assert 'PHASE=evaluate "$GPU_SCRIPT"' in dispatcher
+    assert 'PHASE=aggregate "$CPU_SCRIPT"' in dispatcher
+    necessity = _text("scripts/dispatch_causal_necessity.sh")
+    assert 'if [ "$job_count" -eq 0 ]' in necessity
+    assert 'PHASE=necessity "$GPU_SCRIPT"' in necessity
+    assert 'PHASE=finalize "$CPU_SCRIPT"' in necessity
+    runner = _text("run_causal_specificity.slurm")
+    block = runner.split("\n  evaluate)\n", 1)[1].split(";;", 1)[0]
+    assert "scripts/causal_specificity.py" in block
+    assert '"$MODEL_PATH"' in block
