@@ -1,0 +1,109 @@
+protocol_version: ood_free_generation_v1
+model: Qwen/Qwen3.5-4B
+model_revision: null
+seed: 94001
+abstraction_output: artifacts/abstraction_discovery_v1
+output_root: artifacts/ood_free_generation_v1
+
+entry:
+  # Level-4 established the causal object; the abstraction stage must have
+  # identified E, but its stricter exploratory specificity gate is not reused.
+  require_e_winner: true
+  require_abstraction_gate: false
+
+frozen:
+  expected_das_sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0
+
+prompts:
+  open_ended:
+    - Write about anything you want.
+    - Write whatever you would like.
+    - Choose any topic and write about it.
+    - Say whatever comes to mind.
+    - Write freely about a subject of your choice.
+    - Tell me about anything you feel like discussing.
+  fixed_topic:
+    - Write about the ocean.
+    - Write about mathematics.
+    - Write about trees.
+    - Write about music.
+  continuation:
+    - |-
+      A small coastal town wakes before sunrise. Fishing boats leave the harbor while shopkeepers prepare for the day.
+
+      Continue.
+    - |-
+      Mathematics often begins with a simple pattern and grows into a language for describing relationships that are difficult to see directly.
+
+      Continue.
+
+sampling:
+  do_sample: true
+  temperature: 1.0
+  top_p: 1.0
+  top_k: null
+  repetition_penalty: 1.0
+  thinking_enabled: false
+  context_safety_margin: 1
+
+intervention:
+  doses: [-2, -1, 0, 1, 2]
+  regime: continuous
+  activation_position: newly_generated_final_token
+  scale: structured_signed_coordinate_sd
+
+design:
+  primary_seeds_per_prompt: 100
+  seeds_per_job: 10
+  seed_start: 1
+  matched_seeds_across_doses: true
+
+pulse:
+  enabled: true
+  seeds_per_prompt: 50
+
+secondary:
+  fixed_topic: true
+  fixed_topic_seeds_per_prompt: 50
+  continuation: false
+  continuation_seeds_per_prompt: 50
+
+controls:
+  random_subspaces: 100
+  neural_random_directions_per_job: 10
+  behavioral_random_subspaces: 10
+  behavioral_seeds_per_prompt: 10
+  behavioral_random_doses: [-2, 0, 2]
+  eos_seeds_per_prompt: 10
+  eos_logit_scale: 2.0
+  match_intervention_norm: true
+
+runtime:
+  # This is infrastructure censoring, never an EOS or scientific length cap.
+  generation_timeout_seconds: 600
+
+analysis:
+  primary: eos_hazard
+  survival_model: prompt_stratified_cox_breslow
+  confidence: 0.95
+  context_exhaustion: right_censored
+  infrastructure_timeout: right_censored
+  dose_response: frozen_linear_and_monotonic
+
+gates:
+  maximum_positive_dose_degeneration: 0.25
+  maximum_degeneration_increase: 0.10
+  random_p_max: 0.05
+
+artifact_policy:
+  save_full_activations: false
+  save_kv_cache: false
+  save_token_scalar_events: true
+  max_tracked_file_mb: 10
+
+cluster:
+  conda_env: llm-cognitive-discovery
+  model_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  scratch_template: /scratch/gpfs/JORDANAT/{user}/persistence_ood_generation
+  evaluation_array_concurrency: 2
+  require_cuda: true

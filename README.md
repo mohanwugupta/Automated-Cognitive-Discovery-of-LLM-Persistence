@@ -518,3 +518,38 @@ GPU array only for Qwen natural-state and intervention forwards. Results are
 isolated under `artifacts/abstraction_discovery_v1/`, and circuit work remains
 blocked unless one abstraction passes every neighboring-dissociation and
 matched-control gate.
+
+## OOD free-generation validation
+
+`PRD_OOD_Generalization_Persistence_Evidence_Subspace.md` is implemented in
+`src/cognitive_discovery/ood_generation/`. It copies and hash-verifies the
+existing layer-28/rank-2 DAS artifact, then derives a signed E axis using only
+the structured-task coverage projections and frozen behavioral E values. The
+axis, structured activation scale, prompts, doses, sampling policy, controls,
+exclusions, and statistical plan are hash-frozen before any free generation.
+
+The GPU phase uses a custom KV-cached autoregressive loop. It intervenes only
+on the newly processed final-token residual, leaves every canonical EOS token
+sampleable, and has no application-level output-token cap. EOS is an event;
+architectural context exhaustion, infrastructure timeout, and resource
+exhaustion are recorded as distinct right-censoring reasons. The primary
+battery contains 6 prompts × 100 matched seeds × 5 doses = 3,000 generations.
+Fixed-topic prompts, pulse interventions, 100 immediate random-subspace
+controls, 10 full-generation random controls, and direct EOS-logit controls are
+kept secondary.
+
+After the abstraction artifacts are present on Della, run:
+
+```bash
+conda activate llm-cognitive-discovery
+pip install --upgrade -e '.[qwen,parquet]'
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+export ABSTRACTION_OUTPUT=artifacts/abstraction_discovery_v1
+export OOD_OUTPUT=artifacts/ood_free_generation_v1
+bash scripts/submit_ood_generation.sh
+```
+
+The dependency chain is CPU tests → CPU protocol freeze → CPU dispatcher →
+GPU evaluation array (maximum two live by default) → CPU survival analysis and
+reporting. CUDA placement is enforced inside every evaluation shard, while the
+test, freeze, dispatch, and aggregation jobs reject accidental GPU allocations.

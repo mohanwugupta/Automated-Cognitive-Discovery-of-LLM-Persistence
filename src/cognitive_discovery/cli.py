@@ -59,6 +59,11 @@ from .causal_abstraction.pipeline import (
     evaluate_abstraction_job,
     prepare_abstraction_run,
 )
+from .ood_generation.pipeline import (
+    aggregate_ood_run,
+    evaluate_ood_job,
+    prepare_ood_run,
+)
 
 
 DEFAULT_CONFIG = "configs/discovery_v1.yaml"
@@ -603,6 +608,56 @@ def causal_abstraction_main(argv=None):
         )
     else:
         result = aggregate_abstraction_run(config, output=args.output)
+    print(
+        json.dumps(
+            {
+                key: str(value) if isinstance(value, Path) else value
+                for key, value in result.items()
+            },
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
+    )
+
+
+def ood_generation_main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Test the frozen persistence-evidence subspace on voluntary EOS"
+    )
+    parser.add_argument("--config", default="configs/ood_free_generation_v1.yaml")
+    parser.add_argument("--output")
+    parser.add_argument("--abstraction-output")
+    parser.add_argument(
+        "--phase", choices=("prepare", "evaluate", "aggregate"), required=True
+    )
+    parser.add_argument("--job-index", type=int)
+    parser.add_argument("--model")
+    parser.add_argument("--revision")
+    parser.add_argument("--online", action="store_true")
+    parser.add_argument("--limit", type=int)
+    args = parser.parse_args(argv)
+    config = load_config(args.config)
+    if args.phase == "prepare":
+        result = prepare_ood_run(
+            config,
+            abstraction_output=args.abstraction_output,
+            output=args.output,
+        )
+    elif args.phase == "evaluate":
+        if args.job_index is None:
+            parser.error("--job-index is required for evaluate")
+        result = evaluate_ood_job(
+            config,
+            job_index=args.job_index,
+            output=args.output,
+            model_path=args.model,
+            revision=args.revision,
+            online=args.online,
+            limit=args.limit,
+        )
+    else:
+        result = aggregate_ood_run(config, output=args.output)
     print(
         json.dumps(
             {
