@@ -1,0 +1,24 @@
+{
+  "application_output_cap": null,
+  "context_limit": 262144,
+  "cuda_device": "cuda:0",
+  "das_sha256": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+  "eos_token_ids": [
+    248044,
+    248046
+  ],
+  "expected_orientation_sha256": "98732c97b59d21bb7fb15e47aa959eea55f4e90130f6864b6e7b7b3a5049e5f6",
+  "final_token_only": true,
+  "frozen_before_ood": true,
+  "full_activations_saved": false,
+  "gpu_evaluation_only": true,
+  "immediate_controls": 0,
+  "job_index": 43,
+  "job_mode": "generation",
+  "kv_cache_used": true,
+  "layer": 28,
+  "orientation_sha256": "98732c97b59d21bb7fb15e47aa959eea55f4e90130f6864b6e7b7b3a5049e5f6",
+  "rank": 2,
+  "summaries": 54,
+  "token_events": 2520
+}

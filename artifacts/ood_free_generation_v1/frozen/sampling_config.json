@@ -1,0 +1,12 @@
+{
+  "application_token_cap": null,
+  "context_safety_margin": 1,
+  "count_all_autoregressive_tokens": true,
+  "do_sample": true,
+  "repetition_penalty": 1.0,
+  "scientific_stop_rule": "canonical_eos_or_architectural_context_capacity",
+  "temperature": 1.0,
+  "thinking_enabled": false,
+  "top_k": null,
+  "top_p": 1.0
+}

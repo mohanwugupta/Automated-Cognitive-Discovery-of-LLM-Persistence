@@ -1,0 +1,42 @@
+{
+  "artifact": "artifacts/ood_free_generation_v1/frozen/das_001_outcome_history_dual_history_L28_r2.safetensors",
+  "artifact_id": "das_001_outcome_history_dual_history_L28_r2",
+  "candidate_index": 1,
+  "job_index": 1,
+  "layer": 28,
+  "orientation": {
+    "activation_position": "final_prompt_token",
+    "artifact_id": "das_001_outcome_history_dual_history_L28_r2",
+    "layer": 28,
+    "ood_data_used": false,
+    "orientation_correlation": 0.423384306074477,
+    "orientation_r2": 0.1792542706301663,
+    "orientation_rows": 2368,
+    "rank": 2,
+    "scale_definition": "sample_sd_of_signed_frozen_DAS_coordinate",
+    "sign_check": {
+      "high_projection_mean_E": -0.18666540917167368,
+      "low_projection_mean_E": -0.9401320605993133,
+      "passed": true
+    },
+    "source": "structured_persistence_coverage_only",
+    "source_behavioral_variables_sha256": "8c3c875e19401dec9e956e9dcc2fbdc622f12d3144140760a4914ace8b5575d5",
+    "source_das_sha256": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+    "source_projection_sha256": "40579e2d20dbe86a3c5018a9a60e12f9b46df54c06186b29efdc9cae4465fb18"
+  },
+  "orientation_artifact": "artifacts/ood_free_generation_v1/frozen/e_orientation.pt",
+  "orientation_sha256": "98732c97b59d21bb7fb15e47aa959eea55f4e90130f6864b6e7b7b3a5049e5f6",
+  "persistence_control": "artifacts/abstraction_discovery_v1/frozen_das/persistence_controls/das_001_outcome_history_dual_history_L28_r2.safetensors",
+  "persistence_control_sha256": "76f9d380a12965bb2a64cab7b13dcaa17dc897182bd2224358157e07dabc38b5",
+  "primary": true,
+  "primary_reanalysis_retrained": false,
+  "rank": 2,
+  "retrained_for_abstraction_primary": false,
+  "retrained_for_ood": false,
+  "scope": "shared",
+  "sha256": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+  "source_artifact": "artifacts/abstraction_discovery_v1/frozen_das/alignments/das_001_outcome_history_dual_history_L28_r2.safetensors",
+  "target_variable": "outcome_history",
+  "task_family": null,
+  "theory": "dual_history"
+}

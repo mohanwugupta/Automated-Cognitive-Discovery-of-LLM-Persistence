@@ -1,0 +1,12 @@
+{
+  "frozen_protocol": {
+    "application_output_cap_removed": true,
+    "das_hash_verified": true,
+    "layer_rank_dose_tuned_on_ood": false,
+    "orientation_pre_ood": true,
+    "passed": true
+  },
+  "ood_generalization": {
+    "status": "awaiting_frozen_evaluation"
+  }
+}

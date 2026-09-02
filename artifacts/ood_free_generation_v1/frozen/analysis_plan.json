@@ -1,0 +1,78 @@
+{
+  "analysis": {
+    "confidence": 0.95,
+    "context_exhaustion": "right_censored",
+    "dose_response": "frozen_linear_and_monotonic",
+    "infrastructure_timeout": "right_censored",
+    "primary": "eos_hazard",
+    "survival_model": "prompt_stratified_cox_breslow"
+  },
+  "controls": {
+    "behavioral_random_doses": [
+      -2,
+      0,
+      2
+    ],
+    "behavioral_random_subspaces": 10,
+    "behavioral_seeds_per_prompt": 3,
+    "eos_logit_scale": 2.0,
+    "eos_seeds_per_prompt": 3,
+    "match_intervention_norm": true,
+    "neural_random_directions_per_job": 10,
+    "random_subspaces": 100
+  },
+  "design": {
+    "matched_seeds_across_doses": true,
+    "primary_seeds_per_prompt": 50,
+    "seed_start": 1,
+    "seeds_per_job": 10
+  },
+  "entry": {
+    "require_abstraction_gate": false,
+    "require_e_winner": true
+  },
+  "exclusions": {
+    "context_limit": "right_censored",
+    "eos": "observed_event",
+    "infrastructure_oom": "right_censored",
+    "infrastructure_timeout": "right_censored",
+    "post_ood_prompt_or_dose_selection": "forbidden"
+  },
+  "execution_profile": "compute_efficient_initial",
+  "gates": {
+    "maximum_degeneration_increase": 0.1,
+    "maximum_positive_dose_degeneration": 0.25,
+    "random_p_max": 0.05
+  },
+  "intervention": {
+    "activation_position": "newly_generated_final_token",
+    "doses": [
+      -2.0,
+      -1.0,
+      0.0,
+      1.0,
+      2.0
+    ],
+    "regime": "continuous",
+    "scale": "structured_signed_coordinate_sd"
+  },
+  "model": "Qwen/Qwen3.5-4B",
+  "model_revision": null,
+  "primary_outcome": "canonical_EOS_hazard",
+  "primary_population": "open_ended_continuous_frozen_E",
+  "pulse": {
+    "enabled": true,
+    "seeds_per_prompt": 5
+  },
+  "runtime": {
+    "generation_timeout_seconds": 300
+  },
+  "secondary": {
+    "continuation": false,
+    "continuation_seeds_per_prompt": 50,
+    "fixed_topic": true,
+    "fixed_topic_seeds_per_prompt": 5
+  },
+  "seed": 94001,
+  "selected_before_ood": true
+}

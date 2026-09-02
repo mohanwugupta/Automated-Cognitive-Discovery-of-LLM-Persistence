@@ -1,0 +1,77 @@
+{
+  "prompts": [
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_01",
+      "text": "Write about anything you want."
+    },
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_02",
+      "text": "Write whatever you would like."
+    },
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_03",
+      "text": "Choose any topic and write about it."
+    },
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_04",
+      "text": "Say whatever comes to mind."
+    },
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_05",
+      "text": "Write freely about a subject of your choice."
+    },
+    {
+      "primary": true,
+      "prompt_family": "open_ended",
+      "prompt_id": "open_ended_06",
+      "text": "Tell me about anything you feel like discussing."
+    },
+    {
+      "primary": false,
+      "prompt_family": "fixed_topic",
+      "prompt_id": "fixed_topic_01",
+      "text": "Write about the ocean."
+    },
+    {
+      "primary": false,
+      "prompt_family": "fixed_topic",
+      "prompt_id": "fixed_topic_02",
+      "text": "Write about mathematics."
+    },
+    {
+      "primary": false,
+      "prompt_family": "fixed_topic",
+      "prompt_id": "fixed_topic_03",
+      "text": "Write about trees."
+    },
+    {
+      "primary": false,
+      "prompt_family": "fixed_topic",
+      "prompt_id": "fixed_topic_04",
+      "text": "Write about music."
+    },
+    {
+      "primary": false,
+      "prompt_family": "continuation",
+      "prompt_id": "continuation_01",
+      "text": "A small coastal town wakes before sunrise. Fishing boats leave the harbor while shopkeepers prepare for the day.\n\nContinue."
+    },
+    {
+      "primary": false,
+      "prompt_family": "continuation",
+      "prompt_id": "continuation_02",
+      "text": "Mathematics often begins with a simple pattern and grows into a language for describing relationships that are difficult to see directly.\n\nContinue."
+    }
+  ],
+  "selected_before_ood": true
+}
