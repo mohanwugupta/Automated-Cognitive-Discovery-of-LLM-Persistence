@@ -349,6 +349,7 @@ def evaluate_ood_job(
     if job_index < 0 or job_index >= len(jobs):
         raise ValueError(f"OOD job index must lie in 0..{len(jobs) - 1}")
     job = jobs[job_index]
+    shard = root / "shards" / f"job_{job_index:04d}"
     prompts = _load_prompts(root)
     analysis_plan = json.loads(
         (root / "frozen/analysis_plan.json").read_text(encoding="utf-8")
@@ -386,13 +387,32 @@ def evaluate_ood_job(
             layer=layer,
             direction=orientation["hidden_direction"],
         )
+        # Persist and print the measurements before enforcing the gate.  A
+        # failed validation shard must remain diagnosable from its artifact and
+        # SLURM log instead of exposing only a generic exception.
+        numerical_path = json_write(
+            shard / "numerical_checks.json", numerical_checks
+        )
+        print(
+            "OOD cache validation: "
+            + json.dumps(numerical_checks, sort_keys=True),
+            flush=True,
+        )
         if not numerical_checks["alpha_zero_passed"]:
             raise RuntimeError(
-                "alpha-zero hook is not numerically identical to baseline"
+                "alpha-zero hook is not numerically identical to baseline; "
+                f"diagnostics={numerical_path}"
             )
         if not numerical_checks["cache_equivalent"]:
+            criteria = numerical_checks["cache_equivalence_criteria"]
             raise RuntimeError(
-                "cached and uncached alpha-zero logits are not equivalent"
+                "cached and uncached alpha-zero next-token distributions are "
+                "not equivalent: "
+                f"total_variation={numerical_checks['cache_total_variation_distance']:.6g} "
+                f"(max={criteria['total_variation_max']:.6g}), "
+                f"eos_log_odds_abs_error={numerical_checks['cache_eos_log_odds_abs_error']:.6g} "
+                f"(max={criteria['eos_log_odds_abs_error_max']:.6g}); "
+                f"diagnostics={numerical_path}"
             )
 
     summaries, token_rows, immediate_rows = [], [], []
@@ -491,7 +511,6 @@ def evaluate_ood_job(
     else:
         raise RuntimeError(f"unknown frozen OOD job mode: {job['mode']}")
 
-    shard = root / "shards" / f"job_{job_index:04d}"
     paths = {}
     if summaries:
         paths["summary"] = write_records(

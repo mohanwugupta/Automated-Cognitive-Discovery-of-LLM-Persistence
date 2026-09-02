@@ -20,6 +20,7 @@ from cognitive_discovery.ood_generation.generation import (
     GenerationStep,
     QwenFreeGenerationRunner,
     _eos_stats,
+    compare_cached_logits,
     decode_autoregressive,
     edit_final_token,
 )
@@ -172,6 +173,36 @@ def test_cache_and_uncached_logits_match_at_zero_intervention():
     assert checks["cache_equivalent"]
     assert checks["context_limit"] == 32
     assert checks["eos_token_ids"] == [3]
+
+
+def test_cache_validation_ignores_irrelevant_tail_logit_error():
+    uncached = torch.linspace(8.0, -8.0, 64)
+    cached = uncached.clone()
+    cached[-1] -= 10.0
+    result = compare_cached_logits(cached, uncached, (5,))
+    assert result["cache_max_abs_logit_error"] == 10.0
+    assert result["cache_total_variation_distance"] < 1e-6
+    assert result["cache_eos_log_odds_abs_error"] < 1e-6
+    assert result["cache_equivalent"]
+
+
+def test_cache_validation_rejects_sampling_distribution_change():
+    uncached = torch.tensor([8.0, 0.0, -1.0, -2.0])
+    cached = torch.tensor([0.0, 8.0, -1.0, -2.0])
+    result = compare_cached_logits(cached, uncached, (3,))
+    assert result["cache_total_variation_distance"] > 0.9
+    assert not result["cache_top1_token_match"]
+    assert not result["cache_equivalent"]
+
+
+def test_cache_validation_protects_eos_log_odds_when_eos_is_rare():
+    uncached = torch.tensor([10.0, 1.0, 0.0, -20.0])
+    cached = uncached.clone()
+    cached[3] += 0.1
+    result = compare_cached_logits(cached, uncached, (3,))
+    assert result["cache_total_variation_distance"] < 1e-6
+    assert result["cache_eos_log_odds_abs_error"] > 0.05
+    assert not result["cache_equivalent"]
 
 
 def test_job_manifest_uses_matched_seeds_for_every_dose():

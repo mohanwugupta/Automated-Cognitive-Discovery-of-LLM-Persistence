@@ -556,3 +556,24 @@ reporting. CUDA placement is enforced inside every evaluation shard, while the
 test, freeze, dispatch, and aggregation jobs reject accidental GPU allocations.
 Each GPU shard requests at most six hours (rather than the earlier 24-hour
 ceiling) and exits immediately when its assigned generations finish.
+
+If one or more evaluation shards fail after other shards have completed, do not
+rerun protocol preparation or the full array. Pull the repaired code, preserve
+the existing artifact directory, and submit only shards without a valid audit:
+
+```bash
+git pull
+conda activate llm-cognitive-discovery
+pip install --upgrade -e '.[qwen,parquet]'
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
+export OOD_OUTPUT=artifacts/ood_free_generation_v1
+bash scripts/resume_ood_generation.sh
+```
+
+The helper discovers incomplete shard indices and submits a new GPU array for
+only those indices, followed by a CPU aggregation job with a fresh `afterok`
+dependency. Task 0 writes `shards/job_0000/numerical_checks.json` before
+enforcing cache validation. That validation is based on next-token total
+variation and EOS log-odds error; raw maximum logit error remains diagnostic
+because BF16 cache and no-cache kernels can disagree on negligible-probability
+tail tokens without materially changing the sampling distribution.

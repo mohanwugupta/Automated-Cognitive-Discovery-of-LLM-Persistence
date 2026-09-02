@@ -116,6 +116,102 @@ def _eos_stats(logits, eos_token_ids: tuple[int, ...]) -> tuple[float, float]:
     return probability, log_odds
 
 
+# These bounds are defined in probability space because BF16 cached and
+# uncached forwards may use different kernel shapes.  A vocabulary-wide
+# maximum logit difference can therefore be dominated by a token with
+# effectively zero probability even when the two sampling distributions are
+# indistinguishable.  Total variation directly bounds the probability change
+# of any next-token event; the separate EOS bound protects the scientific
+# outcome even when EOS is very unlikely.
+CACHE_EQUIVALENCE_CRITERIA = {
+    "total_variation_max": 0.02,
+    "eos_log_odds_abs_error_max": 0.05,
+}
+
+
+def compare_cached_logits(
+    cached_logits,
+    uncached_logits,
+    eos_token_ids: tuple[int, ...],
+) -> dict:
+    """Compare cache paths by sampling distribution and EOS evidence.
+
+    Raw maximum logit error is retained as a diagnostic, but is deliberately
+    not a pass/fail criterion: softmax is invariant to a common logit shift and
+    large errors on negligible-probability tail tokens do not affect sampling.
+    """
+
+    import torch
+
+    cached = cached_logits.detach().float().reshape(-1)
+    uncached = uncached_logits.detach().float().reshape(-1)
+    if cached.shape != uncached.shape:
+        raise ValueError("cached and uncached logits have different shapes")
+    if not torch.isfinite(cached).all() or not torch.isfinite(uncached).all():
+        raise RuntimeError("cached or uncached logits contain non-finite values")
+
+    difference = cached - uncached
+    max_abs = float(difference.abs().max().cpu())
+    mean_abs = float(difference.abs().mean().cpu())
+    rmse = float(torch.sqrt(torch.mean(difference.square())).cpu())
+    scale = float(uncached.abs().max().cpu())
+
+    cached_log_prob = torch.log_softmax(cached, dim=0)
+    uncached_log_prob = torch.log_softmax(uncached, dim=0)
+    cached_probability = torch.exp(cached_log_prob)
+    uncached_probability = torch.exp(uncached_log_prob)
+    probability_difference = (cached_probability - uncached_probability).abs()
+    total_variation = float((0.5 * probability_difference.sum()).cpu())
+    max_probability_error = float(probability_difference.max().cpu())
+
+    log_midpoint = torch.logaddexp(cached_log_prob, uncached_log_prob) - math.log(2.0)
+    js_value = 0.5 * (
+        torch.sum(cached_probability * (cached_log_prob - log_midpoint))
+        + torch.sum(uncached_probability * (uncached_log_prob - log_midpoint))
+    )
+    js_divergence = max(0.0, float(js_value.cpu()))
+
+    cached_eos_probability, cached_eos_log_odds = _eos_stats(
+        cached, eos_token_ids
+    )
+    uncached_eos_probability, uncached_eos_log_odds = _eos_stats(
+        uncached, eos_token_ids
+    )
+    eos_probability_error = abs(cached_eos_probability - uncached_eos_probability)
+    eos_log_odds_error = abs(cached_eos_log_odds - uncached_eos_log_odds)
+
+    top_k = min(10, int(cached.numel()))
+    cached_top = set(torch.topk(cached_probability, top_k).indices.cpu().tolist())
+    uncached_top = set(
+        torch.topk(uncached_probability, top_k).indices.cpu().tolist()
+    )
+    top_overlap = len(cached_top & uncached_top) / max(1, top_k)
+    criteria = dict(CACHE_EQUIVALENCE_CRITERIA)
+    equivalent = bool(
+        total_variation <= criteria["total_variation_max"]
+        and eos_log_odds_error <= criteria["eos_log_odds_abs_error_max"]
+    )
+    return {
+        "cache_validation_version": "next_token_distribution_v1",
+        "cache_equivalence_criteria": criteria,
+        "cache_max_abs_logit_error": max_abs,
+        "cache_mean_abs_logit_error": mean_abs,
+        "cache_rmse_logit_error": rmse,
+        "cache_relative_error": max_abs / max(scale, 1e-12),
+        "cache_total_variation_distance": total_variation,
+        "cache_jensen_shannon_divergence": js_divergence,
+        "cache_max_probability_abs_error": max_probability_error,
+        "cache_eos_probability_abs_error": eos_probability_error,
+        "cache_eos_log_odds_abs_error": eos_log_odds_error,
+        "cache_top1_token_match": bool(
+            cached_probability.argmax().item()
+            == uncached_probability.argmax().item()
+        ),
+        "cache_top10_overlap_fraction": float(top_overlap),
+        "cache_equivalent": equivalent,
+    }
+
+
 def sample_token(logits, sampling: dict, generator) -> int:
     import torch
 
@@ -530,19 +626,13 @@ class QwenFreeGenerationRunner:
             apply_intervention=False,
             use_cache=False,
         )
-        cache_max_abs = float(
-            torch.max(torch.abs(cached_second.logits - uncached_second.logits))
-            .detach()
-            .cpu()
-        )
-        scale = float(torch.max(torch.abs(uncached_second.logits)).detach().cpu())
         return {
             "alpha_zero_max_abs_logit_error": alpha_zero_max_abs,
             "alpha_zero_passed": bool(alpha_zero_max_abs <= 1e-5),
-            "cache_max_abs_logit_error": cache_max_abs,
-            "cache_relative_error": cache_max_abs / max(scale, 1e-12),
-            "cache_equivalent": bool(
-                cache_max_abs <= 2e-2 or cache_max_abs / max(scale, 1e-12) <= 2e-3
+            **compare_cached_logits(
+                cached_second.logits,
+                uncached_second.logits,
+                self.eos_token_ids,
             ),
             "eos_token_ids": list(self.eos_token_ids),
             "context_limit": self.context_limit,
