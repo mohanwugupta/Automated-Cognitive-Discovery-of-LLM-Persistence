@@ -28,7 +28,7 @@ from .frozen import (
     sha256_file,
     verify_frozen_protocol,
 )
-from .generation import QwenFreeGenerationRunner
+from .generation import GENERATION_ENGINE_VERSION, QwenFreeGenerationRunner
 
 
 def _root(config: dict, output=None) -> Path:
@@ -335,10 +335,12 @@ def evaluate_ood_job(
     revision=None,
     online=False,
     limit: int | None = None,
+    validate_only: bool = False,
 ):
     """Run one frozen GPU shard with continuous autoregressive model use."""
 
     import torch
+    import transformers
 
     root = _root(config, output)
     manifest = verify_frozen_protocol(root)
@@ -348,6 +350,8 @@ def evaluate_ood_job(
     job_index = int(job_index)
     if job_index < 0 or job_index >= len(jobs):
         raise ValueError(f"OOD job index must lie in 0..{len(jobs) - 1}")
+    if validate_only and job_index != 0:
+        raise ValueError("OOD cache validation-only mode requires job index 0")
     job = jobs[job_index]
     shard = root / "shards" / f"job_{job_index:04d}"
     prompts = _load_prompts(root)
@@ -390,12 +394,9 @@ def evaluate_ood_job(
         # Persist and print the measurements before enforcing the gate.  A
         # failed validation shard must remain diagnosable from its artifact and
         # SLURM log instead of exposing only a generic exception.
-        numerical_path = json_write(
-            shard / "numerical_checks.json", numerical_checks
-        )
+        numerical_path = json_write(shard / "numerical_checks.json", numerical_checks)
         print(
-            "OOD cache validation: "
-            + json.dumps(numerical_checks, sort_keys=True),
+            "OOD cache validation: " + json.dumps(numerical_checks, sort_keys=True),
             flush=True,
         )
         if not numerical_checks["alpha_zero_passed"]:
@@ -403,7 +404,22 @@ def evaluate_ood_job(
                 "alpha-zero hook is not numerically identical to baseline; "
                 f"diagnostics={numerical_path}"
             )
-        if not numerical_checks["cache_equivalent"]:
+        if not numerical_checks["cache_state_reuse_equivalent"]:
+            replay = numerical_checks["cache_state_replay_comparison"]
+            criteria = replay["cache_equivalence_criteria"]
+            raise RuntimeError(
+                "retained KV cache and fresh recurrent replay are not "
+                "equivalent: "
+                f"total_variation={replay['cache_total_variation_distance']:.6g} "
+                f"(max={criteria['total_variation_max']:.6g}), "
+                f"eos_log_odds_abs_error={replay['cache_eos_log_odds_abs_error']:.6g} "
+                f"(max={criteria['eos_log_odds_abs_error_max']:.6g}); "
+                f"diagnostics={numerical_path}"
+            )
+        if (
+            not numerical_checks["cache_equivalent"]
+            and not numerical_checks["native_no_cache_limitation"]
+        ):
             criteria = numerical_checks["cache_equivalence_criteria"]
             raise RuntimeError(
                 "cached and uncached alpha-zero next-token distributions are "
@@ -414,6 +430,21 @@ def evaluate_ood_job(
                 f"(max={criteria['eos_log_odds_abs_error_max']:.6g}); "
                 f"diagnostics={numerical_path}"
             )
+        if numerical_checks["native_no_cache_limitation"]:
+            print(
+                "WARNING: Qwen3.5 native full-sequence/no-cache logits differ "
+                "from recurrent cached decoding. The shard will run because "
+                "fresh cache-state replay passed, but the strict native cache "
+                "equivalence gate remains failed in the aggregate report.",
+                flush=True,
+            )
+        if validate_only:
+            return {
+                "job_index": job_index,
+                "validation_only": True,
+                "numerical_checks": numerical_path,
+                "generation_engine_version": GENERATION_ENGINE_VERSION,
+            }
 
     summaries, token_rows, immediate_rows = [], [], []
     if job["mode"] == "generation":
@@ -540,10 +571,26 @@ def evaluate_ood_job(
         "full_activations_saved": False,
         "cuda_device": str(device),
         "gpu_evaluation_only": True,
+        "generation_engine_version": GENERATION_ENGINE_VERSION,
+        "transformers_version": transformers.__version__,
+        "torch_version": str(torch.__version__),
+        "model_class": type(runner.model).__name__,
         "summaries": len(summaries),
         "token_events": len(token_rows),
         "immediate_controls": len(immediate_rows),
     }
+    if numerical_checks is not None:
+        audit.update(
+            {
+                "cache_state_reuse_equivalent": numerical_checks[
+                    "cache_state_reuse_equivalent"
+                ],
+                "native_no_cache_equivalent": numerical_checks["cache_equivalent"],
+                "native_no_cache_limitation": numerical_checks[
+                    "native_no_cache_limitation"
+                ],
+            }
+        )
     if audit["orientation_sha256"] != audit["expected_orientation_sha256"]:
         raise RuntimeError("orientation changed during OOD evaluation")
     json_write(shard / "audit.json", audit)
@@ -589,6 +636,7 @@ def _report(
     pulse_survival: dict,
 ):
     result = gates["ood_generalization"]
+    frozen = gates["frozen_protocol"]
     median_change = dose.get("endpoint_rmst_change", float("nan"))
     eos_count = (
         int(censoring.loc[censoring.termination_reason == "eos", "runs"].sum())
@@ -635,26 +683,28 @@ def _report(
 3. **Layer/rank/dose tuned on free generation:** no.
 4. **Application output caps removed:** yes; stopping was EOS, context capacity, or separately labeled infrastructure timeout.
 5. **Actual model context capacity:** {metadata['context_limit']} tokens.
+6. **Retained cache matches fresh recurrent replay:** {frozen['cache_state_reuse_equivalent']}.
+7. **Native cached versus full-sequence/no-cache equivalence:** {frozen['cache_equivalent']} (disposition: `{frozen['cache_validation_disposition']}`).
 
 ## Primary results
 
-6. **EOS terminations:** {eos_count}.
-7. **Context-censored generations:** {context_count}.
-8. **Did increasing E lower EOS hazard?** {result['direction_passed']} (Cox beta={survival.get('coefficient', float('nan')):.6g}, 95% CI [{survival.get('ci_lower', float('nan')):.6g}, {survival.get('ci_upper', float('nan')):.6g}]).
-9. **Monotonic dose response:** {result['dose_response_passed']} (Spearman alpha–RMST={dose.get('spearman_alpha_rmst', float('nan')):.3f}).
-10. **Generation-duration change:** endpoint restricted-mean change={median_change:.3f} decision steps.
-11. **Prompt wording generalization:** {result['prompt_generalization_passed']}; {direction_prompts}/{len(prompt_table)} open-ended prompts had negative hazard coefficients.
-12. **Fixed-topic generalization:** {result['fixed_topic_direction']} (beta={fixed_survival.get('coefficient', float('nan')):.6g}).
-13. **Random-subspace specificity:** {result['random_specificity_passed']} (p={random_result.get('random_p', float('nan')):.6g}; n={random_result.get('random_directions', 0)}).
-14. **Direct EOS benchmark:** {eos_control_note}
-15. **Degeneration:** {result['nondegeneration_passed']}; {quality_note}.
-16. **Single-pulse persistence:** beta={pulse_survival.get('coefficient', float('nan')):.6g}; continuous steering remains primary.
+8. **EOS terminations:** {eos_count}.
+9. **Context-censored generations:** {context_count}.
+10. **Did increasing E lower EOS hazard?** {result['direction_passed']} (Cox beta={survival.get('coefficient', float('nan')):.6g}, 95% CI [{survival.get('ci_lower', float('nan')):.6g}, {survival.get('ci_upper', float('nan')):.6g}]).
+11. **Monotonic dose response:** {result['dose_response_passed']} (Spearman alpha–RMST={dose.get('spearman_alpha_rmst', float('nan')):.3f}).
+12. **Generation-duration change:** endpoint restricted-mean change={median_change:.3f} decision steps.
+13. **Prompt wording generalization:** {result['prompt_generalization_passed']}; {direction_prompts}/{len(prompt_table)} open-ended prompts had negative hazard coefficients.
+14. **Fixed-topic generalization:** {result['fixed_topic_direction']} (beta={fixed_survival.get('coefficient', float('nan')):.6g}).
+15. **Random-subspace specificity:** {result['random_specificity_passed']} (p={random_result.get('random_p', float('nan')):.6g}; n={random_result.get('random_directions', 0)}).
+16. **Direct EOS benchmark:** {eos_control_note}
+17. **Degeneration:** {result['nondegeneration_passed']}; {quality_note}.
+18. **Single-pulse persistence:** beta={pulse_survival.get('coefficient', float('nan')):.6g}; continuous steering remains primary.
 
 ## Conclusion
 
-17. **Strongest justified claim:** {claim}
+19. **Strongest justified claim:** {claim}
 
-All outcomes were analyzed under the frozen protocol, including negative outcomes. No OOD result was used to redefine the subspace, direction, layer, rank, dose, prompt set, decoding policy, or analysis.
+All outcomes were analyzed under the frozen analysis plan, including negative outcomes. A native Qwen3.5 cache/no-cache discrepancy remains a failed strict protocol gate even when fresh recurrent cache replay passes; it is not reclassified as equivalence. No OOD result was used to redefine the subspace, direction, layer, rank, dose, prompt set, decoding policy, or analysis.
 """
     (root / "report.md").write_text(text, encoding="utf-8")
 
@@ -676,6 +726,14 @@ def aggregate_ood_run(config: dict, *, output: str | Path | None = None):
         if not audit_path.exists():
             raise RuntimeError(f"OOD evaluation is incomplete: {audit_path}")
         audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        if (
+            job["mode"] == "generation"
+            and audit.get("generation_engine_version") != GENERATION_ENGINE_VERSION
+        ):
+            raise RuntimeError(
+                "OOD shard was produced by an obsolete generation engine: "
+                f"{audit_path}"
+            )
         if (
             not audit["frozen_before_ood"]
             or audit["application_output_cap"] is not None
@@ -890,6 +948,9 @@ def aggregate_ood_run(config: dict, *, output: str | Path | None = None):
         random_result["true_eos_logit_slope"] < 0
         and random_result["random_p"] < float(q.get("random_p_max", 0.05))
     )
+    cache_state_reuse_equivalent = numerical.get(
+        "cache_state_reuse_equivalent", numerical["cache_equivalent"]
+    )
     frozen_passed = bool(
         manifest["orientation"]["ood_data_used"] is False
         and all(audit["das_sha256"] == manifest["sha256"] for audit in audits)
@@ -897,6 +958,7 @@ def aggregate_ood_run(config: dict, *, output: str | Path | None = None):
         and len({tuple(audit["eos_token_ids"]) for audit in audits}) == 1
         and numerical["alpha_zero_passed"]
         and generation_zero_passed
+        and cache_state_reuse_equivalent
         and numerical["cache_equivalent"]
     )
     passed = bool(
@@ -917,6 +979,13 @@ def aggregate_ood_run(config: dict, *, output: str | Path | None = None):
             "alpha_zero_equivalent": numerical["alpha_zero_passed"],
             "matched_generation_alpha_zero": generation_zero_passed,
             "cache_equivalent": numerical["cache_equivalent"],
+            "cache_state_reuse_equivalent": cache_state_reuse_equivalent,
+            "native_no_cache_limitation": numerical.get(
+                "native_no_cache_limitation", False
+            ),
+            "cache_validation_disposition": numerical.get(
+                "cache_validation_disposition", "legacy_cache_validation"
+            ),
         },
         "ood_generalization": {
             "passed": passed,
@@ -956,6 +1025,12 @@ def aggregate_ood_run(config: dict, *, output: str | Path | None = None):
             "ood_generalization_passed": passed,
             "figure_count": len(figures),
             "full_activations_saved": False,
+            "generation_engine_version": GENERATION_ENGINE_VERSION,
+            "cache_state_reuse_equivalent": cache_state_reuse_equivalent,
+            "native_no_cache_equivalent": numerical["cache_equivalent"],
+            "native_no_cache_limitation": numerical.get(
+                "native_no_cache_limitation", False
+            ),
         }
     )
     json_write(root / "run_metadata.json", metadata)

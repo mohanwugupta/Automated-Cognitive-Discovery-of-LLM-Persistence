@@ -25,6 +25,7 @@ import json
 import os
 from pathlib import Path
 
+required_engine = "qwen_incremental_single_token_v2"
 root = Path(os.environ["OOD_OUTPUT"])
 manifest = root / "frozen/evaluation_jobs.json"
 if not manifest.exists():
@@ -38,7 +39,13 @@ for job in jobs:
     audit_path = root / "shards" / f"job_{index:04d}" / "audit.json"
     try:
         audit = json.loads(audit_path.read_text(encoding="utf-8"))
-        complete = int(audit["job_index"]) == index
+        complete = (
+            int(audit["job_index"]) == index
+            and (
+                job["mode"] != "generation"
+                or audit.get("generation_engine_version") == required_engine
+            )
+        )
     except (FileNotFoundError, KeyError, TypeError, ValueError, json.JSONDecodeError):
         complete = False
     if not complete:
@@ -48,15 +55,29 @@ PY
 )
 
 if [ -n "$missing_indices" ]; then
+  evaluation_dependency=()
+  validation_job=""
+  case ",${missing_indices}," in
+    *,0,*)
+      validation_submission=$(sbatch --parsable --job-name=cog_ood_validate \
+        --array=0 --export=ALL,PHASE=validate "$GPU_SCRIPT")
+      validation_job="${validation_submission%%;*}"
+      evaluation_dependency=(--dependency="afterok:${validation_job}")
+      ;;
+  esac
   evaluation_submission=$(sbatch --parsable --job-name=cog_ood_resume \
     --array="${missing_indices}%${EVALUATION_CONCURRENCY}" \
+    "${evaluation_dependency[@]}" \
     --export=ALL,PHASE=evaluate "$GPU_SCRIPT")
   evaluation_job="${evaluation_submission%%;*}"
   aggregate_submission=$(sbatch --parsable --job-name=cog_ood_aggregate \
     --time=12:00:00 --dependency="afterok:${evaluation_job}" \
     --export=ALL,PHASE=aggregate "$CPU_SCRIPT")
   aggregate_job="${aggregate_submission%%;*}"
-  echo "Resubmitted missing OOD shards: ${missing_indices}"
+  echo "Resubmitted missing or obsolete OOD shards: ${missing_indices}"
+  if [ -n "$validation_job" ]; then
+    echo "  GPU validation: ${validation_job}"
+  fi
   echo "  GPU evaluation: ${evaluation_job}"
   echo "  CPU aggregate:  ${aggregate_job} (afterok:${evaluation_job})"
 else

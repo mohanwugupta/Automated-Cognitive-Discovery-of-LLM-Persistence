@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import inspect
 import math
 import re
 import time
+from dataclasses import dataclass
 from typing import Callable
 
 import numpy as np
@@ -16,6 +17,9 @@ from cognitive_discovery.mechanistic.activations.hooks import (
     replace_hidden_state,
 )
 from cognitive_discovery.participants.qwen import QwenParticipant
+
+
+GENERATION_ENGINE_VERSION = "qwen_incremental_single_token_v2"
 
 
 @dataclass
@@ -171,9 +175,7 @@ def compare_cached_logits(
     )
     js_divergence = max(0.0, float(js_value.cpu()))
 
-    cached_eos_probability, cached_eos_log_odds = _eos_stats(
-        cached, eos_token_ids
-    )
+    cached_eos_probability, cached_eos_log_odds = _eos_stats(cached, eos_token_ids)
     uncached_eos_probability, uncached_eos_log_odds = _eos_stats(
         uncached, eos_token_ids
     )
@@ -182,9 +184,7 @@ def compare_cached_logits(
 
     top_k = min(10, int(cached.numel()))
     cached_top = set(torch.topk(cached_probability, top_k).indices.cpu().tolist())
-    uncached_top = set(
-        torch.topk(uncached_probability, top_k).indices.cpu().tolist()
-    )
+    uncached_top = set(torch.topk(uncached_probability, top_k).indices.cpu().tolist())
     top_overlap = len(cached_top & uncached_top) / max(1, top_k)
     criteria = dict(CACHE_EQUIVALENCE_CRITERIA)
     equivalent = bool(
@@ -204,8 +204,7 @@ def compare_cached_logits(
         "cache_eos_probability_abs_error": eos_probability_error,
         "cache_eos_log_odds_abs_error": eos_log_odds_error,
         "cache_top1_token_match": bool(
-            cached_probability.argmax().item()
-            == uncached_probability.argmax().item()
+            cached_probability.argmax().item() == uncached_probability.argmax().item()
         ),
         "cache_top10_overlap_fraction": float(top_overlap),
         "cache_equivalent": equivalent,
@@ -398,6 +397,15 @@ class QwenFreeGenerationRunner:
             raise ValueError("OOD generation currently requires one prompt per run")
         return [int(value) for value in inputs["input_ids"][0].detach().cpu().tolist()]
 
+    @property
+    def uses_hybrid_linear_attention(self) -> bool:
+        """Whether decoding crosses Qwen-style chunked/recurrent mixer paths."""
+
+        config = getattr(self.model, "config", None)
+        text_config = getattr(config, "text_config", None) or config
+        layer_types = getattr(text_config, "layer_types", ()) or ()
+        return any(str(value) == "linear_attention" for value in layer_types)
+
     def _model_step(
         self,
         token_ids: list[int],
@@ -415,35 +423,49 @@ class QwenFreeGenerationRunner:
         device = next(self.model.parameters()).device
         full_ids = torch.as_tensor([token_ids], device=device, dtype=torch.long)
         attention_mask = torch.ones_like(full_ids)
+        step_ids = full_ids if past_key_values is None else full_ids[:, -1:]
         if use_cache and hasattr(self.model, "prepare_inputs_for_generation"):
-            cache_position = torch.arange(
-                0 if past_key_values is None else len(token_ids) - 1,
-                len(token_ids),
-                device=device,
-                dtype=torch.long,
-            )
-            try:
-                model_inputs = self.model.prepare_inputs_for_generation(
-                    full_ids,
-                    past_key_values=past_key_values,
-                    attention_mask=attention_mask,
-                    cache_position=cache_position,
-                    use_cache=True,
-                )
-            except TypeError:
-                model_inputs = self.model.prepare_inputs_for_generation(
-                    full_ids,
-                    past_key_values=past_key_values,
-                    attention_mask=attention_mask,
-                    use_cache=True,
-                )
-        elif use_cache and past_key_values is not None:
-            model_inputs = {
-                "input_ids": full_ids[:, -1:],
-                "attention_mask": attention_mask,
+            # Transformers 5.x no longer infers which tokens are new from the
+            # cache. Passing the full growing prefix without
+            # ``next_sequence_length`` reprocesses old tokens on top of the
+            # existing cache. Always provide only the new token after prefill,
+            # and pass version-specific hints only when explicitly supported.
+            parameters = inspect.signature(
+                self.model.prepare_inputs_for_generation
+            ).parameters
+            prepare_kwargs = {
                 "past_key_values": past_key_values,
+                "attention_mask": attention_mask,
                 "use_cache": True,
             }
+            if "next_sequence_length" in parameters:
+                prepare_kwargs["next_sequence_length"] = int(step_ids.shape[1])
+            if "is_first_iteration" in parameters:
+                prepare_kwargs["is_first_iteration"] = past_key_values is None
+            if "cache_position" in parameters:
+                if past_key_values is None:
+                    past_seen_tokens = 0
+                elif hasattr(past_key_values, "get_seq_length"):
+                    past_seen_tokens = int(past_key_values.get_seq_length())
+                else:
+                    past_seen_tokens = len(token_ids) - int(step_ids.shape[1])
+                prepare_kwargs["cache_position"] = torch.arange(
+                    past_seen_tokens,
+                    past_seen_tokens + int(step_ids.shape[1]),
+                    device=device,
+                    dtype=torch.long,
+                )
+            model_inputs = self.model.prepare_inputs_for_generation(
+                step_ids, **prepare_kwargs
+            )
+        elif use_cache:
+            model_inputs = {
+                "input_ids": step_ids,
+                "attention_mask": attention_mask,
+                "use_cache": True,
+            }
+            if past_key_values is not None:
+                model_inputs["past_key_values"] = past_key_values
         else:
             model_inputs = {
                 "input_ids": full_ids,
@@ -604,21 +626,62 @@ class QwenFreeGenerationRunner:
             apply_intervention=False,
             use_cache=True,
         )
-        selectable = cached_first.logits.clone()
-        selectable[list(self.eos_token_ids)] = float("-inf")
-        next_token = int(selectable.argmax().item())
-        extended = [*token_ids, next_token]
-        cached_second = self._model_step(
-            extended,
-            cached_first.past_key_values,
+        if cached_first.past_key_values is None:
+            raise RuntimeError("model did not return a cache when use_cache=True")
+        prefill_comparison = compare_cached_logits(
+            cached_first.logits, baseline.logits, self.eos_token_ids
+        )
+
+        # Exercise retained cache state across several decode steps. The token
+        # path is fixed by the retained-cache run, then replayed from a fresh
+        # prompt prefill. This isolates state retention, token slicing, and
+        # cache positions without conflating Qwen3.5's distinct Gated DeltaNet
+        # chunked and recurrent numerical algorithms.
+        replay_tokens = []
+        cached_step = cached_first
+        for _ in range(3):
+            selectable = cached_step.logits.clone()
+            selectable[list(self.eos_token_ids)] = float("-inf")
+            replay_tokens.append(int(selectable.argmax().item()))
+            cached_step = self._model_step(
+                [*token_ids, *replay_tokens],
+                cached_step.past_key_values,
+                layer=layer,
+                direction=direction,
+                magnitude=0.0,
+                apply_intervention=False,
+                use_cache=True,
+            )
+
+        fresh_step = self._model_step(
+            token_ids,
+            None,
             layer=layer,
             direction=direction,
             magnitude=0.0,
             apply_intervention=False,
             use_cache=True,
         )
-        uncached_second = self._model_step(
-            extended,
+        for index in range(len(replay_tokens)):
+            fresh_step = self._model_step(
+                [*token_ids, *replay_tokens[: index + 1]],
+                fresh_step.past_key_values,
+                layer=layer,
+                direction=direction,
+                magnitude=0.0,
+                apply_intervention=False,
+                use_cache=True,
+            )
+        state_replay_comparison = compare_cached_logits(
+            cached_step.logits, fresh_step.logits, self.eos_token_ids
+        )
+
+        # Keep the literal PRD comparison as a separate, strict result. On
+        # hybrid Qwen3.5 this crosses the chunked-prefill and recurrent-decode
+        # Gated DeltaNet paths, for which Transformers currently has a known
+        # upstream divergence. It must be reported, not relaxed or hidden.
+        native_uncached = self._model_step(
+            [*token_ids, *replay_tokens],
             None,
             layer=layer,
             direction=direction,
@@ -626,13 +689,38 @@ class QwenFreeGenerationRunner:
             apply_intervention=False,
             use_cache=False,
         )
+        native_comparison = compare_cached_logits(
+            cached_step.logits, native_uncached.logits, self.eos_token_ids
+        )
+        cache_state_reuse_equivalent = bool(
+            prefill_comparison["cache_equivalent"]
+            and state_replay_comparison["cache_equivalent"]
+        )
+        native_limitation = bool(
+            self.uses_hybrid_linear_attention
+            and not native_comparison["cache_equivalent"]
+            and cache_state_reuse_equivalent
+        )
         return {
             "alpha_zero_max_abs_logit_error": alpha_zero_max_abs,
             "alpha_zero_passed": bool(alpha_zero_max_abs <= 1e-5),
-            **compare_cached_logits(
-                cached_second.logits,
-                uncached_second.logits,
-                self.eos_token_ids,
+            # The top-level fields remain the literal native cache/no-cache
+            # result consumed by the strict preregistered aggregate gate.
+            **native_comparison,
+            "cache_prefill_comparison": prefill_comparison,
+            "cache_state_replay_comparison": state_replay_comparison,
+            "cache_state_reuse_equivalent": cache_state_reuse_equivalent,
+            "cache_replay_tokens": len(replay_tokens),
+            "model_uses_hybrid_linear_attention": self.uses_hybrid_linear_attention,
+            "native_no_cache_limitation": native_limitation,
+            "cache_validation_disposition": (
+                "native_qwen35_chunk_recurrent_divergence"
+                if native_limitation
+                else (
+                    "passed"
+                    if native_comparison["cache_equivalent"]
+                    else "unexplained_native_cache_divergence"
+                )
             ),
             "eos_token_ids": list(self.eos_token_ids),
             "context_limit": self.context_limit,

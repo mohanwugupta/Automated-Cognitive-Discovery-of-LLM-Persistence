@@ -59,7 +59,7 @@ case "$PHASE" in
       exit 3
     fi
     ;;
-  evaluate)
+  evaluate|validate)
     python -c 'import torch; assert torch.cuda.is_available(), "CUDA is unavailable"; print("CUDA preflight:", torch.cuda.get_device_name(0))'
     nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
     ;;
@@ -85,6 +85,10 @@ case "$PHASE" in
   evaluate)
     python scripts/ood_free_generation.py "${COMMON[@]}" --phase evaluate \
       --job-index "$ARRAY_INDEX" --model "$MODEL_PATH"
+    ;;
+  validate)
+    python scripts/ood_free_generation.py "${COMMON[@]}" --phase evaluate \
+      --job-index 0 --model "$MODEL_PATH" --validate-only
     ;;
   aggregate)
     python scripts/ood_free_generation.py "${COMMON[@]}" --phase aggregate

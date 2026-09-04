@@ -17,6 +17,7 @@ from cognitive_discovery.ood_generation.frozen import (
     verify_frozen_protocol,
 )
 from cognitive_discovery.ood_generation.generation import (
+    GENERATION_ENGINE_VERSION,
     GenerationStep,
     QwenFreeGenerationRunner,
     _eos_stats,
@@ -135,10 +136,14 @@ class _TinyModel(torch.nn.Module):
         self.output = torch.nn.Linear(5, 4, bias=False)
         self.config = SimpleNamespace(max_position_embeddings=32, eos_token_id=3)
         self.generation_config = SimpleNamespace(eos_token_id=[3])
+        self.prepared_input_lengths = []
 
     def prepare_inputs_for_generation(
         self, input_ids, *, past_key_values=None, attention_mask=None, use_cache=True
     ):
+        self.prepared_input_lengths.append(
+            (int(input_ids.shape[1]), past_key_values is not None)
+        )
         if past_key_values is not None:
             input_ids = input_ids[:, -1:]
         return {
@@ -166,13 +171,50 @@ class _TinyModel(torch.nn.Module):
         )
 
 
+class _HybridNativeDivergentModel(_TinyModel):
+    """Mimic a hybrid model whose native full-sequence path differs."""
+
+    def __init__(self):
+        super().__init__()
+        self.config.layer_types = ["linear_attention"]
+
+    def forward(self, input_ids, **kwargs):
+        result = super().forward(input_ids, **kwargs)
+        if not kwargs.get("use_cache", False) and input_ids.shape[1] > 2:
+            result.logits = result.logits.clone()
+            current = int(result.logits[0, -1].argmax().item())
+            result.logits[0, -1, (current + 1) % result.logits.shape[-1]] += 50.0
+        return result
+
+
 def test_cache_and_uncached_logits_match_at_zero_intervention():
-    runner = QwenFreeGenerationRunner(_TinyParticipant(_TinyModel()))
+    model = _TinyModel()
+    runner = QwenFreeGenerationRunner(_TinyParticipant(model))
     checks = runner.numerical_checks("anything", layer=0, direction=np.ones(5))
     assert checks["alpha_zero_passed"]
     assert checks["cache_equivalent"]
+    assert checks["cache_state_reuse_equivalent"]
+    assert not checks["native_no_cache_limitation"]
     assert checks["context_limit"] == 32
     assert checks["eos_token_ids"] == [3]
+    cached_input_lengths = [
+        length for length, has_cache in model.prepared_input_lengths if has_cache
+    ]
+    assert cached_input_lengths
+    assert set(cached_input_lengths) == {1}
+
+
+def test_hybrid_native_divergence_is_reported_separately_from_cache_replay():
+    runner = QwenFreeGenerationRunner(_TinyParticipant(_HybridNativeDivergentModel()))
+    checks = runner.numerical_checks("anything", layer=0, direction=np.ones(5))
+    assert checks["model_uses_hybrid_linear_attention"]
+    assert checks["cache_state_reuse_equivalent"]
+    assert not checks["cache_equivalent"]
+    assert checks["native_no_cache_limitation"]
+    assert (
+        checks["cache_validation_disposition"]
+        == "native_qwen35_chunk_recurrent_divergence"
+    )
 
 
 def test_cache_validation_ignores_irrelevant_tail_logit_error():
@@ -441,6 +483,7 @@ def test_synthetic_shards_complete_ood_gates_figures_and_report(tmp_path):
             "full_activations_saved": False,
             "cuda_device": "cuda:0",
             "gpu_evaluation_only": True,
+            "generation_engine_version": GENERATION_ENGINE_VERSION,
             "summaries": 0,
             "token_events": 0,
             "immediate_controls": 0,

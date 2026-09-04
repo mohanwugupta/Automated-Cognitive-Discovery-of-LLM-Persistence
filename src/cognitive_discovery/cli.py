@@ -636,6 +636,7 @@ def ood_generation_main(argv=None):
     parser.add_argument("--revision")
     parser.add_argument("--online", action="store_true")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args(argv)
     config = load_config(args.config)
     if args.phase == "prepare":
@@ -655,6 +656,7 @@ def ood_generation_main(argv=None):
             revision=args.revision,
             online=args.online,
             limit=args.limit,
+            validate_only=args.validate_only,
         )
     else:
         result = aggregate_ood_run(config, output=args.output)

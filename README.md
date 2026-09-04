@@ -570,10 +570,26 @@ export OOD_OUTPUT=artifacts/ood_free_generation_v1
 bash scripts/resume_ood_generation.sh
 ```
 
-The helper discovers incomplete shard indices and submits a new GPU array for
-only those indices, followed by a CPU aggregation job with a fresh `afterok`
-dependency. Task 0 writes `shards/job_0000/numerical_checks.json` before
-enforcing cache validation. That validation is based on next-token total
-variation and EOS log-odds error; raw maximum logit error remains diagnostic
-because BF16 cache and no-cache kernels can disagree on negligible-probability
-tail tokens without materially changing the sampling distribution.
+The helper discovers incomplete shards and shards created by an obsolete
+generation engine, then submits only those indices followed by a CPU
+aggregation job with a fresh `afterok` dependency. When task 0 needs to run,
+the helper first submits a validation-only GPU job and holds the evaluation
+array behind it, preventing a failed cache check from consuming the full
+array's allocation. Task 0 writes
+`shards/job_0000/numerical_checks.json` before
+enforcing cache validation. It separately tests prompt-prefill equivalence,
+retained cache state against a fresh recurrent replay, and the literal native
+cached versus full-sequence/no-cache comparison. Qwen3.5's hybrid Gated
+DeltaNet currently has a known upstream divergence between its chunked and
+recurrent paths. When that specific native limitation occurs but recurrent
+replay passes, the shard completes so the frozen outcomes can be aggregated;
+the native cache-equivalence gate remains false and prevents the report from
+claiming strong preregistered OOD generalization.
+
+Generation engine `qwen_incremental_single_token_v2` explicitly sends only the
+new token after the prefill. This is required by the Transformers 5.x
+generation API; passing the entire growing prefix with an existing cache would
+process prior tokens twice. Every shard audit records the engine version, and
+aggregation rejects mixed or obsolete generation shards. Existing
+`immediate_control` shards are unaffected because they use one full no-cache
+forward rather than the autoregressive stepping engine.
