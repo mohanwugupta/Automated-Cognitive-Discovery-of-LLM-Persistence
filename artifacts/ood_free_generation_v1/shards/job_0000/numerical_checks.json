@@ -1,26 +1,69 @@
 {
   "alpha_zero_max_abs_logit_error": 0.0,
   "alpha_zero_passed": true,
-  "cache_eos_log_odds_abs_error": 0.24772288871071702,
-  "cache_eos_probability_abs_error": 3.1965259950084146e-07,
+  "cache_eos_log_odds_abs_error": 0.021467217416395457,
+  "cache_eos_probability_abs_error": 4.9966075721386005e-09,
   "cache_equivalence_criteria": {
     "eos_log_odds_abs_error_max": 0.05,
     "total_variation_max": 0.02
   },
-  "cache_equivalent": false,
-  "cache_jensen_shannon_divergence": 0.021325774490833282,
-  "cache_max_abs_logit_error": 2.39453125,
-  "cache_max_probability_abs_error": 0.07371166348457336,
-  "cache_mean_abs_logit_error": 0.4001687169075012,
-  "cache_relative_error": 0.14623091603053434,
-  "cache_rmse_logit_error": 0.5023452639579773,
-  "cache_top10_overlap_fraction": 0.8,
-  "cache_top1_token_match": false,
-  "cache_total_variation_distance": 0.16273456811904907,
+  "cache_equivalent": true,
+  "cache_jensen_shannon_divergence": 0.0002641796600073576,
+  "cache_max_abs_logit_error": 0.15625,
+  "cache_max_probability_abs_error": 0.013860583305358887,
+  "cache_mean_abs_logit_error": 0.024197522550821304,
+  "cache_prefill_comparison": {
+    "cache_eos_log_odds_abs_error": 0.0,
+    "cache_eos_probability_abs_error": 0.0,
+    "cache_equivalence_criteria": {
+      "eos_log_odds_abs_error_max": 0.05,
+      "total_variation_max": 0.02
+    },
+    "cache_equivalent": true,
+    "cache_jensen_shannon_divergence": 0.0,
+    "cache_max_abs_logit_error": 0.0,
+    "cache_max_probability_abs_error": 0.0,
+    "cache_mean_abs_logit_error": 0.0,
+    "cache_relative_error": 0.0,
+    "cache_rmse_logit_error": 0.0,
+    "cache_top10_overlap_fraction": 1.0,
+    "cache_top1_token_match": true,
+    "cache_total_variation_distance": 0.0,
+    "cache_validation_version": "next_token_distribution_v1"
+  },
+  "cache_relative_error": 0.007763975155279503,
+  "cache_replay_tokens": 3,
+  "cache_rmse_logit_error": 0.031550824642181396,
+  "cache_state_replay_comparison": {
+    "cache_eos_log_odds_abs_error": 0.0,
+    "cache_eos_probability_abs_error": 0.0,
+    "cache_equivalence_criteria": {
+      "eos_log_odds_abs_error_max": 0.05,
+      "total_variation_max": 0.02
+    },
+    "cache_equivalent": true,
+    "cache_jensen_shannon_divergence": 1.2322737497072467e-08,
+    "cache_max_abs_logit_error": 0.0,
+    "cache_max_probability_abs_error": 0.0,
+    "cache_mean_abs_logit_error": 0.0,
+    "cache_relative_error": 0.0,
+    "cache_rmse_logit_error": 0.0,
+    "cache_top10_overlap_fraction": 1.0,
+    "cache_top1_token_match": true,
+    "cache_total_variation_distance": 0.0,
+    "cache_validation_version": "next_token_distribution_v1"
+  },
+  "cache_state_reuse_equivalent": true,
+  "cache_top10_overlap_fraction": 1.0,
+  "cache_top1_token_match": true,
+  "cache_total_variation_distance": 0.016909364610910416,
+  "cache_validation_disposition": "passed",
   "cache_validation_version": "next_token_distribution_v1",
   "context_limit": 262144,
   "eos_token_ids": [
     248044,
     248046
-  ]
+  ],
+  "model_uses_hybrid_linear_attention": true,
+  "native_no_cache_limitation": false
 }

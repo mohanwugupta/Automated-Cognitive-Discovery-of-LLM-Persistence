@@ -1,12 +1,26 @@
 {
   "frozen_protocol": {
+    "alpha_zero_equivalent": true,
     "application_output_cap_removed": true,
+    "cache_equivalent": true,
+    "cache_state_reuse_equivalent": true,
+    "cache_validation_disposition": "passed",
     "das_hash_verified": true,
     "layer_rank_dose_tuned_on_ood": false,
+    "matched_generation_alpha_zero": true,
+    "native_no_cache_limitation": false,
     "orientation_pre_ood": true,
     "passed": true
   },
   "ood_generalization": {
-    "status": "awaiting_frozen_evaluation"
+    "direction_passed": false,
+    "dose_response_passed": false,
+    "fixed_topic_direction": true,
+    "nondegeneration_passed": true,
+    "outcome": "ood_generalization_not_established",
+    "passed": false,
+    "prompt_direction_fraction": 0.6666666666666666,
+    "prompt_generalization_passed": true,
+    "random_specificity_passed": false
   }
 }

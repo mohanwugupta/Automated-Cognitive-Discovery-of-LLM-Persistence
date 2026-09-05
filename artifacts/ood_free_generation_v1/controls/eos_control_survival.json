@@ -1,0 +1,15 @@
+{
+  "censored": 0,
+  "ci_lower": -0.5748130689251767,
+  "ci_upper": -0.2130341222830667,
+  "coefficient": -0.3939235956041217,
+  "converged": true,
+  "events": 90,
+  "hazard_ratio": 0.6744055818230847,
+  "log_likelihood": -168.66955025970393,
+  "observations": 90,
+  "score_at_solution": 4.884981308350689e-15,
+  "standard_error": 0.09229224350441546,
+  "stratified_by": "prompt_id",
+  "ties": "breslow"
+}

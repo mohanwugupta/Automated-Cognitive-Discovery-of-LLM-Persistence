@@ -11,14 +11,18 @@
   "final_token_only": true,
   "frozen_before_ood": true,
   "full_activations_saved": false,
+  "generation_engine_version": "qwen_incremental_single_token_v2",
   "gpu_evaluation_only": true,
   "immediate_controls": 0,
   "job_index": 41,
   "job_mode": "generation",
   "kv_cache_used": true,
   "layer": 28,
+  "model_class": "Qwen3_5ForConditionalGeneration",
   "orientation_sha256": "98732c97b59d21bb7fb15e47aa959eea55f4e90130f6864b6e7b7b3a5049e5f6",
   "rank": 2,
   "summaries": 54,
-  "token_events": 2134
+  "token_events": 17849,
+  "torch_version": "2.13.0+cu130",
+  "transformers_version": "5.16.1"
 }
