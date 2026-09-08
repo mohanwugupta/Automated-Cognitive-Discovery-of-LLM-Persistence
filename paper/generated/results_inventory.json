@@ -1,0 +1,242 @@
+{
+  "provenance": {
+    "artifacts/causal_mech_v1/representations/selected_alignments.json": "7540f73338476eadf710ab08b66ae59817b2b61f950d4615b426abdeb85eb766",
+    "artifacts/causal_specificity_v2/corrected_metrics/bootstrap_intervals.csv": "e506a63831faa8aa9a377d267ba3c12d24329170f0a907289e98632e594cfd9d",
+    "artifacts/causal_specificity_v2/candidate_gates.csv": "28bdf81ab7b53768bd8a0f4badc05786bea007b0f344d5d6ceba90b9a159dd62",
+    "artifacts/causal_specificity_v2/shards/candidate_000/shuffled_target.parquet": "b481022486c53ce3fb8bd87a38651da77252b2109cbcef62b9285a4a0a0f16c7",
+    "artifacts/causal_specificity_v2/shards/candidate_001/shuffled_target.parquet": "ce5422094faaf1818b780ecd0b37d719bb82f98fb01689eef683d51bb1ef2ef4",
+    "artifacts/causal_specificity_v2/shards/candidate_002/shuffled_target.parquet": "37404be27403962ce8c2281b02c47214b606d9447a821b640e75cd95c3139daa",
+    "artifacts/causal_specificity_v2/frozen_models/necessity_jobs.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "artifacts/discovery_v2/final_validation/metrics.json": "c92da0fcce9d93734f9de95b4838eae7697c7dd3edb979663260f2d6361aff37",
+    "artifacts/abstraction_discovery_v1/gates.json": "1b7be5e32c5b2f17e62be0e25ad9540cfc0e70601cae97d079cf6e793e5da02c",
+    "artifacts/ood_free_generation_v1/gates.json": "fbbeadc1e1f25fe8f001e61a3616b4fb37ef3c59277c5fef382a974273c667c0",
+    "artifacts/ood_free_generation_v1/analysis/survival_model.json": "cfb92d1cbae89611209676e1fc1dcf0a90bab9bf41d21d3d94345c73c1b24095"
+  },
+  "controllers": [
+    {
+      "candidate_index": 0,
+      "theory": "latent_context",
+      "layer": 30,
+      "rank": 8,
+      "train_rows": 18,
+      "validation_rows": 18,
+      "test_estimate": 0.9301290076517662,
+      "test_ci_lower": 0.9128865929224852,
+      "test_ci_upper": 0.9529528189710011,
+      "holdout_estimate": 0.6725030824784228,
+      "holdout_ci_lower": 0.4399445453234962,
+      "holdout_ci_upper": 0.8411768709167714
+    },
+    {
+      "candidate_index": 1,
+      "theory": "dual_history",
+      "layer": 28,
+      "rank": 2,
+      "train_rows": 24,
+      "validation_rows": 22,
+      "test_estimate": 0.9682648384627148,
+      "test_ci_lower": 0.9425206582399418,
+      "test_ci_upper": 0.9862676319448076,
+      "holdout_estimate": 0.8728057199204062,
+      "holdout_ci_lower": 0.7720522187696506,
+      "holdout_ci_upper": 0.9478847223464114
+    },
+    {
+      "candidate_index": 2,
+      "theory": "outcome_history",
+      "layer": 30,
+      "rank": 2,
+      "train_rows": 24,
+      "validation_rows": 22,
+      "test_estimate": 0.9667386365148124,
+      "test_ci_lower": 0.9343287376839996,
+      "test_ci_upper": 0.9871730424503974,
+      "holdout_estimate": 0.8783020358507125,
+      "holdout_ci_lower": 0.7634133837036995,
+      "holdout_ci_upper": 0.9528131448011676
+    }
+  ],
+  "behavioral_validation": {
+    "calibration_intercept": -0.08496145951610964,
+    "calibration_slope": 0.8237169605670581,
+    "correlation": 0.92970204709279,
+    "macro_correlation": 0.8795331512527392,
+    "macro_mse": 0.24109327049974946,
+    "macro_r2": 0.7631155743593886,
+    "mae": 0.3797403365542207,
+    "mse": 0.24115682387746942,
+    "r2": 0.8623489382499774,
+    "residual_sd": 0.49097537331265356,
+    "rmse": 0.4910772076542236
+  },
+  "abstraction_gates": {
+    "causal_abstraction": {
+      "neighbor_dissociations_passed": true,
+      "outcome": "no_candidate_abstraction_passed",
+      "passed": false,
+      "persistence_controls_passed": true,
+      "random_p": 0.6672212978369384,
+      "random_subspaces_passed": false,
+      "recovery_passed": true,
+      "shuffled_target_passed": true,
+      "task_general": true,
+      "winner": "E"
+    },
+    "circuit": {
+      "status": "not_eligible",
+      "submitted": false
+    },
+    "depth_transformation": {
+      "sequence": [
+        {
+          "abstraction": "E",
+          "layer": 16
+        },
+        {
+          "abstraction": "E",
+          "layer": 20
+        },
+        {
+          "abstraction": "E",
+          "layer": 24
+        },
+        {
+          "abstraction": "E",
+          "layer": 28
+        },
+        {
+          "abstraction": "E",
+          "layer": 30
+        }
+      ],
+      "systematic": true
+    },
+    "design": {
+      "contrast_families": 6,
+      "contrast_rows": 1400,
+      "maximum_absolute_delta_correlation": 0.8489523789080325,
+      "minimum_discriminating_effect_sd": 1.5505031926364874,
+      "minimum_family_count": 200,
+      "passed": true,
+      "semantic_conditions": 2400
+    },
+    "highest_evidence": "B",
+    "source_level4": true
+  },
+  "ood_gates": {
+    "frozen_protocol": {
+      "alpha_zero_equivalent": true,
+      "application_output_cap_removed": true,
+      "cache_equivalent": true,
+      "cache_state_reuse_equivalent": true,
+      "cache_validation_disposition": "passed",
+      "das_hash_verified": true,
+      "layer_rank_dose_tuned_on_ood": false,
+      "matched_generation_alpha_zero": true,
+      "native_no_cache_limitation": false,
+      "orientation_pre_ood": true,
+      "passed": true
+    },
+    "ood_generalization": {
+      "direction_passed": false,
+      "dose_response_passed": false,
+      "fixed_topic_direction": true,
+      "nondegeneration_passed": true,
+      "outcome": "ood_generalization_not_established",
+      "passed": false,
+      "prompt_direction_fraction": 0.6666666666666666,
+      "prompt_generalization_passed": true,
+      "random_specificity_passed": false
+    }
+  },
+  "ood_survival": {
+    "censored": 0,
+    "ci_lower": -0.05006854729370516,
+    "ci_upper": 0.022506881136775667,
+    "coefficient": -0.013780833078464748,
+    "converged": true,
+    "events": 1500,
+    "hazard_ratio": 0.9863136879108753,
+    "log_likelihood": -6813.470069775055,
+    "observations": 1500,
+    "score_at_solution": -1.709743457922741e-14,
+    "standard_error": 0.018514480113651723,
+    "stratified_by": "prompt_id",
+    "ties": "breslow"
+  },
+  "shuffled_target_audit": {
+    "artifacts/causal_specificity_v2/shards/candidate_000/shuffled_target.parquet": {
+      "rows": 18,
+      "changed_target_rows": 7,
+      "maximum_target_change": 0.05067142846515371,
+      "semantic_contrasts": 11,
+      "informative_permutation": true,
+      "tasks": {
+        "bandit": {
+          "rows": 6,
+          "target_sd": 3.268408087260198e-16
+        },
+        "debugging": {
+          "rows": 6,
+          "target_sd": 0.023886740453412658
+        },
+        "foraging": {
+          "rows": 6,
+          "target_sd": 0.008111955303696971
+        }
+      }
+    },
+    "artifacts/causal_specificity_v2/shards/candidate_001/shuffled_target.parquet": {
+      "rows": 24,
+      "changed_target_rows": 0,
+      "maximum_target_change": 6.661338147750939e-16,
+      "semantic_contrasts": 14,
+      "informative_permutation": false,
+      "tasks": {
+        "bandit": {
+          "rows": 6,
+          "target_sd": 2.026980648162706e-16
+        },
+        "debugging": {
+          "rows": 6,
+          "target_sd": 1.6958936828758672e-16
+        },
+        "foraging": {
+          "rows": 6,
+          "target_sd": 2.6814433536895164e-16
+        },
+        "solvability": {
+          "rows": 6,
+          "target_sd": 2.026980648162706e-16
+        }
+      }
+    },
+    "artifacts/causal_specificity_v2/shards/candidate_002/shuffled_target.parquet": {
+      "rows": 24,
+      "changed_target_rows": 0,
+      "maximum_target_change": 1.1102230246251565e-15,
+      "semantic_contrasts": 14,
+      "informative_permutation": false,
+      "tasks": {
+        "bandit": {
+          "rows": 6,
+          "target_sd": 2.398355846665908e-16
+        },
+        "debugging": {
+          "rows": 6,
+          "target_sd": 4.666459889952806e-16
+        },
+        "foraging": {
+          "rows": 6,
+          "target_sd": 2.7569917507762497e-16
+        },
+        "solvability": {
+          "rows": 6,
+          "target_sd": 4.881615836846586e-16
+        }
+      }
+    }
+  },
+  "necessity_jobs": 0,
+  "interpretation": "No submitted Level-5B necessity jobs"
+}
