@@ -1,0 +1,152 @@
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
+\usepackage{amsmath,amssymb,booktabs,graphicx,url,hyperref}
+\title{From Cognitive Models to Causal Neural Controllers:\\The Scope and Limits of Persistence Interventions}
+\author{Anonymous authors}
+\newcommand{\cfr}{\mathrm{CFR}_{G}}
+\begin{document}
+\maketitle
+\begin{abstract}
+Cognitive models can specify quantitative changes that an internal neural intervention should reproduce. We study this approach in a seven-task battery of structured continuing-versus-disengaging decisions made by Qwen3.5-4B. Behavioral modeling supplies frozen counterfactual targets for distributed alignment search, which identifies low-dimensional residual-stream controllers with strong held-out recovery. Across three retained controllers, global counterfactual recovery ranges from 0.930 to 0.968 on held-out pairs and from 0.673 to 0.878 on held-out tasks. These results support causal control within the structured task family, but do not uniquely identify the represented cognitive variable. A subsequent dissociation study fails to distinguish the leading integrated-evidence interpretation from matched random subspaces. A row-level audit further shows that the original within-task shuffled-target test is uninformative for the two rank-2 history controllers because the target values are constant within task. Finally, a frozen transfer test on unrestricted free generation fails to show the predicted monotonic reduction in EOS hazard. The case study illustrates both the utility of computational counterfactuals for discovering neural controllers and the additional evidence required to interpret those controllers as specific, naturally used, domain-general mechanisms.
+\end{abstract}
+
+\noindent\textbf{Working draft.} Existing artifact results only. Fresh specificity contrasts, matched discovery baselines, optimization-seed stability, and second-model replication remain outstanding. This draft is not yet submission-ready.
+
+\section{Introduction}
+Continuing toward a goal can reflect several computations: integration of past success, beliefs about the current context, expected future value, accumulated effort, or the cost of switching. A language model can exhibit similar stay/disengage behavior without implementing a single, general-purpose persistence variable. The scientific problem is therefore to connect an explicit behavioral computation to a neural intervention while preserving distinctions among prediction, control, and mechanistic identification.
+
+Cognitive models offer a useful intermediate description. Rather than supplying only a label to decode, they predict how a decision should change when an internal computational quantity changes while other inputs remain fixed. This turns a behavioral theory into a quantitative target for intervention. Distributed alignment search (DAS) provides a means of fitting a neural subspace to such targets \citep{geiger2024alignments}. Its application to instruction-following models shows that causal alignment can be studied beyond small task-specific networks \citep{wu2023scale}. These methods motivate our approach, but they do not remove the need to test whether a successful intervention identifies the variable proposed by the theory.
+
+We study Qwen3.5-4B on seven structured tasks spanning bandit choice, foraging, solvability, information sampling, waiting, effort, and debugging. We first fit behavioral models, then freeze computational counterfactuals before searching for neural alignments. The resulting low-dimensional controllers reproduce held-out effects and transfer to task families excluded from neural fitting. Stronger tests yield a more limited interpretation: the leading cognitive identity remains unresolved, and the frozen state does not meet the preregistered generalization criteria for unrestricted generation.
+
+The contribution is a case study in the use and interpretation of cognitive counterfactuals for mechanistic discovery. We do not introduce DAS itself or claim that this pipeline outperforms alternatives under equal discovery budgets. Instead, we expose the evidential steps from behavioral fit through held-out control to specificity and out-of-distribution testing. An artifact audit identifies a limitation in the original shuffled-target design that changes how its negative outcome should be described. Reporting this limitation is part of the result, rather than grounds for silently replacing the original test.
+
+\section{Framework: prediction, intervention, and identification}
+Let $x$ denote a rendered task condition, including its prescribed history, current evidence, and response mapping. We measure the semantic choice logit
+\begin{equation}
+g(x)=\ell_{\mathrm{continue}}(x)-\ell_{\mathrm{disengage}}(x),
+\end{equation}
+using verified single-token action labels. The associated binary probability is conditional on those two actions. It is distinct from their total probability mass in the full vocabulary; the collection pipeline records that mass and checks response validity.
+
+A behavioral model $f$ assigns a computational prediction to each condition. For a source/base pair $(s,b)$ and a proposed variable $z$, its interchange counterfactual specifies an effect $\Delta_i^f$ obtained by substituting the source value of $z$ into the base computation. These targets are computed before neural optimization. Model alternatives remain in the frozen bank when behavior does not discriminate them.
+
+For a residual state $h_b$ and an orthonormal basis $U\in\mathbb{R}^{d\times r}$, the neural interchange is
+\begin{equation}
+\widetilde h_b=h_b+UU^\top(h_s-h_b).
+\end{equation}
+The intervention replaces only the source-aligned coordinates at the final prompt token. The remaining residual coordinates and the rest of the prompt are preserved. The induced change in semantic logit, $\Delta_i^N$, is compared with $\Delta_i^f$. This tests an input-output transformation; it does not, by itself, show that the same coordinates naturally carry the proposed variable or are necessary for the behavior. Subspace patching can produce an intended causal effect through pathways that do not justify the intended interpretation \citep{makelov2024illusion}.
+
+We distinguish five empirical questions. First, does a cognitive model predict held-out behavior? Second, does a neural intervention reproduce its quantitative counterfactuals? Third, does recovery transfer to excluded task families? Fourth, is the intervention specific to the proposed computation relative to alternative targets and matched controls? Fifth, does the frozen state generalize beyond the discovery task family? Each question imposes additional requirements; a positive answer to an earlier one does not settle the later ones.
+
+\section{Behavioral testbed and discovery}
+The task compiler varies an explicit ontology of history, current state, and choice conditions. Counterbalanced X/Y mappings separate semantic continuing from a particular output token. Histories are prescribed evidence, not trajectories generated by the model's previous choices. We therefore interpret the measurements as responses to experimental histories, rather than as naturally evolving long-horizon agency.
+
+The initial design uses pair/episode-safe discovery, interpolation, and structural partitions. The implemented behavioral bank includes grounded cognitive models and flexible comparison models. Subsequent rounds examine parameter sharing, task transfer, residual structure, and targeted discrimination between surviving accounts. The strongest hierarchical interpolation result is dual history with task-structured calibration, reported at task-macro $R^2=0.738$. This supports shared computational form with heterogeneous parameters, not one invariant set of coefficients across tasks.
+
+The untouched final behavioral validation reports pooled $R^2=0.862$, task-macro $R^2=0.763$, RMSE $0.491$, and calibration slope $0.824$. The pooled and task-macro statistics answer different questions and should not be substituted for each other. Dual-history and latent-context accounts remain unresolved by the reported behavioral comparisons. Flexible teacher recovery is also imperfect: the Round-2 report records 30 of 36 passed checks. Accordingly, we retain model uncertainty instead of treating the winning descriptive model as a uniquely established theory.
+
+\section{Causal controller discovery}
+\subsection{Frozen targets and selection}
+The causal workflow separates behavioral-model freezing, counterfactual-pair construction, layer localization, DAS fitting, and evaluation. The neural discovery tasks are bandit, debugging, foraging, and solvability; effort, information sampling, and waiting form the task holdout. The full pair manifest is larger than the selected neural evaluation subsets. Counts for the evaluated controllers must therefore be reported from their actual shards, not inferred from the full manifest.
+
+Whole-state patching provides candidate layers using validation data. The configured DAS search examines ranks $1,2,4,8$, with three epochs, learning rate $0.03$, and an activation-change penalty of $10^{-4}$. The implementation also includes a constant rank-dependent term in each fixed-rank loss; because the rank is fixed within an optimization run, this term does not affect its gradients. Layer/rank selection uses validation outcomes and the configured preference for smaller ranks within an MSE tolerance. Reported test and task-holdout outcomes do not enter the fitting loop.
+
+Three shared alignments were retained. We report all three to avoid presenting the descriptive test maximum as if it were an independently selected winner. The later abstraction and OOD studies freeze the layer-28/rank-2 dual-history alignment. Those follow-ups are additional tests of a chosen controller, not independent replications of its discovery.
+
+\subsection{Evaluation metric and results}
+The primary corrected metric is global counterfactual recovery,
+\begin{equation}
+\cfr=1-\frac{\sum_i(\Delta_i^N-\Delta_i^f)^2}{\sum_i(0-\Delta_i^f)^2}.
+\end{equation}
+Here zero denotes no neural intervention effect. A score of one is exact recovery, zero matches the no-effect baseline, and negative scores are worse. The metric is undefined when the denominator vanishes. Unlike the mean of per-example relative recovery, this aggregate avoids dividing separately by small target effects. Nevertheless, high recovery can coexist with limited within-task discrimination, so we also examine effect correlation, calibration, controls, and target variation.
+
+\begin{table}[t]
+\centering\small
+\input{generated/controllers.tex}
+\caption{All retained shared controllers. Layers are zero-based block outputs. Train/validation counts are rendered pair rows, not independent semantic sample sizes. Test and task-holdout scores are extracted from the corrected bootstrap table.}
+\label{tab:controllers}
+\end{table}
+
+The dual-history alignment has test $\cfr=0.968$ and task-holdout $\cfr=0.873$; the outcome-history alignment has corresponding scores $0.967$ and $0.878$. In the corrected bootstrap table, the dual-history test interval is $[0.943,0.986]$ and its task-holdout interval is $[0.772,0.948]$. The test effect correlation is $0.856$. Intervals resample semantic contrast IDs within task while retaining duplicated response mappings together. These are conditional intervals for fitted alignments, not estimates of optimization-seed uncertainty.
+
+The latent-context controller has test recovery $0.930$, but its effect-correlation interval includes zero. Thus recovery alone does not satisfy every stronger criterion in the later analysis. The mean task-holdout recovery across the three controllers is $0.808$; this is not the dual-history controller's individual transfer score. The two rank-2 controllers each have 24 test rows spanning 14 distinct semantic contrast IDs, making the evidence more limited than a large-sample interpretation of the recovery values would suggest.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{generated/controllers.pdf}
+\caption{Recovery for all retained controllers, with 95\% semantic-contrast bootstrap intervals from the committed corrected-metrics table. No additional model fitting was performed to create this figure.}
+\label{fig:recovery}
+\end{figure}
+
+\section{What does the controller represent?}
+\subsection{Matched controls and an uninformative shuffle}
+The dual-history controller exceeds 500 matched random subspaces on recovery ($p=0.0020$). The later comparison reports persistence-output recovery $0.485$ and persistence-state recovery $0.264$ on its matched test rows. These comparisons support non-random causal control under their evaluation conditions. They do not constitute a complete equal-data, equal-budget comparison of discovery methods, and should not be described as such.
+
+The same stage marks shuffled-target specificity as failed. Inspection of the stored rows reveals why that outcome is not an informative test for the two rank-2 history controllers. Their target effects are constant within each task up to numerical precision. Although the implementation deranges semantic contrast identifiers within task, it leaves all 24 target values unchanged to a tolerance of $10^{-10}$. Maximum changes are below $1.2\times10^{-15}$. Recovery against those shuffled targets must therefore remain essentially identical.
+
+This is a limitation of the selected contrast set and null design. It neither establishes specificity nor demonstrates its absence. The latent-context shuffle changes 7 of 18 values, but also contains a task with essentially constant targets. A future specificity test requires preregistered variation in counterfactual magnitude and sign within task and must verify that its constrained permutations actually change target values. Such a follow-up should be labeled a new test; the frozen original results must remain intact.
+
+Target-selective necessity is also unresolved. In the stable-CFR follow-up, the necessity-job manifest is empty because no candidate passes the preceding specificity gate. Blank necessity scores in this stage are therefore not an empirical estimate of zero necessity. Earlier exploratory necessity artifacts should be described separately from this unexecuted, gated test.
+
+\subsection{Factorial abstraction study}
+A separate study freezes the layer-28/rank-2 controller and contrasts raw outcome history $O$, context-sensitive history $O^*$, integrated history $H$, and total evidence $E$. Its design contains 1,400 contrast rows across six dissociation families and 2,400 semantic conditions. The largest absolute target-difference correlation remains $0.849$, so the design improves discrimination without making the abstractions independent.
+
+The descriptive and intervention analyses favor $E$: held-out natural-state geometry reaches $R^2=0.700$, and intervention recovery is $0.707$ with effect correlation $0.882$. The leading interpretation exceeds the stored shuffled-target and persistence/output comparisons. However, it fails the matched-random comparison ($p=0.667$), and the overall abstraction gate is false. These results motivate integrated evidence as a hypothesis but do not uniquely identify an E representation. Positive descriptive fits must be interpreted alongside the failed control that limits their specificity.
+
+\section{Frozen transfer to unrestricted generation}
+The OOD study asks whether the structured-task state controls voluntary continuation of free generation. The alignment is hash-frozen; a signed E-oriented axis is derived from 2,368 pre-OOD structured activation rows. The layer, rank, doses, prompts, decoding policy, and statistical plan are frozen before generation. The experiment intervenes on the newly processed final-token residual and keeps canonical EOS tokens available. There is no application-level output-token cap; context exhaustion, infrastructure timeout, and resource exhaustion are separately classified censoring events.
+
+The primary battery contains six prompts, 50 matched seeds, and five doses, yielding 1,500 generations. All primary generations terminate with EOS; none is context-censored. In the current committed gates, the frozen protocol and both cache checks pass. This current artifact state supersedes generic warning text about cache discrepancies that remains in parts of the repository documentation.
+
+The prompt-stratified Cox estimate for dose is $\beta=-0.0138$, with 95\% interval $[-0.0501,0.0225]$. The dose/RMST Spearman statistic is $0.100$, and the random-specificity test reports $p=0.257$. Direction, monotonicity, and random-specificity gates fail. Some secondary outcomes have the hypothesized sign, but they do not satisfy the full primary criterion. The justified conclusion is failure to establish the registered OOD generalization claim, rather than proof that the controller has exactly zero influence on stopping or that no domain-general persistence mechanism exists anywhere in the model.
+
+\section{Discussion and limitations}
+The positive finding is quantitative causal control across a structured task family. The cognitive models make useful intervention targets by specifying transformations rather than merely labels. However, the degree of scientific interpretation supported by those targets depends on their diversity and on the controls that can distinguish them from simpler explanations. Constant within-task targets illustrate this issue directly: a high recovery score can reflect a task-conditioned effect without discriminating the proposed within-task computation.
+
+The present evidence is limited to one model, small selected neural test sets, and the retained alignments from one optimization configuration. Five-seed stability and a genuinely matched probe/mean-difference/PCA/direct-persistence comparison are needed before claiming reliable superiority of cognitive guidance. Fresh varied counterfactuals are more informative than repeated evaluation of the unchanged shuffled-target null. Cross-model replication should refit the behavioral account for the new model; reusing Qwen coefficients as Llama's behavioral theory would change the scientific question.
+
+The scope of the OOD inference is also narrow. Six prompt families and one frozen intervention recipe do not exhaust open-ended continuation behavior. Failure of this recipe establishes a boundary for the tested claim, not a universal impossibility result. Conversely, retuning the direction on those outcomes would no longer be a frozen generalization test. The negative evidence is useful precisely when that distinction is preserved.
+
+This study supports a disciplined progression from behavioral theory to computational counterfactuals, held-out neural control, and explicit specificity tests. The controller result survives the present audit. Its interpretation should remain narrower than variable identity, natural necessity, circuit implementation, or universal persistence.
+
+\section*{Reproducibility statement}
+The accompanying source includes a read-only extractor that reconstructs the controller table from committed CSV artifacts, audits stored target permutations, and records SHA-256 hashes of all sources it reads. It does not rerun the original GPU experiments. The appendix identifies the source artifacts and selection boundaries. An anonymous code archive, immutable model revisions, and complete environment manifests must be verified before submission.
+
+\section*{AI use statement}
+This working manuscript, artifact audit, and supporting code were prepared with an AI assistant. Authors must review every claim, calculation, citation, and code change before submission and complete this statement with the full extent of AI use in the research. This draft does not attest that author verification is complete.
+
+\bibliography{references}
+\bibliographystyle{iclr2027_conference}
+
+\appendix
+\section{Selection and evidence audit}
+\begin{table}[h]
+\centering\small
+\begin{tabular}{p{0.25\linewidth}p{0.32\linewidth}p{0.32\linewidth}}
+\toprule
+Decision & Permitted selection evidence & Reporting boundary \\
+\midrule
+Behavioral theory & Behavioral discovery and designated model comparisons & Untouched final behavioral validation \\
+Counterfactual pairs & Frozen model predictions, coverage, theory disagreement & No neural test-outcome selection \\
+Layer and rank & Mechanistic localization/validation subsets & No fitting on pair test or task holdout \\
+DAS coordinates & Mechanistic training pairs & Semantic contrast bootstrap is conditional on fit \\
+Abstraction follow-up & Previously chosen, hash-frozen controller & All abstractions score identical interventions \\
+OOD orientation and scale & Pre-OOD structured projections & No OOD retuning \\
+\bottomrule
+\end{tabular}
+\caption{Declared selection boundaries. The audit confirms artifact identities and examines stored rows; it is not a full reconstruction of every historical selection decision.}
+\end{table}
+
+The full source inventory is generated alongside the paper. Controller estimates and Figure~\ref{fig:recovery} use the corrected bootstrap table, while later specificity-control intervals come from a separate reanalysis table. Slight differences between bootstrap endpoints across those tables must not be silently mixed. The artifact files retain each calculation's resampling metadata.
+
+The rank-2 test sets include bandit, debugging, foraging, and solvability. Task holdout comprises effort, information sampling, and waiting. The larger counterfactual manifest also contains unselected and control rows; its total size is not the effective sample size of the primary neural result. Semantic contrast IDs, response mappings, and actual evaluated rows are the appropriate basis for uncertainty and sample-size reporting.
+
+\section{Outstanding experiments}
+The next confirmatory design should freeze fresh within-task contrasts before any new neural evaluation. The design must support multiple nontrivial effect magnitudes and directions within each relevant task and target, and a semantic-pair-preserving shuffle must change a substantial prespecified fraction of target values. Report the achieved variation and permutation coverage even if the gate fails.
+
+For a matched discovery comparison, use the same training, validation, pair-test, and task-holdout definitions for cognitive-target DAS, direct behavior-target DAS, a linear probe, mean differences, PCA, and random controls. Report rank and layer choices, training examples, GPU time, optimization updates, and intervention evaluations. A rank-1 probe should be compared at rank 1 or with an explicitly labeled additional-rank rule, rather than receiving arbitrary extra coordinates without disclosure. Keep scalar decoding quality separate from causal recovery.
+
+Five initialization/data-order seeds should be evaluated without choosing the best seed on test outcomes. A fixed-layer/rank repeat measures local optimization stability; repeating the whole search additionally measures layer/rank selection stability. These are different experiments. Report both when affordable, together with principal-angle distributions and every retained seed's paired held-out scores.
+
+The planned Llama-3.1-8B-Instruct replication is not included in the results. It requires confirmed gated-model access, tokenizer/semantic-label checks, numerical intervention checks, a real behavioral pilot, and a frozen Llama behavioral comparison before full DAS. A successful tiny random-Llama software test verifies plumbing only and is not evidence of scientific replication.
+\end{document}
