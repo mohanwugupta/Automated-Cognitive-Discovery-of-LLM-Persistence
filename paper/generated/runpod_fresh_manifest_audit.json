@@ -1,0 +1,13 @@
+{
+  "schema": "per_mapping_signed_history_diagnostic",
+  "standard_matched_manifest_loader_compatible": false,
+  "reason": "Historical paired_condition_id fields were inherited when constructing fresh variants. They are provenance, not the fresh pairing key. The executed runner builds records directly and does not reload this JSONL with the standard fully-counterbalanced manifest loader.",
+  "pairing_key": "task_family, response_mapping, contrast_id; contrast_member separates base and source",
+  "backgrounds_differ_between_response_mappings": [
+    "debugging",
+    "effort",
+    "foraging",
+    "waiting"
+  ],
+  "impact": "Each source/base contrast holds current factors and action history fixed within its mapping. Cross-mapping background identity and response-label invariance are not established. Permutations synchronize pattern assignments across mappings without claiming identical backgrounds."
+}
