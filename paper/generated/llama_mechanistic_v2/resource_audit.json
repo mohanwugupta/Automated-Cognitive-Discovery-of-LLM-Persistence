@@ -1,0 +1,11 @@
+{
+  "pod": "tk8jgwhvijy1rt",
+  "created_utc": "2026-09-09T05:11:48.401Z",
+  "deletion_verified_utc": "2026-09-09T05:47:52.829525+00:00",
+  "gpu": "NVIDIA L40S",
+  "hourly_usd": 1.09,
+  "disk_gb": 50,
+  "network_volume": null,
+  "resources_deleted": true,
+  "archive_sha256": "c8c4ec0ef8a17235186605747a2f0f2e1f7619731977760e0cfd1904784e4cd2"
+}

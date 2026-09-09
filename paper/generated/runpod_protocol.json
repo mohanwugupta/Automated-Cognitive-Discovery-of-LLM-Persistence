@@ -1,0 +1,175 @@
+{
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "layer": 28,
+  "rank": 2,
+  "seeds": [
+    75001,
+    75002,
+    75003,
+    75004,
+    75005
+  ],
+  "epochs": 3,
+  "lr": 0.03,
+  "activation_penalty": 0.0001,
+  "fitting": "original mech_pair_train only; no new hyperparameter selection",
+  "evaluation": "all five seeds reported separately; original validation/test/holdout and fresh signed histories",
+  "baselines": [
+    "ridge_history_rank2",
+    "mean_difference_rank2",
+    "pca_rank2",
+    "ridge_persistence_rank2",
+    "direct_DAS_rank2"
+  ],
+  "matching": "same layer/rank/evaluation pairs; baseline intervention norms matched to frozen original DAS",
+  "ridge_alpha": 1.0,
+  "random_count": 20,
+  "random_seed": 76001,
+  "fresh_target_audit": [
+    {
+      "task": "bandit",
+      "mapping": "continue_x",
+      "targets": [
+        0.18253894767374312,
+        0.443308872921948,
+        -0.18253894767374318,
+        -0.4433088729219476
+      ]
+    },
+    {
+      "task": "bandit",
+      "mapping": "continue_y",
+      "targets": [
+        0.18253894767374312,
+        0.44330887292194787,
+        -0.1825389476737433,
+        -0.44330887292194765
+      ]
+    },
+    {
+      "task": "debugging",
+      "mapping": "continue_x",
+      "targets": [
+        0.17801525314539324,
+        0.4323227576388121,
+        -0.17801525314539313,
+        -0.4323227576388122
+      ]
+    },
+    {
+      "task": "debugging",
+      "mapping": "continue_y",
+      "targets": [
+        0.17801525314539335,
+        0.43232275763881245,
+        -0.17801525314539313,
+        -0.43232275763881134
+      ]
+    },
+    {
+      "task": "effort",
+      "mapping": "continue_x",
+      "targets": [
+        0.14023852014768762,
+        0.34057926321581283,
+        -0.14023852014768745,
+        -0.3405792632158128
+      ]
+    },
+    {
+      "task": "effort",
+      "mapping": "continue_y",
+      "targets": [
+        0.14023852014768756,
+        0.34057926321581256,
+        -0.1402385201476874,
+        -0.34057926321581256
+      ]
+    },
+    {
+      "task": "foraging",
+      "mapping": "continue_x",
+      "targets": [
+        0.14912846997276505,
+        0.3621691413624293,
+        -0.1491284699727653,
+        -0.36216914136242995
+      ]
+    },
+    {
+      "task": "foraging",
+      "mapping": "continue_y",
+      "targets": [
+        0.1491284699727653,
+        0.3621691413624295,
+        -0.14912846997276535,
+        -0.36216914136242956
+      ]
+    },
+    {
+      "task": "information_sampling",
+      "mapping": "continue_x",
+      "targets": [
+        0.02464256608969073,
+        0.059846231932105365,
+        -0.02464256608969073,
+        -0.059846231932105365
+      ]
+    },
+    {
+      "task": "information_sampling",
+      "mapping": "continue_y",
+      "targets": [
+        0.024642566089689844,
+        0.05984623193210492,
+        -0.024642566089690288,
+        -0.059846231932105365
+      ]
+    },
+    {
+      "task": "solvability",
+      "mapping": "continue_x",
+      "targets": [
+        0.26723475457825785,
+        0.6489986896900544,
+        -0.2672347545782577,
+        -0.6489986896900545
+      ]
+    },
+    {
+      "task": "solvability",
+      "mapping": "continue_y",
+      "targets": [
+        0.26723475457825774,
+        0.6489986896900543,
+        -0.26723475457825785,
+        -0.6489986896900549
+      ]
+    },
+    {
+      "task": "waiting",
+      "mapping": "continue_x",
+      "targets": [
+        0.1431760544952596,
+        0.3477132752027734,
+        -0.1431760544952596,
+        -0.3477132752027735
+      ]
+    },
+    {
+      "task": "waiting",
+      "mapping": "continue_y",
+      "targets": [
+        0.14317605449525983,
+        0.3477132752027736,
+        -0.14317605449525983,
+        -0.34771327520277384
+      ]
+    }
+  ],
+  "created_utc": "2026-09-09T00:20:21.196156+00:00",
+  "original_revision_unknown": true,
+  "scope": "fixed primary dual-history controller; other frozen controllers not rerun",
+  "max_wall_seconds": 10800
+}

@@ -1,0 +1,7 @@
+{
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "source_conditions": 320,
+  "role": "secondary diagnostic added during intervention run; no fitting or selection",
+  "baseline": "reuse independently cached base logits from the main run"
+}

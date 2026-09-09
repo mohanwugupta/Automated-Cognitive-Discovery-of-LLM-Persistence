@@ -1,0 +1,40 @@
+{
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "interface": "question",
+  "seeds": [
+    93001,
+    93002,
+    93003
+  ],
+  "observations": {
+    "train": 2800,
+    "selection": 980,
+    "test": 980
+  },
+  "models": [
+    "immediate_state",
+    "choice_perseveration",
+    "outcome_history",
+    "dual_history"
+  ],
+  "variant": "M3",
+  "alpha": 1,
+  "gates": {
+    "sample_actions": true,
+    "expand_history_prefixes": false,
+    "save_prompts_separately": true,
+    "shard_count": 8,
+    "batch_size": 1,
+    "pilot_probability_bounds": [
+      0.05,
+      0.95
+    ],
+    "minimum_logit_sd": 0.15,
+    "minimum_parse_rate": 0.99,
+    "minimum_top_token_action_rate": 0.9,
+    "maximum_mapping_gap": 0.25
+  },
+  "entry": "history R2>=.6 and >= immediate+.01 on selection and untouched test; all final task measurement gates pass",
+  "script_sha256": "e2a34a8ed20e3e58545a596a16584fac00c4530b840d610baff82e36e7ce5090",
+  "plan_sha256": "2eaea6f946242ad46f3502e5fc482ef20f6932ce03f94d5854b12092b46952b9"
+}

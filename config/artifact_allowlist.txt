@@ -3,3 +3,5 @@
 artifacts/theory_resolution_v1/active_sampling/candidate_predictions.csv
 artifacts/theory_resolution_v1/active_sampling/sampling_scores.csv
 artifacts/abstraction_discovery_v1/frozen_das/natural_geometry.csv
+# Existing main-branch EOS token evidence; required for stopping-hazard replay.
+artifacts/ood_free_generation_v1/generations/token_events.parquet

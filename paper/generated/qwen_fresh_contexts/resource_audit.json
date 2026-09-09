@@ -1,0 +1,14 @@
+{
+  "pod": "yq92v60ihexfcg",
+  "created_utc": "2026-09-09T01:53:59.73Z",
+  "gpu": "NVIDIA L40S",
+  "hourly_usd": 1.09,
+  "disk_gb": 50,
+  "disk_usd_per_gb_month": 0.1,
+  "network_volume": null,
+  "resources_deleted": true,
+  "deletion_verified_utc": "2026-09-09T02:44:50Z",
+  "download_sha256": "4d8ca0ad979055b168f55273897931919584013b3d8c7f77e8aa64afbfb8b267",
+  "estimated_total_usd_upper_bound": 1.1,
+  "billing_note": "Conservative estimate from allocation duration and quoted prices; not a posted invoice."
+}

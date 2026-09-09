@@ -1,0 +1,66 @@
+{
+  "repository": "https://github.com/mohanwugupta/digital-minds-hackathon",
+  "commit": "5b968d0bb8de64f67556a7b300200aa488a591fa",
+  "probe": {
+    "rows": 1800,
+    "episodes": 78,
+    "future_return_r2": 0.23986218083208,
+    "persistence_r2": 0.9982580453752955,
+    "episode_split_disjoint": true
+  },
+  "factorial": {
+    "rows": 14244,
+    "states": 1187,
+    "episodes": 48,
+    "complete_cells": true,
+    "history_fixed": true,
+    "logit_identity_verified": true,
+    "relative_incentive_r2": 0.7836443200157732,
+    "stop_slope": -0.10392125862569122,
+    "continue_slope": 0.1071721914527832
+  },
+  "steering_status": "independently recomputed from eight hash-verified LFS shards",
+  "scope": "Independent arithmetic from stored rows; original inference and probe training not rerun.",
+  "steering": [
+    {
+      "direction": "advantage",
+      "states": 1187,
+      "episodes": 48,
+      "episode_weighted_effect": -0.0011718768744520527,
+      "ci_low": -0.006378709300202277,
+      "ci_high": 0.004258654212385402
+    },
+    {
+      "direction": "generic_return",
+      "states": 1187,
+      "episodes": 48,
+      "episode_weighted_effect": 0.002832385335154114,
+      "ci_low": -0.0009742363946864786,
+      "ci_high": 0.006826993893237426
+    },
+    {
+      "direction": "persistence",
+      "states": 1187,
+      "episodes": 48,
+      "episode_weighted_effect": 1.9935099649929058,
+      "ci_low": 1.977691756725173,
+      "ci_high": 2.010570166512369
+    }
+  ],
+  "steering_rows": 224343,
+  "source_sha256": {
+    "artifacts/linear_probes/test_predictions.csv": "d70d54bd3f979ce52bb39bc84ab121e5f0785f7ee458dae1bb11bf8875686f2e",
+    "artifacts/value_dissociation/factorial_shard_000.csv": "038ce2636a13d857e3801138cd4959b2c9f44c2eb9cfb2aa59256434f7d607aa",
+    "artifacts/value_dissociation/factorial_shard_001.csv": "2e4c4455fb332bbd93b736d860a432c36ec5693ed867bda53adfc2ae9ba8f7da",
+    "artifacts/value_dissociation/factorial_shard_002.csv": "f427d727ac6f160e4738ca5142a233733760ce025420e6d4f088de6a41d3ef0f",
+    "artifacts/value_dissociation/factorial_shard_003.csv": "0066aa7ca5af5f3dcccf9a60e055b9fd92dd5ee42e6dcd73b0304cdd85d78659",
+    "artifacts/causal_steering/replays_shard_000.csv": "b31c98af585c332971975c77a1f90fdd659aa02b557c04be06de4af511b42671",
+    "artifacts/causal_steering/replays_shard_001.csv": "b995b7828bf334f83eaf5a541516c9abcb1cc8b5ab10b5c698bda454be3c30b3",
+    "artifacts/causal_steering/replays_shard_002.csv": "d8a85f237c540f55414a4a96e0d5644f6c6cff1a0b0a06895e16ac3b5a2c0597",
+    "artifacts/causal_steering/replays_shard_003.csv": "6ece81a61cf9057e616bdb9fc0a1da44e3dc7227e727d9474f4edf4008535b90",
+    "artifacts/causal_steering/replays_shard_004.csv": "1d935fe8d21b4c0f43cc0019a1aa1709199cf1f9f1a2531de9255ab126bc0ff7",
+    "artifacts/causal_steering/replays_shard_005.csv": "770eee4eda33a58e29d36b9b783ea97e1c334c4c3614f09f9d4328a9fc64110f",
+    "artifacts/causal_steering/replays_shard_006.csv": "f013adec496e5d59141f5e91dbdd9840335ab26651c08a916c89135ccdf9d718",
+    "artifacts/causal_steering/replays_shard_007.csv": "0c5b6dc100e2d54c93e3e3e10824134b654f1b26bde90bfb67134bdf62d24026"
+  }
+}

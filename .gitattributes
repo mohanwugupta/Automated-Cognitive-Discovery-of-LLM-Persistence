@@ -1,0 +1,12 @@
+# Preserve evidence while keeping the default PR review focused on source.
+paper/generated/** linguist-generated=true
+# Small scientific summaries remain visible in the review.
+paper/generated/**/metrics.csv linguist-generated=false
+paper/generated/**/random_comparisons.csv linguist-generated=false
+paper/generated/**/control_differences.csv linguist-generated=false
+paper/generated/**/bootstrap.csv linguist-generated=false
+paper/generated/**/norm_audit.csv linguist-generated=false
+paper/generated/*.tex linguist-generated=false
+paper/generated/audit.md linguist-generated=false
+paper/iclr2027_conference.sty linguist-vendored=true
+paper/iclr2027_conference.bst linguist-vendored=true

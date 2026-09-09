@@ -1,0 +1,34 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "seed": 86001,
+  "labels": [
+    [
+      "X",
+      "Y"
+    ],
+    [
+      "A",
+      "B"
+    ]
+  ],
+  "observations_per_format": 980,
+  "gates": {
+    "sample_actions": true,
+    "expand_history_prefixes": false,
+    "save_prompts_separately": true,
+    "shard_count": 8,
+    "batch_size": 1,
+    "pilot_probability_bounds": [
+      0.05,
+      0.95
+    ],
+    "minimum_logit_sd": 0.15,
+    "minimum_parse_rate": 0.99,
+    "minimum_top_token_action_rate": 0.9,
+    "maximum_mapping_gap": 0.25
+  },
+  "rationale": "Original X/Y pilot failed counterbalance on all seven tasks.",
+  "selection": "One prospectively chosen A/B correction; X/Y is matched control; report both.",
+  "script_sha256": "d168860e9daf945aef030e39e7d5da97f6b994e293dd40a08bd6ca2914933cdd"
+}

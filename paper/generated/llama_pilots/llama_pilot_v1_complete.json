@@ -1,0 +1,17 @@
+{
+  "behavioral_approved": false,
+  "hook_check": {
+    "layer": 16,
+    "identity_error": 0.0,
+    "gradient_finite": true,
+    "gradient_norm": 0.35377973318099976,
+    "intervention_effect": 0.0,
+    "state_finite": true
+  },
+  "observations": 980,
+  "seconds": 112.42981311958283,
+  "torch": "2.8.0.dev20250319+cu128",
+  "transformers": "5.16.1",
+  "gpu": "NVIDIA L40S",
+  "peak_vram_bytes": 16632807936
+}

@@ -1,0 +1,24 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "seed": 85001,
+  "conditions": 980,
+  "scope": "behavioral feasibility, endpoint histories only",
+  "gates": {
+    "sample_actions": true,
+    "expand_history_prefixes": false,
+    "save_prompts_separately": true,
+    "shard_count": 8,
+    "batch_size": 1,
+    "pilot_probability_bounds": [
+      0.05,
+      0.95
+    ],
+    "minimum_logit_sd": 0.15,
+    "minimum_parse_rate": 0.99,
+    "minimum_top_token_action_rate": 0.9,
+    "maximum_mapping_gap": 0.25
+  },
+  "progression": "Every task must pass all inherited gates before replication.",
+  "script_sha256": "3b96f742f5484a6dfa7d806f151a417e0c5fa41e5bf4cf791269f7aba5f19f1b"
+}

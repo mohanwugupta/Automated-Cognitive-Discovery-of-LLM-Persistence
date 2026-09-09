@@ -1,0 +1,159 @@
+{
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "seed": 87001,
+  "backgrounds_per_task": 4,
+  "patterns": [
+    [
+      [
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        -1,
+        -1
+      ]
+    ],
+    [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        -1,
+        -1,
+        -1
+      ]
+    ],
+    [
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        1,
+        1
+      ]
+    ]
+  ],
+  "conditions": 640,
+  "pairs": 416,
+  "controllers": [
+    {
+      "artifact": "artifacts/causal_mech_v1/representations/alignments/contextual_outcome_history__latent_context__L30__rank8__shared__all_tasks.safetensors",
+      "final_training_loss": 0.151940138,
+      "job_index": 7,
+      "layer": 30,
+      "rank": 8,
+      "scope": "shared",
+      "target_variable": "contextual_outcome_history",
+      "task_family": null,
+      "theory": "latent_context",
+      "training_examples": 18,
+      "validation_correlation": 0.4897012772,
+      "validation_examples": 18,
+      "validation_fraction_behavioral_effect_recovered": 0.8202461134,
+      "validation_intercept": 0.2848789552,
+      "validation_mean_cfr": 0.922118108,
+      "validation_median_cfr": 0.9660204074,
+      "validation_rmse": 0.3102718846,
+      "validation_sign_accuracy": 1.0,
+      "validation_slope": 0.5632817444
+    },
+    {
+      "artifact": "artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors",
+      "final_training_loss": 0.0639787821,
+      "job_index": 2,
+      "layer": 28,
+      "rank": 2,
+      "scope": "shared",
+      "target_variable": "outcome_history",
+      "task_family": null,
+      "theory": "dual_history",
+      "training_examples": 24,
+      "validation_correlation": 0.8032670349,
+      "validation_examples": 22,
+      "validation_fraction_behavioral_effect_recovered": 0.9698144972,
+      "validation_intercept": -0.0995576403,
+      "validation_mean_cfr": 0.9550630034,
+      "validation_median_cfr": 0.9801644015,
+      "validation_rmse": 0.2115195406,
+      "validation_sign_accuracy": 1.0,
+      "validation_slope": 1.0701200714
+    },
+    {
+      "artifact": "artifacts/causal_mech_v1/representations/alignments/outcome_history__outcome_history__L30__rank2__shared__all_tasks.safetensors",
+      "final_training_loss": 0.0791354259,
+      "job_index": 3,
+      "layer": 30,
+      "rank": 2,
+      "scope": "shared",
+      "target_variable": "outcome_history",
+      "task_family": null,
+      "theory": "outcome_history",
+      "training_examples": 24,
+      "validation_correlation": 0.8129804923,
+      "validation_examples": 22,
+      "validation_fraction_behavioral_effect_recovered": 0.9124208399,
+      "validation_intercept": -0.1773545302,
+      "validation_mean_cfr": 0.9543658454,
+      "validation_median_cfr": 0.9773520657,
+      "validation_rmse": 0.2169991639,
+      "validation_sign_accuracy": 1.0,
+      "validation_slope": 1.14323845
+    }
+  ],
+  "random_count": 20,
+  "random_seed": 87002,
+  "intervention": "source-to-base subspace interchange at final prompt token; explicit pair table sets signed orientation, manifest members are increasing-target order",
+  "random_matching": "same layer/rank; match frozen-controller norm for each pair",
+  "fitting": "none; all historical controllers and cognitive models frozen",
+  "scope": "fresh current-state contexts and length-3/5 histories; existing renderer wording",
+  "inference": "report all three controllers; paired background-level bootstrap and random null",
+  "manifest_sha256": "0341f24fe8ac9ba9d7edb28e4aa040b1d2055ea1b35dd20fe4d597fadc1ae691",
+  "script_sha256": "51842d5588adba2784c4def0d2fefa7af2fd0079cad66ab2a6edb22c93d5e520",
+  "theory_hashes": {
+    "dual_history/model.pkl": "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3",
+    "dual_history/model_spec.json": "ac7e11f49f69862e3a99a5ba03be31ef57efceee6d8c46b82d3470af2f95fe24",
+    "dual_history/parameters.csv": "7b2d7d1f14d132a895fbaec48ee77268c75d2854a1e1c0f8fc539c85875f362e",
+    "dual_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "latent_context/model.pkl": "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f",
+    "latent_context/model_spec.json": "9403ffffea563eafb4c54ab879d660b0936490e9bfe92d5761c41690997b1664",
+    "latent_context/parameters.csv": "b49fa311467abff542b9bbc1fab621318b243221b1cfd0ea639386c2d9f488a5",
+    "latent_context/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25",
+    "outcome_history/model.pkl": "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667",
+    "outcome_history/model_spec.json": "a39bb985f3050e28b3504240fee0665b2504dd49ee7331c522adcf0d1d4fd8d2",
+    "outcome_history/parameters.csv": "52e0c0f0781f4a4b617ac160fb4080f7fa6e48e950bdf4224eb53f255c8b8008",
+    "outcome_history/training_condition_hashes.json": "87dbeac0efddc575bc86c1b6ab359c36284ff8f173cd117d85325d9fb79a2b25"
+  },
+  "alignment_hashes": {
+    "artifacts/causal_mech_v1/representations/alignments/contextual_outcome_history__latent_context__L30__rank8__shared__all_tasks.safetensors": "151dba55acd347d7866c960e87b92b86aea05f815fa14d167ac17a1b5d065856",
+    "artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors": "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0",
+    "artifacts/causal_mech_v1/representations/alignments/outcome_history__outcome_history__L30__rank2__shared__all_tasks.safetensors": "f1646812228a22d47601e51d7d3593b46006929b427e5c7156f552a7a2f2169b"
+  }
+}

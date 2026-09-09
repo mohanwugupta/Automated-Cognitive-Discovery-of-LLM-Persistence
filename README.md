@@ -1,4 +1,8 @@
-# Automated Cognitive Discovery of LLM Persistence
+# Cognitive Models as Guides to Causal Discovery
+
+The [working paper](paper/main.tex) studies whether cognitive counterfactuals can guide discovery of neural controllers. The evidence distinguishes cognitive-target matching, natural-effect recovery, computational identity, and free-generation stopping. Strong results on selected Qwen contrasts do not establish all four.
+
+Completed follow-ups include [broader Qwen contexts](paper/qwen-fresh-results.md), [Llama behavioral validation](paper/llama-behavior-results.md), [partial Llama causal replication](paper/llama-mechanistic-results.md), and an [independent arithmetic audit of the original study](paper/original-study-audit.md). The prospectively specified [Qwen confirmation](paper/qwen-confirmation-results.md) is also complete. All experiment pods have been deleted; no further GPU runs are queued. The manuscript and PR remain drafts.
 
 This repository implements the coverage-oriented behavioral pipeline in
 [`PRD.md`](PRD.md). It asks which computations govern continuing versus
