@@ -61,8 +61,8 @@ L28/rank2 controller. The follow-up supports original-pair recovery but exposes
 poor fresh calibration and fails fresh matched-random specificity.
 
 Remaining work includes broader templates and all retained controllers, full
-layer/rank search stability under declared budgets, Llama behavioral pilot and
-replication, independent auditing of the original sequential-bandit artifacts,
+layer/rank search stability under declared budgets, a Llama prompt-validity
+redesign and subsequent mechanistic replication, independent auditing of the original sequential-bandit artifacts,
 and author review of the complete paper and submission materials. The original
 and follow-up results must remain distinct.
 
@@ -86,7 +86,12 @@ The runner writes its protocol before loading weights. `--prepare-only` checks
 the signed-history design without GPU inference. The run measures optimization
 stability at fixed layer/rank, not stability of the full discovery search.
 
-To enable the Llama check, the account owner must sign into Hugging Face and
+The saved `hf_token` credential now has verified gated-weight access. Completed
+Llama pilots total 2,940 behavioral evaluations and fail the task-wide
+counterbalance gate with both X/Y and A/B labels; see `llama-results.md`.
+The pod was deleted after verified download. No Llama experiment remains running.
+
+For future credential setup, the account owner must sign into Hugging Face and
 verify access to the requested model. Store a read token as a RunPod secret
 (suggested name `hf_token`) and inject it as `HF_TOKEN` using
 `{{ RUNPOD_SECRET_hf_token }}`. Do not put tokens in Git or chat. A browser login
@@ -108,9 +113,10 @@ are unresolved. A stopped Pod can still bill for storage.
 
 The existing participant uses AutoModelForCausalLM for Llama, and its hook
 locator supports `model.layers`. A tiny random-Llama integration test passes
-identity patching, nontrivial interchange, and alignment gradients. This is
-software verification only: actual gated tokenizer behavior, 8B weights,
-CUDA placement, and behavioral adequacy still require a real pilot.
+identity patching, nontrivial interchange, and alignment gradients. The real
+8B model, tokenizer, and CUDA execution now also work, but behavioral adequacy
+fails the counterbalance criterion. A useful causal intervention still needs
+verification after a valid behavioral measurement is established.
 
 ## Submission administration
 

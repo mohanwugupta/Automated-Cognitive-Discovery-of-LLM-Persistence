@@ -1,0 +1,19 @@
+{
+  "pod": "6z9vhkulwj53jc",
+  "created_utc": "2026-09-09T01:38:30.208Z",
+  "gpu": "NVIDIA L40S",
+  "gpu_hourly_usd": 1.09,
+  "disk_gb": 50,
+  "disk_usd_per_gb_month": 0.1,
+  "data_center": "EU-NL-1",
+  "network_volume": null,
+  "scope": "behavioral feasibility pilot; no trained checkpoints",
+  "image": "runpod/pytorch:2.8.0-py3.11-cuda12.8.1-cudnn-devel-ubuntu22.04",
+  "job_timeout_seconds": 3600,
+  "timeout_note": "Bounds process runtime; resource deletion is separately verified by agent.",
+  "resources_deleted": true,
+  "deletion_verified_utc": "2026-09-09T01:46:52Z",
+  "download_sha256": "dc668b3c2472ff95de6900ef4086b53eeb5dde32369d61c46bc8ad1ca0ece9e9",
+  "estimated_total_usd_upper_bound": 0.2,
+  "billing_note": "Estimate from allocation duration and quoted rates; not a posted invoice."
+}

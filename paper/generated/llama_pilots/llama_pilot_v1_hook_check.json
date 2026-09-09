@@ -1,0 +1,8 @@
+{
+  "layer": 16,
+  "identity_error": 0.0,
+  "gradient_finite": true,
+  "gradient_norm": 0.35377973318099976,
+  "intervention_effect": 0.0,
+  "state_finite": true
+}
