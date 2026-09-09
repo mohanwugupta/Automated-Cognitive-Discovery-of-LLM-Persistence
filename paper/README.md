@@ -1,5 +1,10 @@
 # ICLR 2027 working draft
 
+The main framing is **computational-cognitive discovery**: behavioral theory →
+computational counterfactual → causal subspace search → held-out intervention
+test. Persistence is the case study. See `framing-and-claims.md` for how the
+new experiments constrain this framing.
+
 This manuscript develops the original *Sisyphus in the Loop* report into a
 multi-task study of cognitive counterfactuals and neural controllers. It combines
 the historical artifact audit with a new fixed-controller Qwen RunPod experiment.
