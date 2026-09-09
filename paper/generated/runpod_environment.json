@@ -1,0 +1,12 @@
+{
+  "python": "3.12.3",
+  "torch": "2.8.0+cu128",
+  "transformers": "5.16.1",
+  "cuda": "12.8",
+  "gpu": "NVIDIA L40S",
+  "script_sha256": "fe58f26f1824eac0644314e686b74cc1d70e86ff03bc628ae795d97cff81044d",
+  "pod": "gz4967d71uiagd",
+  "gpu_hourly_usd": 1.09,
+  "network_volume": "29201d2fyj",
+  "pod_created_utc": "2026-09-09T00:11:35.964Z"
+}

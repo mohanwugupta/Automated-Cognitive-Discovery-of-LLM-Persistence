@@ -1,0 +1,29 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "variants": [
+    "question",
+    "proposition",
+    "instruction"
+  ],
+  "calibration_seed": 91001,
+  "validation_seed": 91002,
+  "gates": {
+    "sample_actions": true,
+    "expand_history_prefixes": false,
+    "save_prompts_separately": true,
+    "shard_count": 8,
+    "batch_size": 1,
+    "pilot_probability_bounds": [
+      0.05,
+      0.95
+    ],
+    "minimum_logit_sd": 0.15,
+    "minimum_parse_rate": 0.99,
+    "minimum_top_token_action_rate": 0.9,
+    "maximum_mapping_gap": 0.25
+  },
+  "selection": "All seven tasks must pass all inherited gates. Minimize worst-task polarity gap; lexical tie break. One independent validation attempt, no reselection or threshold changes.",
+  "estimand": "Continuation probability from Yes/No logits under paired complementary action propositions; polarity gap replaces arbitrary-label mapping gap. Not identical to historical X/Y interface.",
+  "script_sha256": "78b5f28f65307a71eaa55157b4ad8b84dcdbfb4451492b773ded1548cbde586e"
+}

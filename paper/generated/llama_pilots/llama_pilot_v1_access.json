@@ -1,0 +1,1 @@
+{"model": "meta-llama/Llama-3.1-8B-Instruct", "status": "gated_weight_access_verified", "revision": "0e9e39f249a16976918f6564b8830bc894c89659", "weight_file": "model-00001-of-00004.safetensors", "weight_bytes": 4976698672}

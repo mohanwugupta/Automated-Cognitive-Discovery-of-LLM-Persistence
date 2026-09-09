@@ -1,0 +1,176 @@
+{
+  "semantic_conditions": 320,
+  "old_semantic_overlap": 0,
+  "fully_counterbalanced_standard_loader_passed": true,
+  "task_backgrounds": {
+    "bandit": 4,
+    "debugging": 4,
+    "effort": 4,
+    "foraging": 4,
+    "information_sampling": 4,
+    "solvability": 4,
+    "waiting": 4
+  },
+  "signed_target_groups": [
+    {
+      "theory": "dual_history",
+      "task": "bandit",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.44330887292194854,
+      "maximum": 0.2172213477317544
+    },
+    {
+      "theory": "dual_history",
+      "task": "debugging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.43232275763881234,
+      "maximum": 0.21183815124301814
+    },
+    {
+      "theory": "dual_history",
+      "task": "effort",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.3405792632158129,
+      "maximum": 0.16688383897574832
+    },
+    {
+      "theory": "dual_history",
+      "task": "foraging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.3621691413624297,
+      "maximum": 0.17746287926759052
+    },
+    {
+      "theory": "dual_history",
+      "task": "information_sampling",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.05984623193210603,
+      "maximum": 0.02932465364673198
+    },
+    {
+      "theory": "dual_history",
+      "task": "solvability",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.6489986896900546,
+      "maximum": 0.3180093579481267
+    },
+    {
+      "theory": "dual_history",
+      "task": "waiting",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.3477132752027736,
+      "maximum": 0.17037950484935938
+    },
+    {
+      "theory": "outcome_history",
+      "task": "bandit",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.3763376429303411,
+      "maximum": 0.18440544503586725
+    },
+    {
+      "theory": "outcome_history",
+      "task": "debugging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.41552635488054485,
+      "maximum": 0.20360791389146715
+    },
+    {
+      "theory": "outcome_history",
+      "task": "effort",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.34076727884755686,
+      "maximum": 0.16697596663530276
+    },
+    {
+      "theory": "outcome_history",
+      "task": "foraging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.34660603671512896,
+      "maximum": 0.16983695799041332
+    },
+    {
+      "theory": "outcome_history",
+      "task": "information_sampling",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.05605570136663651,
+      "maximum": 0.027467293669651838
+    },
+    {
+      "theory": "outcome_history",
+      "task": "solvability",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.6168705965716937,
+      "maximum": 0.30226659232013
+    },
+    {
+      "theory": "outcome_history",
+      "task": "waiting",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.3446141294572591,
+      "maximum": 0.168860923434057
+    },
+    {
+      "theory": "latent_context",
+      "task": "bandit",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.7579502309025061,
+      "maximum": 0.371395613142228
+    },
+    {
+      "theory": "latent_context",
+      "task": "debugging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.496843861778421,
+      "maximum": 0.2434534922714262
+    },
+    {
+      "theory": "latent_context",
+      "task": "effort",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.5900838790546732,
+      "maximum": 0.28914110073679056
+    },
+    {
+      "theory": "latent_context",
+      "task": "foraging",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.5023881758879623,
+      "maximum": 0.24617020618510144
+    },
+    {
+      "theory": "latent_context",
+      "task": "information_sampling",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.08613008986116566,
+      "maximum": 0.17577569359421452
+    },
+    {
+      "theory": "latent_context",
+      "task": "waiting",
+      "positive": 16,
+      "negative": 16,
+      "minimum": -0.4898061063395658,
+      "maximum": 0.24000499210638715
+    }
+  ]
+}

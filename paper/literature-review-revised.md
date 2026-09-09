@@ -1,0 +1,67 @@
+# Literature review: cognitive discovery and causal abstraction
+
+Updated 9 September 2026. Scope: the union of academic works cited in the original Sisyphus draft and current manuscript, plus Geiger et al.'s 2025 foundation paper. This document distinguishes source findings from implications for our study. Reading coverage is recorded below; acquiring a PDF is not counted as reading it in full.
+
+## Revised argument
+
+Persistence provides a useful computational question: how does evidence about an ongoing activity, its costs, and available alternatives determine whether an agent continues? Human work supplies contrasting explanations and experimental manipulations. McGuire and Kable study context-dependent revaluation during waiting; Constantino and Daw compare learning accounts of patch leaving; Sukhov and colleagues distinguish stochastic pursuit and irreversible abandonment from ordinary bandit exploration. These motivate controlled task structure and model comparison, not an assumption that LLMs inherit human motivations. [McGuire & Kable](https://www.nature.com/articles/nn.3994), [Constantino & Daw](https://www.princeton.edu/~ndaw/cd15.pdf), [Sukhov et al.](https://cocosci.princeton.edu/papers/sukhov2025quitting.pdf).
+
+Computational cognitive models also offer a bridge to neural measurements. Klein-Flügge et al. vary reward and effort independently to distinguish comparison signals from constituent values. Pisauro et al. use a behavioral accumulation model to predict neural dynamics, linking EEG and fMRI measurements. Their relevance is methodological: a model specifies a pattern to seek beyond generic correlation with choice. Their findings do not establish homologous LLM circuitry or a universal accumulator. [Klein-Flügge et al.](https://doi.org/10.1523/JNEUROSCI.0292-16.2016), [Pisauro et al.](https://www.nature.com/articles/ncomms15808).
+
+Machine psychology transfers this experimental logic to language models. Binz and Schulz show why good task performance and human-like answers can conceal different strategies or sensitivity to presentation. Hayes et al. compare explicit reward-encoding and learning models and connect behavioral biases to hidden-state measurements. These are close precedents for constructing computational hypotheses from behavior; our neural interventions extend the evidential question beyond behavioral fit and representation analysis. [Binz & Schulz](https://doi.org/10.1073/pnas.2218523120), [Hayes et al.](https://arxiv.org/abs/2405.11422).
+
+The theoretical foundation for that extension is causal abstraction. Geiger et al. formalize correspondence between high- and low-level systems under mapped interventions. Approximate correspondence depends on the intervention distribution, comparison metric, and aggregation rule; it is not a context-free property attached to a feature. Their framework also accommodates steering, while distinguishing behavioral manipulation from interchange-based tests of internal reasoning. [Geiger et al., 2025](https://www.jmlr.org/papers/v26/23-0058.html).
+
+DAS already searches for distributed alignments using counterfactual predictions from a high-level model. Its equality and entailment analyses also investigate whether an apparent intermediate relation decomposes into representations of its inputs. Boundless DAS extends alignment search to an instruction-following LLM and compares several algorithms that solve the same task. These are direct methodological predecessors. Our prospective contribution is using empirical cognitive model comparison to construct the hypotheses for a heterogeneous persistence family, then testing their fidelity and scope. [Geiger et al., 2024](https://proceedings.mlr.press/v236/geiger24a.html), [Wu et al.](https://arxiv.org/abs/2305.08809).
+
+The contrast with direction-based work must therefore be accurate. Arditi et al. provide causal interventions on refusal and investigate propagation of the refusal-related signal. Persona vectors support monitoring and intervention on traits. Our question concerns the computational explanation attached to a representation; it is not a claim that prior direction studies were merely correlational, or that multiple dimensions are inherently more explanatory. [Arditi et al.](https://arxiv.org/abs/2406.11717), [Chen et al., persona vectors](https://arxiv.org/abs/2507.21509).
+
+Finally, intervention success needs interpretation. Makelov et al. show how subspace patching can exploit dormant pathways and discuss successful localization as well. The published version emphasizes dataset scope and supporting mechanistic evidence; it does not invalidate DAS wholesale. For our study, independent contexts and controls strengthen the causal effect claim, while the weak E-specificity result and poor frozen cognitive calibration limit claims about computational identity. The EOS null result limits the tested intervention's scope rather than excluding all domain-general persistence computations. [Makelov et al., published ICLR version](https://proceedings.iclr.cc/paper_files/paper/2024/hash/70b8505ac79e3e131756f793cd80eb8d-Abstract-Conference.html).
+
+## Consequences for our methods and claims
+
+These are applications to our code and results, rather than claims made by the cited authors.
+
+1. **Specify the candidate program.** The current model bank contains fixed recency traces and feature-based accounts. “Latent context” is cue-weighted history with specified interactions, not an established fitted latent-state learning process. Explain this before discussing neural alignment.
+2. **Specify the intervention correspondence.** The primary code replaces history inputs and recomputes a frozen theory. Neural patching replaces source coordinates. State which high-level variables those coordinates are hypothesized to represent; do not silently equate a history-input manipulation with evidence that a particular intermediate update was localized.
+3. **Distinguish effect agreement from a complete abstraction claim.** We optimize changes in one output logit. A baseline offset can cancel when taking differences. The current score therefore does not by itself verify absolute output agreement, every intermediate state, or all interventions. Continuous errors can be appropriate; simply renaming CFR as IIA is not.
+4. **Do not demand uniqueness as part of the definition.** Multiple abstractions can be faithful. Our E problem is insufficient discriminating evidence for the particular proposed interpretation, not a theorem that non-unique explanations are invalid.
+5. **Keep the output-level alternative explicit.** E is the full predicted decision logit and D equals E in the implementation. A model of this downstream quantity can be useful without establishing the upstream algorithm that produced it.
+6. **Separate explanatory fidelity from control performance.** Direct DAS matching or beating cognitive-guided DAS on natural effects limits superiority claims. It does not alone refute the value of cognitive theories as hypotheses. Conversely, a useful search target does not establish that the target variable is the mechanism's content.
+7. **Preserve the original cognitive foundations.** Waiting, opportunity cost, effort/reward comparison, and evidence accumulation belong in the introduction and theory section. Goal-directedness and refusal work give neighboring questions and contrasts; they should not displace the computational account of persistence.
+
+## Coverage and citation inventory
+
+“Focused” means substantive sections were examined; it does not certify every appendix or derivation. “Initial” means abstract/introduction and indicated passages only. This pass is a focused review, **not a completed page-by-page reading of every cited paper**. The local acquisition manifest records source URLs and file hashes separately.
+
+| Work | Coverage in this pass | Role and caution |
+|---|---|---|
+| Geiger et al. 2025, Causal Abstraction | Focused: definitions of approximate transformation and interchange interventions; alignment construction; graded faithfulness; DAS; steering; selected foundation passages | Main theoretical anchor. Specify intervention family and metric. |
+| Geiger et al. 2024, DAS | Focused: introduction, formal method, equality/NLI experiments, alternative models, decomposition, random-network control, conclusion | Direct predecessor, including computational alternatives and distributed representation. |
+| Wu et al. 2023, Boundless DAS | Main method, price-tagging hypotheses, results, generalization, metric calibration, limitations | Algorithmic correspondence and prompt/output transfer precede this project. |
+| Makelov et al. 2024 | Extended preprint introduction and mathematical illusion; published ICLR method/result passages checked separately | Cite the published four-author version. The earlier arXiv version has three authors. |
+| Binz & Schulz 2023 | Preprint introduction, vignette controls, bandit and two-step analyses, causal-task setup | Strategy-sensitive evaluation; version read is the 2022 preprint, citation is the 2023 publication. |
+| McGuire & Kable 2015 | Publisher abstract and figure descriptions; full article access unresolved in this pass | Dynamic revaluation motivates persistence tasks; do not claim full-paper reading. |
+| Constantino & Daw 2015 | Introduction, task design, MVT derivation, threshold/model-comparison and learning-method passages | Competing sequential learning accounts; not equivalent to our fixed history regressors. |
+| Klein-Flügge et al. 2016 | Abstract, significance statement, introduction | Independent reward/effort manipulations motivate component versus integrated-value distinctions. |
+| Pisauro et al. 2017 | Introduction and model-based EEG/EEG-informed fMRI result passages | Models predict neural temporal profiles; our final-prompt measurements are a different level of evidence. |
+| Sukhov et al. 2025 | Introduction, task definition, optimal-policy and human-result overview | Irreversible abandonment and finite horizons matter; ordinary bandits are not the same quitting problem. |
+| Hagendorff et al., Machine Psychology | Initial framing and selected methodological passages, August 2024 preprint | Behavioral experiments and computational analysis; human paradigms require adaptation. |
+| Aher et al. 2023 | Abstract and introduction | Simulated population behavior and systematic distortions; not evidence of shared human internal processes. |
+| Shanahan et al. 2023 | Abstract and introduction, May 2023 preprint | Role-play is an interpretive caution, not evidence that all computational accounts are empty. |
+| Hayes et al. 2024 | Introduction, full cognitive-model subsection, hidden-state analysis, conclusions | Relative versus absolute reward encoding, learning and response functions; close cognitive-modeling precedent. |
+| Schmied et al. 2025 | Abstract, introduction and study overview | Exploration, frequency bias and knowing-doing gap; distinguish fine-tuning changes from our inference-time interventions. |
+| Chen et al. 2025, When Greedy Wins | Abstract and introduction | Lower average regret can hide premature abandonment of exploration. |
+| Zhang et al. | Abstract and introduction, arXiv v3, May 2026 | Random/directed exploration and thinking conditions; version title ends “Experiments,” not original “Tasks.” |
+| Everitt et al. 2025 | Introduction and limitations | Capability-relative pursuit of a prompted goal differs from raw success and our conditional persistence logits. |
+| Arghal et al. 2026 | Abstract, introduction and overview, v2 | Goal-preserving transformations and representational probing; latest PDF confirms ICML 2026. |
+| Xu et al. 2026 | Introduction and value-neuron intervention/transfer subsections, v2 | Includes causal ablations and downstream reward-prediction diagnostics; do not dismiss as probing only. |
+| Arditi et al. 2024 | Introduction, extraction, interventions, evaluation, refusal results, weight-edit section | Causal refusal evidence; our conceptual distinction is explanatory target, not direction rank. |
+| Chen et al. 2025, Persona Vectors | Abstract, introduction and extraction overview | Automated trait directions, monitoring, training-data prediction and intervention applications. |
+| Gupta et al. 2026, Sisyphus | Original draft/intro/reference audit and stored-results audit from this project | Original motivation retained; original inference/training was not rerun by the arithmetic audit. |
+
+Remaining comprehensive reading includes the unexamined main sections and appendices in the rows above, and a full accessible copy of McGuire and Kable. The rewritten review only makes source claims supported by the passages examined. It should not be described as “all papers read in full.”
+
+## Non-paper sources from the original draft
+
+The original OpenAI/Hugging Face incident is now supported by an official primary disclosure. The earlier source-lineage note requiring verification should not be treated as evidence that the incident was fabricated. Its existence does not establish the cognitive mechanism of our experimental models, so the revised scientific introduction can stand on the cognitive literature. The original Hugging Face disclosure and Black Hat talk are separate source items requiring their own verification if quoted. [Official OpenAI disclosure](https://openai.com/index/hugging-face-model-evaluation-security-incident/).

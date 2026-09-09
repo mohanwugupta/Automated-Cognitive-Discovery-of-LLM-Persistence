@@ -1,0 +1,329 @@
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
+\usepackage{amsmath,amssymb,booktabs,graphicx,url,hyperref}
+\hypersetup{hidelinks}
+\title{Cognitive Models as Guides to Causal Discovery\\in Language Models}
+\author{Anonymous authors}
+\newcommand{\cfr}{\mathrm{CFR}_{G}}
+\begin{document}
+\maketitle
+\begin{abstract}
+How can a behavioral theory help us discover a neural mechanism? We study this question through persistence: a language model's decision to continue an activity or disengage. Across seven structured tasks, cognitive models describe how current incentives and recent experience influence this decision. We use their counterfactual predictions to search for neural subspaces whose interventions reproduce the predicted changes. The resulting low-dimensional Qwen controllers recover effects on held-out examples and transfer across selected task contrasts. A Llama replication recovers targets within discovery tasks but shows weak transfer to held-out tasks. An independent Qwen confirmation finds stronger recovery of natural history-change effects than of frozen cognitive targets. Direct behavior-target fitting matches or exceeds this natural recovery, limiting claims of cognitive-specific superiority. Target calibration and controller fidelity can therefore come apart. Further tests do not identify the controller uniquely with an integrated evidence variable, and a frozen intervention does not reliably change when unrestricted generation stops. The case study shows how cognitive models can guide causal discovery while providing explicit tests of what the discovered controller does---and how far its interpretation extends.
+\end{abstract}
+
+\section{Introduction}
+Persistence is a decision about whether an activity remains worth continuing. A person waiting for a delayed reward may reconsider as time passes; a forager may leave a depleted patch; a problem solver may stop after repeated failures. Cognitive accounts explain these decisions through changing expectations, accumulated evidence, and the value of alternatives \citep{mcguire2015persistence,constantino2015foraging,sukhov2025quitting}. Language models also make stay-or-disengage decisions in prompted tasks. Their behavior offers a setting in which to ask whether an explicit cognitive theory can help locate the neural computation behind a decision.
+
+Behavioral prediction alone cannot answer that question. Nor can decoding: information may be recoverable from a hidden state without the decoded representation controlling the behavior. In the original \emph{Sisyphus in the Loop} study, future return was linearly decodable in a sequential bandit, but interventions on the fitted return direction had little effect on stopping. A late direction trained to predict the decision itself did change persistence \citep{gupta2026sisyphus}. The distinction is consequential. A reward probe can recover information without explaining its use, while a decision probe can control an output without explaining how the model arrived at it.
+
+We use cognitive models to bridge this gap by specifying \emph{transformations}, rather than merely variables to decode. Consider two task descriptions with the same current incentives and action history but different past outcomes. A cognitive model predicts how much the decision should change between them. We then search for a neural subspace in which replacing source coordinates in a base state reproduces that predicted change. The workflow is behavioral modeling, computational counterfactuals, causal subspace search, and held-out intervention testing. We use distributed alignment search (DAS) for the neural optimization \citep{geiger2024alignments,wu2023scale}; the cognitive models supply the hypotheses that constrain it.
+
+Our main finding is that this procedure discovers useful controllers, while leaving room between a useful discovery model and a complete mechanistic explanation. In Qwen3.5-4B, low-dimensional interventions recover predicted effects across selected persistence tasks. On broader fresh contexts, a controller tracks the model's actual response to history changes substantially better than it tracks the frozen cognitive predictions. This motivates the central distinction of the paper: the theory that helps find a controller need not precisely describe the computation it implements. We test stronger interpretations separately, including an integrated-evidence account and transfer to unrestricted text generation.
+
+\section{From behavioral predictions to neural interventions}\label{sec:framework}
+\subsection{A battery of stay-or-disengage decisions}\label{sec:behavior}
+Each task presents an ongoing activity and an alternative (Table~\ref{tab:tasks}). We vary the current reward, cost, evidence, and outside option, together with prescribed histories of actions and outcomes. For example, the debugging task describes a repair's payoff, cost, estimated success chance, and latest diagnostic clue. A history manipulation changes earlier successes and failures while leaving those current facts unchanged. The histories are supplied by the experiment; these measurements concern decisions about described situations, rather than autonomous long-running trajectories.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lll}
+\toprule
+Task & Continue & Disengage \\
+\midrule
+Bandit & Play the current reward source & Take another opportunity \\
+Foraging & Remain in the current patch & Search elsewhere \\
+Solvability & Attempt the same problem & Use a fallback \\
+Debugging & Attempt another repair & Move to a fresh project \\
+Effort & Perform another work unit & Take the outside option \\
+Information sampling & Obtain another signal & Decide now \\
+Waiting & Wait another simulated step & Take an immediate option \\
+\bottomrule
+\end{tabular}
+\caption{The task family varies, but each decision compares continuing an activity with disengaging. Effort, information sampling, and waiting are excluded from neural fitting in the main Qwen discovery study.}
+\label{tab:tasks}
+\end{table}
+
+For Qwen, each semantic decision is rendered with both mappings of two single-token labels, X and Y. We measure
+\begin{equation}
+g(x)=\ell_{\mathrm{continue}}(x)-\ell_{\mathrm{disengage}}(x).
+\end{equation}
+The corresponding probability is conditional on these two actions. We check action-token validity and mapping sensitivity before interpreting it as behavior. Keeping the two mappings of a situation together in data splits and uncertainty estimates avoids treating them as independent examples.
+
+The behavioral models compare immediate-state predictors with action perseveration, outcome integration, joint action/outcome history, and context-sensitive history. The distinction is computational: action history predicts repetition independently of outcomes, outcome history predicts sensitivity to prior successes and failures, and the joint account allows both influences. Context-sensitive history additionally weights experience by supplied contextual cues. History models use the most recent event and a recency-weighted trace with fixed lag weights $0.7^k$. These are feature-based operationalizations, not fitted canonical learning algorithms; the decay is stipulated rather than discovered. A hierarchical fit allows a common functional form with task-specific calibration. Flexible predictors and competing cognitive accounts provide checks on whether a simple theory captures the available structure. The full model bank and behavioral selection procedure are in Appendix~\ref{app:diagnostics}.
+
+\subsection{Counterfactuals specify what the intervention should do}\label{sec:causal}
+Let $f(c,z)$ be a fitted behavioral model, where $z$ is the proposed computational quantity and $c$ contains the remaining inputs. For a base situation $b$ and source situation $s$, the theory predicts
+\begin{equation}
+\Delta^f=f(c_b,z_s)-f(c_b,z_b).
+\label{eq:counterfactual}
+\end{equation}
+For an outcome-history contrast, this prediction asks what changes when past outcomes change and the other inputs remain fixed. Unlike a binary decoding label, it specifies both the sign and magnitude of an effect. We freeze these predictions before neural fitting and retain alternative models when behavioral comparisons do not distinguish them.
+
+At a chosen transformer layer, let $h_b$ and $h_s$ be the final-prompt residual states and let $U$ be an orthonormal rank-$r$ basis. The intervention is
+\begin{equation}
+\widetilde h_b=h_b+UU^\top(h_s-h_b).
+\end{equation}
+DAS learns $U$ so that the resulting logit change, $\Delta^N$, approaches $\Delta^f$. Layer and rank are selected on validation data. Separate test contrasts assess new examples; task holdouts assess transfer to families excluded from neural fitting. A successful intervention establishes causal control of the output under this replacement, while identifying the natural computation requires additional evidence \citep{makelov2024illusion}.
+
+We summarize quantitative agreement using
+\begin{equation}
+\cfr=1-\frac{\sum_i(\Delta_i^N-\Delta_i^f)^2}{\sum_i(\Delta_i^f)^2}.
+\end{equation}
+A score of one is exact recovery; zero is equivalent to producing no change; negative values are worse. This is normalized prediction error, not the fraction of a mechanism causally mediated. We also examine correlations, calibration, and matched controls because high recovery alone can conceal limited variation in the targets.
+
+Our analysis is motivated by causal abstraction: corresponding interventions on a high-level computational model and a low-level neural system should produce corresponding outcomes \citep{geiger2025foundation}. Here the tested correspondence is between changes in a single decision logit over a declared family of contrasts. Matching these differences does not independently verify baseline output agreement or all intermediate computations. We therefore distinguish counterfactual-effect recovery from a complete identification of the proposed cognitive program.
+
+\section{Cognitive models guide the discovery of transferable controllers}
+The behavioral analysis supports history-dependent predictions with task-specific calibration. On untouched final Qwen behavioral validation, the retained model achieves pooled $R^2=0.862$ and task-macro $R^2=0.763$. Dual-history and latent-context accounts remain difficult to distinguish, so the neural analysis retains their alternative counterfactuals instead of assuming that behavioral fit has identified a unique theory.
+
+The neural search uses bandit, debugging, foraging, and solvability for fitting and selection. Effort, information sampling, and waiting form the task holdout. Three shared controllers are retained: rank-2 outcome-history and dual-history controllers, and a rank-8 context controller. All are reported in Figure~\ref{fig:recovery}; the train/validation counts and selection details appear in Appendix~\ref{app:selection}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.92\linewidth]{generated/controllers.pdf}
+\caption{Held-out recovery for all three retained Qwen controllers. Intervals resample semantic contrasts within task, keeping both response mappings together. These intervals describe the fitted controllers, not uncertainty over the complete discovery search.}
+\label{fig:recovery}
+\end{figure}
+
+The primary dual-history controller, at layer 28 and rank 2, recovers the cognitive targets with scores of 0.968 on held-out contrasts and 0.873 on task holdouts. The other outcome-history controller reaches 0.967 and 0.878; the context controller reaches 0.930 and 0.673. These are promising effects from small selected sets with limited target variation: each rank-2 controller has 24 test rows spanning 14 distinct semantic contrast IDs. The selected rank-2 target effects are constant within task, making their original within-task target-shuffle control uninformative. The context controller's effect-correlation interval includes zero, making its evidence less consistent across metrics.
+
+A follow-up holds the primary layer and rank fixed and repeats optimization with five seeds. Mean recovery remains 0.954 on original test contrasts and 0.863 on task holdouts. On these same contrasts, cognitive-target DAS outperforms a direct behavior-target DAS fit and conventional ridge, mean-difference, and PCA controls. This supports reproducibility within the selected setting. It does not compare the methods under equal budgets for a full discovery search; all seed and baseline results are in Appendix~\ref{app:followup}.
+
+A separate Llama-3.1-8B-Instruct behavioral study tests whether history modeling extends beyond Qwen. Arbitrary action labels initially fail validity checks. A Yes/No question interface then passes all seven task gates on independent validation. On a separate final behavioral test, dual history achieves $R^2=0.835$, compared with 0.821 for immediate state. The improvement is modest but passes the predefined behavioral entry criterion. A prespecified layer/rank search then selects a rank-2 controller at layer 24. It recovers frozen cognitive targets on new examples from the discovery tasks (0.649), but not reliably on neural task holdouts (0.011; 95\% interval $[-0.550,0.506]$). This is a partial replication of the discovery result, with a sharper transfer limit.
+
+\section{Independent tests separate controller fidelity from cognitive identity}\label{sec:interpretation}
+A controller can agree with its discovery targets yet fail to reproduce behavior in new situations. We therefore separate two quantities: recovery of the cognitive prediction $\Delta^f$, and recovery of the model's natural history-change effect, $g(x_s)-g(x_b)$. Both compare the same intervention with a different reference. The natural comparison tests whether the intervention reproduces a controlled behavioral change; it does not by itself identify the computation producing that change.
+
+A broader fresh-context study freezes all three Qwen controllers and varies current-state backgrounds and history lengths. For the primary controller, cognitive-target recovery falls to 0.268 on familiar tasks and 0.026 on task holdouts. A secondary diagnostic, added during that run, finds much stronger natural-effect recovery: 0.894 and 0.871. We use this result to motivate a separate confirmation, rather than treating the diagnostic as confirmatory evidence.
+
+\subsection{Prospective confirmation on new contexts and wording}
+The confirmation freezes the primary controller, layer, rank, and intervention recipe. New semantic states exclude overlap with the previous fresh-context study. Two wording variants preserve the described facts while reordering context paragraphs and rephrasing the action instruction. The 224 rendered pairs cover both response mappings, two signed history changes, four backgrounds per task, and seven tasks. Each pair is evaluated with the frozen controller, four comparison methods, and 99 random subspaces, yielding 23,296 intervention evaluations. Natural-effect recovery is the declared primary endpoint.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lll}
+\toprule
+Reference effect & Familiar tasks & Neural task holdouts \\
+\midrule
+Natural history change & 0.779 [0.736, 0.837] & 0.816 [0.790, 0.835] \\
+Frozen cognitive prediction & 0.251 [0.101, 0.386] & $-0.428$ [$-0.885$, $-0.059$] \\
+\bottomrule
+\end{tabular}
+\caption{Independent Qwen confirmation. Recovery uses the same frozen interventions against two references. Intervals resample backgrounds within task, keeping histories, wordings, and mappings together.}
+\label{tab:confirmation}
+\end{table}
+
+Natural-effect recovery is positive in both task groups and exceeds every random subspace (plus-one $p=0.01$ each; Holm $p=0.02$). It also exceeds ridge-persistence, PCA, and output controls. However, direct behavior-target DAS achieves 0.802 and 0.830, slightly better than the cognitive-guided controller. The familiar-task difference favors direct DAS; the held-out difference is uncertain. The confirmation therefore supports natural causal control, but not superiority of cognitive-guided fitting over direct behavior-target fitting. Wording matters: the controller's familiar-task natural recovery is 0.834 under the original wording and 0.720 under the rephrased variant. Appendix~\ref{app:confirmation} reports every comparison and the limited scope of this variation.
+
+The same interventions still recover the frozen cognitive predictions poorly (Table~\ref{tab:confirmation}). Prediction gains fitted only on the previous dataset improve some scores, but do not restore reliable held-out cognitive-target recovery. Thus the distinction between controller fidelity and target calibration survives independent testing. The behavioral theory was useful in constructing the search; its predicted quantities are not thereby established as the controller's neural content.
+
+\subsection{Integrated evidence remains a candidate interpretation}
+An integrated persistence-evidence state $E$ would combine upstream influences into a downstream decision quantity. Operationally, $E$ is the frozen reference model's full predicted persistence logit; the decision variable $D$ is numerically identical in this parameterization. Thus agreement with $E$ would not alone distinguish how its upstream inputs were integrated. The abstraction study finds promising geometric and intervention agreement with $E$, but fails matched-random specificity ($p=0.667$). Llama provides a related caution: its cognitive-guided controller recovers natural effects less accurately than generic controls, despite better cognitive-target recovery within discovery tasks. We retain $E$ as a hypothesis rather than an identified representation. Multiple abstractions can be faithful; our limitation is the lack of discriminating evidence for this particular interpretation.
+
+\section{The frozen controller does not establish control over free-generation stopping}\label{sec:ood}
+A controller shared by structured stay-or-disengage tasks might reflect a more general tendency to continue. We test this stronger interpretation on unrestricted text generation, where the model chooses when to emit EOS. The alignment, layer, orientation, intervention doses, prompts, and analysis are frozen before generation. No data from this test are used to choose or tune the intervention.
+
+Six prompts, 50 matched seeds, and five doses produce 1,500 generations. EOS remains available, there is no application-level output-token cap, and all primary generations end with EOS. The prompt-stratified Cox dose estimate is $-0.0138$ with a 95\% interval of $[-0.0501,0.0225]$. Monotonicity and matched-random specificity also fail their declared criteria. The tested controller and intervention recipe do not establish generalization to free-generation stopping. This is a boundary on the discovered mechanism's demonstrated scope, rather than evidence that no general persistence computation could exist.
+
+\section{Related work}
+Human persistence research supplies computational alternatives rather than a single tendency to continue. Dynamic revaluation during waiting, opportunity-cost learning in foraging, and optimal quitting under uncertainty motivate different manipulations and predictions \citep{mcguire2015persistence,constantino2015foraging,sukhov2025quitting}. Model-based neuroscience further distinguishes constituent reward and effort signals from their comparison, and uses behavioral models to predict neural evidence-accumulation dynamics \citep{klein2016comparison,pisauro2017evidence}. These studies motivate our explanatory strategy without establishing homologous mechanisms in language models.
+
+Machine psychology uses controlled experiments and computational analysis to characterize strategies beyond aggregate performance \citep{hagendorff2024machine,binz2023psychology}. Simulations of human studies reveal both similarities and systematic distortions \citep{aher2023simulate}, while prompted role-play cautions against interpreting behavioral resemblance as shared motivation \citep{shanahan2023roleplay}. Bandit studies examine relative reward encoding, frequency bias, exploration, and the effects of training or deliberation \citep{hayes2024biased,schmied2025greedy,chen2025greedy,zhang2026exploration}. Goal-directedness studies separately assess capability deployment and goal-relevant representations \citep{everitt2025goals,arghal2026goals}. Our narrower target is the computation underlying structured stay-or-disengage decisions.
+
+Causal abstraction supplies the formal foundation for testing computational hypotheses against neural interventions \citep{geiger2025foundation}. DAS already uses high-level counterfactuals to learn distributed alignments, and Boundless DAS compares alternative algorithms and tests transfer across instructions \citep{geiger2024alignments,wu2023scale}. We build on this program by deriving candidate targets from behavioral model comparison across a persistence task family. The alignment method and the principle of counterfactual correspondence are inherited contributions.
+
+Refusal directions, persona vectors, and sparse reward-related activations provide causal interventions as well as representational measurements \citep{arditi2024refusal,chen2025persona,xu2026reward}. Our distinction concerns the computational hypothesis attached to an intervention, not whether its subspace has one or several dimensions. Causal abstraction can describe steering too, but an effective control intervention need not explain the model's natural computation. Subspace-patching illusions reinforce the need to test that interpretation \citep{makelov2024illusion}. Accordingly, we report cognitive-target fidelity, natural-effect recovery, computational interpretation, and generalization separately.
+
+\section{Discussion}
+Cognitive models are useful guides to mechanistic discovery because they specify how behavior should change under a controlled transformation. In this case study, those predictions lead to low-dimensional neural controllers that transfer across selected persistence tasks. The broader history tests reveal a particularly useful distinction: an intervention can remain faithful to natural behavioral changes even when the cognitive model that guided its discovery is poorly calibrated.
+
+The evidence does not yet establish a uniquely identified integrated-evidence representation or a domain-general persistence variable. Small selected contrast sets, limited wording coverage, and incomplete specificity tests constrain the mechanistic interpretation. The five-seed study tests fixed-configuration optimization, not the reliability of the entire search. The independent Qwen test confirms natural-effect recovery, but direct behavior-target fitting matches or exceeds it. Llama transfer remains weak. These limitations identify the next tests of the method rather than altering what its completed interventions establish.
+
+The methodological lesson is to use cognitive theories as testable guides, not as names assigned to neural features. Behavioral prediction, causal intervention, and mechanistic interpretation are separate stages. Keeping them separate makes both successful discovery and informative failure possible.
+
+\section*{Reproducibility statement}
+The supplementary materials provide task manifests, selection rules, model revisions, intervention outcomes, and CPU analysis scripts. The original sequential study's principal numeric results have been independently recomputed from stored artifacts; its original inference and probe fitting were not rerun. New experiments retain their protocols, code, model bases, and result archives. Appendix~\ref{app:selection} identifies the discovery and evaluation boundaries.
+
+\section*{AI use statement}
+An AI assistant contributed to hypothesis refinement, conceptual framing, synthetic task and experiment design, implementation, artifact checks, analysis, interpretation, literature review, and manuscript preparation. Reported participant outputs were measured by executable model inference. Author verification of AI-assisted work remains pending in this working draft; the disclosure must be finalized before submission.
+
+\bibliography{references}
+\bibliographystyle{iclr2027_conference}
+
+\clearpage
+\appendix
+\section{Selection and evidence audit}\label{app:selection}
+\begin{table}[htbp]
+\centering\small
+\input{generated/controllers.tex}
+\caption{Full selection counts and recovery for all retained Qwen controllers. Counts are rendered pairs.}
+\label{tab:controllers}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{p{0.25\linewidth}p{0.32\linewidth}p{0.32\linewidth}}
+\toprule
+Decision & Permitted selection evidence & Reporting boundary \\
+\midrule
+Behavioral theory & Behavioral discovery and designated model comparisons & Untouched final behavioral validation \\
+Counterfactual pairs & Frozen model predictions, coverage, theory disagreement & No neural test-outcome selection \\
+Layer and rank & Mechanistic localization/validation subsets & No fitting on pair test or task holdout \\
+DAS coordinates & Mechanistic training pairs & Semantic contrast bootstrap is conditional on fit \\
+Abstraction follow-up & Previously chosen, hash-frozen controller & All abstractions score identical interventions \\
+OOD orientation and scale & Pre-OOD structured projections & No OOD retuning \\
+\bottomrule
+\end{tabular}
+\caption{Declared selection boundaries. The audit confirms artifact identities and examines stored rows; it is not a full reconstruction of every historical selection decision.}
+\end{table}
+
+The full source inventory is generated alongside the paper. Controller estimates and Figure~\ref{fig:recovery} use the corrected bootstrap table, while later specificity-control intervals come from a separate reanalysis table. Slight differences between bootstrap endpoints across those tables must not be silently mixed. The artifact files retain each calculation's resampling metadata.
+
+The rank-2 test sets include bandit, debugging, foraging, and solvability. Task holdout comprises effort, information sampling, and waiting. The larger counterfactual manifest also contains unselected and control rows; its total size is not the effective sample size of the primary neural result. Semantic contrast IDs, response mappings, and actual evaluated rows are the appropriate basis for uncertainty and sample-size reporting.
+
+\section{Original sequential study: measurement boundaries}
+The original report's activation bank contained 512 episodes, partitioned into 358 training, 76 validation, and 78 test episodes. Its main return-decoding comparison used 1,800 test states; an exact-matching analysis retained 1,180 states in 147 strata from 55 episodes. These episode-level partitions differ from the semantic contrast partitions of the expanded task battery.
+
+The original prompt instructed the model to maximize points, specified rewards of $+3$ and losses of $-2$, and offered actions A, B, or C (STOP). Arm probabilities, cumulative score, and round number were not explicitly supplied; earlier conversation turns remained available. Episodes ended at STOP or a 100-decision cap. In the factorial follow-up, only the current decision's STOP payoff and CONTINUE bonus changed, with the underlying conversation history held fixed. All 12 incentive combinations were applied to each of 1,187 held-out states, yielding 14,244 observations.
+
+The report selected a future-return ridge probe at layer 1, a provisional continuation-advantage probe at layer 2, and a persistence positive control at layer 31 using validation data. Advantage estimates used ten forced-action continuations per action and state; because STOP was fixed at zero in the original task, the estimated advantage correlated 0.990 with mean continuation value. This collinearity limits claims of a distinct advantage representation. Likewise, future-return decoding reversed its correlation in negative-value environments, limiting an interpretation as universally calibrated value.
+
+Steering altered the final prompt position at the selected decoder block. The reported calibration used validation states and constrained both decoded shift and activation-standardized RMS before confirmatory evaluation. Twenty coordinatewise sign-randomized directions matched native layer and intervention scale; inference resampled 48 confirmatory episodes. The original experiment's 224,343 steering observations therefore do not constitute independent episodes. Its zero-payoff prompt-framing control also shifted persistence by $-1.444$ logits relative to the unmodified task, which prevents treating the zero/zero factorial cell as an identical baseline. An independent arithmetic audit of the stored replay rows reproduces the principal steering contrast; it does not rerun original inference or establish all upstream implementation choices.
+
+\section{Probe motivation, alternative theories, and specificity diagnostics}\label{app:diagnostics}
+\paragraph{What the original draft established and left open.}
+The original report used Qwen3.5-4B with actions A and B yielding stochastic rewards and C terminating the episode. Its persistence measure was $\log(\exp\ell_A+\exp\ell_B)-\ell_C$, whereas the later battery uses a binary semantic contrast. The report gives held-out future-return ridge $R^2=0.240$ and a within-state relative-incentive $R^2=0.784$ from crossing STOP and CONTINUE payoffs on 1,187 states from 48 episodes. Its persistence-direction steering contrast was approximately 1.99 logits, while the fitted return and provisional advantage directions had near-zero effects at the tested scale. An independent audit at repository commit \texttt{5b968d0b} recomputes these figures from stored rows: future-return $R^2=0.239862$, relative-incentive $R^2=0.783644$, and episode-weighted persistence steering $1.993510$. It verifies disjoint stored probe episode splits, complete factorial cells, fixed histories, and the semantic-logit identity. The original inference and probe training are not rerun. They motivate the expanded study; the sequential states, behavioral estimands, and intervention calibrations are not pooled with the later structured contrasts. In particular, the null steering results do not exclude nonlinear, distributed, differently located, or dynamically constructed value computations.
+
+
+\paragraph{Behavioral alternatives and recovery.}
+Dual-history and latent-context accounts remain unresolved; the final behavioral validation reports task-macro $R^2=0.763$ and pooled $R^2=0.862$. The Round-2 flexible-teacher report records 30 of 36 passed recovery checks. This motivates retaining model uncertainty rather than reading descriptive rank order as unique theory identification.
+
+\subsection{Matched controls and an uninformative shuffle}
+The dual-history controller exceeds 500 matched random subspaces on recovery ($p=0.0020$). The later comparison reports persistence-output recovery $0.485$ and persistence-state recovery $0.264$ on its matched test rows. These comparisons support non-random causal control under their evaluation conditions. They do not constitute a complete equal-data, equal-budget comparison of discovery methods, and should not be described as such.
+
+The same stage marks shuffled-target specificity as failed. Inspection of the stored rows reveals why that outcome is not an informative test for the two rank-2 history controllers. Their target effects are constant within each task up to numerical precision. Although the implementation deranges semantic contrast identifiers within task, it leaves all 24 target values unchanged to a tolerance of $10^{-10}$. Maximum changes are below $1.2\times10^{-15}$. Recovery against those shuffled targets must therefore remain essentially identical.
+
+This is a limitation of the selected contrast set and null design. It neither establishes specificity nor demonstrates its absence. The latent-context shuffle changes 7 of 18 values, but also contains a task with essentially constant targets. This limitation motivated the new signed-history test in Appendix~\ref{app:followup}, whose target variation and permutation changes are verified explicitly. The original and follow-up results remain separate.
+
+Target-selective necessity is also unresolved. In the stable-CFR follow-up, the necessity-job manifest is empty because no candidate passes the preceding specificity gate. Blank necessity scores in this stage are therefore not an empirical estimate of zero necessity. Earlier exploratory necessity artifacts should be described separately from this unexecuted, gated test.
+
+\subsection{Factorial abstraction study}
+A separate study freezes the layer-28/rank-2 controller and contrasts raw outcome history $O$, context-sensitive history $O^*$, integrated history $H$, and total evidence $E$. Its design contains 1,400 contrast rows across six dissociation families and 2,400 semantic conditions. The largest absolute target-difference correlation remains $0.849$, so the design improves discrimination without making the abstractions independent.
+
+The descriptive and intervention analyses favor $E$: held-out natural-state geometry reaches $R^2=0.700$, and intervention recovery is $0.707$ with effect correlation $0.882$. The leading interpretation exceeds the stored shuffled-target and persistence/output comparisons. However, it fails the matched-random comparison ($p=0.667$), and the overall abstraction gate is false. These results motivate integrated evidence as a hypothesis but do not uniquely identify an E representation. Positive descriptive fits must be interpreted alongside the failed control that limits their specificity.
+
+\section{Completed Qwen follow-up: full protocol and results}\label{app:followup}
+\subsection{Design and fitting}
+We ran a prospective follow-up on a RunPod L40S using Qwen3.5-4B checkpoint \texttt{851bf6e...cd0a}; the full immutable SHA and environment are recorded with the artifacts. The primary dual-history controller's layer 28 and rank 2 were fixed. Five initialization/data-order seeds trained on the same 24 original training pairs for three epochs, with learning rate 0.03 and activation-change penalty $10^{-4}$. Every seed is retained. This measures optimization stability conditional on the prior layer/rank selection, not stability of the complete discovery procedure.
+
+The comparison includes direct behavior-target DAS, ridge history and persistence probes, mean differences, PCA, and 20 random subspaces. All conventional fits use original training conditions. Scalar directions are completed to rank 2 with an orthogonal training-PCA direction. Comparison interventions match the frozen controller's per-pair norm; median relative discrepancies from bfloat16 arithmetic remain below 0.006 for every method. These are fixed-layer/rank comparisons, not equal-budget reruns of alternative discovery pipelines.
+
+Before neural evaluation, we constructed four signed history changes for each of seven tasks and two response mappings: one or two early outcomes change sign while action history and current factors remain fixed. The 56 new pairs use one background template per task/mapping, yielding a deliberately narrow diagnostic. Background templates differ between mappings in four tasks, so this does not establish response-label invariance. All four predicted effects differ within each task/mapping and include both signs. No fresh pair enters fitting or hyperparameter selection. Across all methods we record 3,720 intervention evaluations, in addition to baseline/state collection and optimization.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Original contrasts} & \multicolumn{2}{c}{Fresh signed histories} \\
+Method & Pair test & Task holdout & Pair-test tasks & Held-out tasks \\
+\midrule
+Frozen cognitive DAS & 0.970 & 0.900 & 0.080 & $-0.426$ \\
+Cognitive DAS, five-seed mean & 0.954 & 0.863 & 0.166 & $-0.253$ \\
+Direct behavior DAS & 0.844 & 0.759 & $-0.804$ & $-1.746$ \\
+History ridge + PCA & 0.168 & 0.178 & 0.076 & 0.126 \\
+Mean difference + PCA & 0.252 & 0.229 & 0.334 & 0.101 \\
+PCA & 0.231 & 0.197 & 0.109 & 0.167 \\
+Persistence ridge + PCA & 0.195 & 0.195 & 0.154 & 0.131 \\
+Random, 20-subspace mean & 0.020 & 0.012 & $-0.021$ & $-0.186$ \\
+\bottomrule
+\end{tabular}
+\caption{New global counterfactual recovery. Original test/holdout sets contain 24/18 pairs; fresh sets contain 32/24. Conventional/direct/random interventions match the frozen DAS norm. New cognitive seeds use their native intervention norms. Means across seeds or random draws are descriptive; no best-seed selection is used.}
+\label{tab:runpod}
+\end{table}
+
+On original pair tests, five-seed recovery is $0.954\pm0.033$ (sample SD; range 0.900--0.983); task-holdout recovery is $0.863\pm0.051$. Similar scores do not imply identical subspaces: maximum pairwise principal angles range from $27.8^\circ$ to $88.0^\circ$. The frozen controller's new test/holdout estimates are 0.970 [0.945, 0.987] and 0.900 [0.757, 0.967], using semantic-contrast bootstraps conditional on that fit.
+
+Fresh histories expose a calibration limitation. The frozen controller's effects correlate with predicted effects (0.935 on familiar tasks; 0.838 on held-out tasks), but global recovery falls to 0.080 and $-0.426$. A mapping-synchronized within-task derangement changes every target and scores worse than the true target assignment ($p=1/1001$ for each task group, 1,000 draws). Thus the new shuffle is informative about target correspondence. It does not rescue quantitative recovery or specificity against other subspaces: matched-random empirical $p$ values are 0.095 and 0.952, respectively, and some conventional baselines achieve higher recovery on the fresh diagnostic. This supports a bounded controller interpretation rather than a uniquely identified, calibrated history mechanism.
+
+Baseline logits differ from historical files by up to 0.125 logits (mean absolute difference 0.064). The original run did not record an immutable model revision; all new effects therefore use recomputed baselines. Numerical/runtime differences and limited template coverage constrain this follow-up. Negative results are retained, and no unrestricted-generation parameter is retuned.
+
+
+\section{Broader fresh-context Qwen test}\label{app:freshcontexts}
+A separate prospective protocol freezes all three retained controllers and their cognitive models. Four distinct current-state backgrounds per task are drawn with seed 87001. Four signed history patterns vary outcomes at lengths three and five while holding actions and current factors fixed. Context-isolated cue contrasts are added for bandit, foraging, and debugging. The resulting 640 rendered conditions represent 320 semantic states, with zero overlap with the original mechanistic manifest. Both response mappings share identical semantic backgrounds, and the standard matched-condition validator and loader pass. The explicit pair table preserves both positive and negative evaluation directions while the condition manifest uses increasing-target member ordering.
+
+There are 416 computational pair rows: 224 ordinary-history pairs and 192 context-sensitive or held-out broad-history pairs. The two ordinary-history controllers each evaluate the 224-pair set; the context controller evaluates 192 pairs. Twenty new random subspaces match each controller's layer and rank and target its per-pair intervention norm; achieved norms differ slightly at bfloat16 precision. All controller and random outcomes are retained. Current-state backgrounds vary, but renderer wording remains fixed; this is not a broad linguistic-template test.
+
+A secondary natural-effect diagnostic was added during the intervention run, with no fitting or selection. It evaluates the 320 unique natural source conditions and reuses the main run's cached base logits. After observing target miscalibration, intervention recovery against natural effects was specified for every method as a diagnostic endpoint. It is not an original preregistered endpoint and does not replace cognitive-target recovery. Background-level bootstrap resampling retains all histories and both response mappings together within each sampled context. Only four backgrounds per task and twenty random subspaces are available, so uncertainty and random-comparison resolution remain limited.
+
+
+\begin{table}[htbp]
+\centering\small
+\input{generated/qwen_fresh_contexts.tex}
+\caption{Fresh-context results for every frozen controller. Random $p$ compares cognitive-target recovery with 20 random subspaces; the minimum plus-one value is $1/21$. These descriptive comparisons are not multiplicity corrected. *Natural-effect recovery is a secondary diagnostic specified during the run. All six natural-effect comparisons exceed every sampled random control.}
+\label{tab:freshcontexts}
+\end{table}
+
+Table~\ref{tab:freshcontexts} separates cognitive-target calibration from natural-effect fidelity. Primary cognitive-target recovery has background-bootstrap 95\% intervals $[0.119,0.411]$ on familiar tasks and $[-0.254,0.276]$ on held-out tasks. Beating random subspaces does not imply accurate cognitive-target recovery. The latent-context controller fails even that comparison on familiar context-isolated contrasts. Generic decision/output-aligned controls were not rerun on this broader design, so the natural-effect diagnostic does not establish computational specificity.
+
+Norm matching is approximate: the largest method/split median relative discrepancy from the achieved frozen-controller norm is 2.69\%, with a maximum individual discrepancy of 24.1\%. A post hoc sensitivity analysis retains common pairs for which all 20 controls are within 5\% of the achieved frozen norm. It retains 127/128 familiar and 79/96 held-out primary-controller pairs, with natural recovery 0.895/0.887. Every controller/split comparison retains its full-data random-ranking pattern. This matching-based sensitivity does not replace the full-data analysis.
+
+\section{Llama replication: validity, behavioral fit, and causal transfer}\label{app:llama}
+\subsection{A validated response interface}
+The inherited X/Y interface failed the counterbalance gate on all seven tasks. Subsequent A/B and option-order studies also failed to find a format that passed every task. These 4,060 behavioral evaluations are retained as measurement diagnostics. Identity patching had zero measured error, but valid model execution did not establish a valid behavioral measurement.
+
+We therefore tested three Yes/No formats with complementary question polarities on 210 calibration situations. The selected question format passed all seven task gates on 490 independent validation situations. This study added 2,240 evaluations. The new interface asks complementary action questions about otherwise identical contexts; it is a change in measurement, not an unchanged replication of the X/Y task.
+
+\subsection{Independent behavioral entry test}
+A separate study used 1,400 training, 490 selection, and 490 final-test semantic situations, each with both question polarities. These 4,760 evaluations excluded prior interface-validation situations and semantic overlap across phases. The hierarchical behavioral models used fixed regularization. The dual-history model was selected from the history candidates using selection data. Its final pooled $R^2$ was 0.8354, compared with 0.8212 for immediate state, 0.8227 for action perseveration, and 0.8335 for outcome history. It passed the predefined entry rule: $R^2\geq0.6$ and an improvement of at least 0.01 over immediate state on selection and final test, with every task passing final response-validity checks. History contributes a modest increment. Behavioral fitting includes all seven tasks; the later task holdout applies only to neural fitting.
+
+\subsection{Neural search and untouched evaluation}
+The behavioral model was frozen before neural fitting. The search compared layers 8, 16, 24, and 28 at ranks 2 and 8, using 64 training and 64 separate selection pairs. Each candidate used three optimization epochs. Layer 24, rank 2 was selected. The final test comprised 64 pairs from familiar tasks and 48 from neural task holdouts, with independent semantic contexts. The selected basis, three generic controls, and 99 random bases yielded 11,536 final intervention evaluations; the 512 candidate-selection evaluations and training updates are separate.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lll}
+\toprule
+Endpoint & Familiar tasks & Neural task holdouts \\
+\midrule
+Cognitive targets & 0.649 [0.511, 0.773] & 0.011 [$-0.550$, 0.506] \\
+Natural effects & 0.345 [0.224, 0.434] & 0.319 [0.000, 0.505] \\
+\bottomrule
+\end{tabular}
+\caption{Llama normalized recovery with background-clustered 95\% intervals. Natural effects are measured changes between the unmodified source and base prompts.}
+\end{table}
+
+All four comparisons exceed 99 sampled random bases (plus-one $p=0.01$; Holm $p=0.04$ across all four). This does not imply accurate target recovery: the held-out cognitive score is near zero and the natural-effect interval touches zero. On familiar tasks, generic persistence-ridge, output, and PCA controls recover natural effects better than the selected controller: selected-minus-control differences are $-0.222$, $-0.245$, and $-0.223$, each with a negative bootstrap interval. The corresponding held-out differences are $-0.106$, $-0.113$, and $-0.156$; only the PCA interval excludes zero. Cognitive-target matching therefore does not establish superior recovery of natural behavior.
+
+Norm matching is approximate in bfloat16. The largest method-level median relative discrepancy is 2.05\% on familiar tasks and 5.11\% on holdouts; individual maxima are 37.2\% and 221.5\%, the latter for small reference norms. A post hoc sensitivity check retaining only pairs where every control matches within 5\% leaves 30/64 familiar and 7/48 held-out pairs. The selected controller still exceeds all random controls on both endpoints, but this heavily reduced subset cannot replace the full evaluation or resolve the transfer uncertainty. No outcome-driven retuning or additional search was performed.
+
+\section{Independent Qwen confirmation: protocol and controls}\label{app:confirmation}
+The primary dual-history layer-28/rank-2 controller is frozen before this test. Seed 92001 generates four current-state backgrounds per task, with two signed outcome-history changes at lengths three and five. Each wording has 56 semantic pairs, rendered under both X/Y mappings for 112 rows. The original and rephrased variants therefore yield 224 rendered evaluation pairs, not 224 independent semantic pairs. Rephrasing preserves factual statements while changing paragraph order and the answer instruction; it is a limited linguistic perturbation. No semantic state overlaps the previous fresh-context design.
+
+All 104 methods are evaluated on the same pairs: the frozen controller, original-training ridge persistence, direct behavior-target DAS, training PCA, an output-embedding direction completed to rank 2 with training PCA, and 99 new random bases. Comparison methods use the same layer and rank and approximately match each reference intervention norm. No controller is fitted or selected on the new data. Two thousand task-stratified background bootstrap samples retain both wordings, histories, and response mappings. The primary natural endpoint requires positive recovery intervals and superiority to random subspaces in both task groups; the random comparisons receive Holm correction. Superiority to every generic comparator is an additional, unmet criterion.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lll}
+\toprule
+Comparator & Familiar: selected minus control & Holdout: selected minus control \\
+\midrule
+Ridge persistence & 0.622 [0.595, 0.659] & 0.632 [0.567, 0.680] \\
+Direct behavior DAS & $-0.023$ [$-0.036$, $-0.002$] & $-0.015$ [$-0.040$, 0.018] \\
+PCA & 0.625 [0.584, 0.680] & 0.624 [0.542, 0.713] \\
+Output direction & 0.148 [0.107, 0.204] & 0.133 [0.098, 0.175] \\
+\bottomrule
+\end{tabular}
+\caption{Differences in natural-effect recovery with paired background-bootstrap 95\% intervals. The controller does not outperform every comparison method.}
+\end{table}
+
+The frozen controller's original/rephrased natural recovery is 0.834/0.720 on familiar tasks and 0.858/0.794 on holdouts. Direct DAS scores 0.825/0.777 and 0.768/0.863, respectively. The aggregate advantage over the output direction must therefore not be described as uniform superiority under every wording.
+
+Two prediction calibrations are fixed using only the previous fresh-context data: a zero-intercept global gain of 1.258385 and task-specific gains shrunk toward it with penalty 10. All are reported without test-based selection. Against intervention effects, global-gain cognitive recovery is 0.488 [0.365, 0.597] on familiar tasks and 0.025 [$-0.285$, 0.291] on holdouts; task-gain recovery is 0.522 [0.401, 0.635] and $-0.045$ [$-0.382$, 0.241]. Against natural effects, calibration gains improve familiar-task predictions but do not consistently improve held-out predictions. Calibration includes prior data from all tasks, so these calibrated-target tests concern new contexts rather than unseen behavioral task families.
+
+Finite-precision norm matching has maximum method-level median discrepancies of 1.09\% on familiar tasks and 1.75\% on holdouts; individual maxima are 21.0\%. Full norm discrepancies are exported. A post hoc common-pair 5\% matching filter retains 103/128 familiar and 59/96 held-out rows; natural recovery remains 0.811/0.828 and exceeds every random control, while direct DAS remains higher at 0.824/0.846. This subset does not replace the full analysis. A separate prespecified training-mean replacement diagnostic attenuates the projection of natural history effects by 0.699 and 0.759. It uses the original training mean and no evaluation-state fitting, but lacks matched ablation controls and therefore does not establish selective necessity.
+
+The completed inference took 3,800 seconds after model loading and used 9.22 GB peak allocated VRAM on an L40S. The archive records the immutable model revision and runtime versions. Every intervention and basis is retained. A wording-only protocol correction clarified semantic versus rendered pair counts after launch without changing the design; the archive preserves the executed protocol and hashes.
+
+\section{Scope of the evidence}
+The fixed-configuration seed study establishes optimization stability within a selected Qwen setting. A claim about the efficiency or reliability of cognitive-guided discovery would additionally require repeated layer/rank selection under equal declared budgets. The present experiments do not establish that claim. Likewise, matching cognitive counterfactuals, recovering natural behavior, uniquely identifying a computational state, and controlling unrestricted stopping are distinct evidential requirements. Successful tests at one level do not substitute for the others.
+\end{document}
