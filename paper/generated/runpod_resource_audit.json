@@ -1,0 +1,11 @@
+{
+  "download_archive_sha256": "a43d851e451f95b6488277f86760c2a7ee68c59e9c45e515ad3a74ed12366163",
+  "resources_deleted": true,
+  "empty_pod_and_volume_lists_verified_before_utc": "2026-09-09T00:53:17Z",
+  "compute_and_storage_estimated_usd_upper_bound": 1.0,
+  "billing_records": "not yet posted when checked; API returned no rows, not evidence of zero cost",
+  "resource_ids": {
+    "pod": "gz4967d71uiagd",
+    "network_volume": "29201d2fyj"
+  }
+}
