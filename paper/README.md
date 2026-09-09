@@ -87,7 +87,7 @@ the signed-history design without GPU inference. The run measures optimization
 stability at fixed layer/rank, not stability of the full discovery search.
 
 The saved `hf_token` credential now has verified gated-weight access. Completed
-Llama pilots total 2,940 behavioral evaluations and fail the task-wide
+Llama pilots and order diagnostics total 4,060 behavioral evaluations and fail the task-wide
 counterbalance gate with both X/Y and A/B labels; see `llama-results.md`.
 The pod was deleted after verified download. No Llama experiment remains running.
 

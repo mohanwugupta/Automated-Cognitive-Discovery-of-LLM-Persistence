@@ -1,0 +1,60 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "calibration_seed": 88001,
+  "validation_seed": 88002,
+  "calibration_observations_per_format": 280,
+  "validation_observations": 980,
+  "variants": [
+    {
+      "name": "AB_continue_first",
+      "labels": [
+        "A",
+        "B"
+      ],
+      "reverse_options": false
+    },
+    {
+      "name": "AB_disengage_first",
+      "labels": [
+        "A",
+        "B"
+      ],
+      "reverse_options": true
+    },
+    {
+      "name": "XY_continue_first",
+      "labels": [
+        "X",
+        "Y"
+      ],
+      "reverse_options": false
+    },
+    {
+      "name": "XY_disengage_first",
+      "labels": [
+        "X",
+        "Y"
+      ],
+      "reverse_options": true
+    }
+  ],
+  "gates": {
+    "sample_actions": true,
+    "expand_history_prefixes": false,
+    "save_prompts_separately": true,
+    "shard_count": 8,
+    "batch_size": 1,
+    "pilot_probability_bounds": [
+      0.05,
+      0.95
+    ],
+    "minimum_logit_sd": 0.15,
+    "minimum_parse_rate": 0.99,
+    "minimum_top_token_action_rate": 0.9,
+    "maximum_mapping_gap": 0.25
+  },
+  "selection": "Only formats passing every gate in every task qualify; smallest maximum task mapping gap wins, lexical name tie-break. Evaluate one winner on untouched validation; no retry or reselection.",
+  "scope": "diagnostic after earlier X/Y and A/B failures; no scientific controller fit",
+  "script_sha256": "a4caa00da43886b778047a7f81a41f9e6559ddd431ecacc6d4f5549736a7e689"
+}

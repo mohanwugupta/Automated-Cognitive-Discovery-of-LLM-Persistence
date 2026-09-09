@@ -43,3 +43,18 @@ Pod `6z9vhkulwj53jc` was deleted after a SHA-256-verified result download; an em
 Next, freeze a prompt-design study that independently varies label identity and answer-option order. Develop changes only on calibration situations, then test the chosen format on untouched semantic situations with the same acceptance thresholds. Only after that gate passes should Llama-specific behavioral models be fitted and frozen, followed by layer/rank selection and held-out causal tests. Averaging mappings or dropping failed tasks would change the measurement or scope and must be declared as a separate protocol, not silently substituted for this failed pilot.
 
 Compact results and metadata: `paper/generated/llama_pilots/`. Full manifests, prompts, observations, logs, and executed scripts are in the accompanying reproducibility archive. The existing manuscript's Qwen causal findings remain a single-model mechanistic result.
+
+## Parallel follow-up: label pair and option order
+
+A third protocol, specified after the first two failures, crossed X/Y versus A/B with continue-first versus disengage-first option presentation. It used 140 new semantic situations (20 per task), both mappings, and four formats: 1,120 additional evaluations. Only a format passing every inherited task gate could be selected; the selection rule chose none. The separately generated 490-situation validation set was not evaluated. Total completed Llama behavioral evaluations are now **4,060**.
+
+| Calibration format | Tasks passing all gates | Mean continuation probability |
+|---|---:|---:|
+| A/B, continue first | 1/7 | 0.337 |
+| A/B, disengage first | 3/7 | 0.812 |
+| X/Y, continue first | 0/7 | 0.412 |
+| X/Y, disengage first | 5/7 | 0.852 |
+
+Option order therefore materially affects behavior in this calibration set. The best passing-task count still failed debugging and information sampling; it was not promoted to validation or mechanistic fitting. These small calibration samples do not establish a stable corrected measurement. A revised response interface and independent validation remain necessary; no threshold was relaxed and no failed task was dropped.
+
+All executed prompt hashes were checked against saved messages and observations. Compact replayable exports are in `paper/generated/llama_order/`; full prompts, manifests, and logs are in `llama-order-reproducibility.tar.gz`. Pod `o3mh87kcmzrv48` was deleted after a checksum-verified download. Its allocation cost is estimated below $0.45; this is not a posted invoice.
