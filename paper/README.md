@@ -1,8 +1,10 @@
 # ICLR 2027 working draft
 
-This manuscript reports the existing Qwen artifacts and a new read-only audit.
-It is an early scientific draft, not a completed submission or a claim that
-new GPU experiments have run. Do not merge automatically.
+This manuscript develops the original *Sisyphus in the Loop* report into a
+multi-task study of cognitive counterfactuals and neural controllers. It combines
+the historical artifact audit with a new fixed-controller Qwen RunPod experiment.
+See `source-lineage.md` for the original PDF, its authors, and integration choices.
+It remains a scientific working draft. Do not merge automatically.
 
 ## Build
 
@@ -45,27 +47,39 @@ retrieved 2026-09-08. Generated PDFs and build intermediates are not source inpu
 `generated/audit.md` summarizes the row-level audit. Existing scientific
 artifact directories are never modified by these scripts.
 
-## Remaining work in priority order
+## New GPU follow-up and remaining work
 
-| Priority | Work | Completion evidence |
-|---|---|---|
-| P0 | Freeze fresh within-task specificity contrasts with varied magnitudes/signs | Untouched manifest, hashes, target-variation and permutation-change audit |
-| P0 | Same-data baseline comparison including direct behavior-target DAS, probe, mean difference, PCA, random | Matched rows, layer/rank protocol, paired test metrics, GPU/update/evaluation budgets |
-| P0 | Five initialization/data-order DAS seeds | Every seed's test/holdout recovery and principal angles; no test-based seed selection |
-| P0 | Complete Methods details, cognitive-model definitions and related-work coverage | Author-reviewed equations, citations, examples, counts and model revisions |
-| P1 | Llama pilot then gated replication | Real semantic-token checks, numerical intervention checks, behavioral gate, Llama-specific frozen behavioral models |
-| P0 | Final scientific and submission review | Checked claims, anonymous supplement, compiled PDF and complete author information |
+See `runpod-results.md` for completed results and `runpod-analysis-plan.md` for
+reporting rules. Five seeds, direct DAS, four conventional bases, twenty random
+bases, and 56 fresh signed-history contrasts are complete for the fixed primary
+L28/rank2 controller. The follow-up supports original-pair recovery but exposes
+poor fresh calibration and fails fresh matched-random specificity.
 
-The within-task null issue raises the priority of new contrast design. Merely
-rerunning the old shuffle or adding random seeds cannot fix absent target
-variation. The original and follow-up outcomes must remain distinct.
+Remaining work includes broader templates and all retained controllers, full
+layer/rank search stability under declared budgets, Llama behavioral pilot and
+replication, independent auditing of the original sequential-bandit artifacts,
+and author review of the complete paper and submission materials. The original
+and follow-up results must remain distinct.
 
 ## Compute access and execution
 
-The RunPod connector was verified by a successful empty Pod listing. The
-console showed a $250 balance and an empty Secrets list on 2026-09-08. No Pod
-was created during preparation. No rate or GPU-hour promise is inferred from
-the earlier chat's stale price estimates.
+The new Qwen run uses a pinned checkpoint on a RunPod L40S in EU-NL-1.
+The GPU rate is $1.09/hour, with a 30 GB standard checkpoint volume.
+`runpod-analysis-plan.md` defines reporting boundaries. The experiment runner
+uses an isolated output directory and is launched with a three-hour process
+limit; paid resources must also be terminated after verified artifact download.
+
+To reproduce the workload from the repository root after installing dependencies
+and downloading the pinned model into the Hugging Face cache:
+
+```bash
+python scripts/qwen_runpod_experiment.py --revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+python scripts/analyze_qwen_runpod.py
+```
+
+The runner writes its protocol before loading weights. `--prepare-only` checks
+the signed-history design without GPU inference. The run measures optimization
+stability at fixed layer/rank, not stability of the full discovery search.
 
 To enable the Llama check, the account owner must sign into Hugging Face and
 verify access to the requested model. Store a read token as a RunPod secret
@@ -103,6 +117,6 @@ confirm reciprocal-reviewer eligibility/exemption, complete AI disclosure,
 and anonymize paper and supplementary materials. See the
 [official author guidelines](https://iclr.cc/Conferences/2027/AuthorGuidelines).
 
-The abstract in `main.tex` is based only on existing results and the audit;
+The abstract in `main.tex` distinguishes historical evidence and the new follow-up;
 it does not promise completed Llama replication. The AI-use statement is a
 draft for the authors to complete, not an attestation of finished review.
