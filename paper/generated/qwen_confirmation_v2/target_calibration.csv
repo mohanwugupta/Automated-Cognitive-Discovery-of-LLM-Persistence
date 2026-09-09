@@ -1,0 +1,13 @@
+split,wording,predictor,recovery,n
+mech_pair_test,original,original_prediction,0.5337213897225693,64
+mech_pair_test,original,global_prediction,0.5971639823926402,64
+mech_pair_test,original,task_prediction,0.5992742700608397,64
+mech_pair_test,rephrased,original_prediction,0.5494607537269063,64
+mech_pair_test,rephrased,global_prediction,0.6125583872248977,64
+mech_pair_test,rephrased,task_prediction,0.6339104885933589,64
+mech_task_holdout,original,original_prediction,0.331351389391112,48
+mech_task_holdout,original,global_prediction,0.29005552286364145,48
+mech_task_holdout,original,task_prediction,0.30567751912941576,48
+mech_task_holdout,rephrased,original_prediction,0.37479801508479815,48
+mech_task_holdout,rephrased,global_prediction,0.4045024591954226,48
+mech_task_holdout,rephrased,task_prediction,0.4010815763440294,48

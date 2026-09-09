@@ -1,0 +1,19 @@
+{
+  "global_gain": 1.2583852848222747,
+  "task_gains": {
+    "bandit": 1.4197266495685872,
+    "debugging": 1.287516787186227,
+    "effort": 1.1920300500446084,
+    "foraging": 1.2899053623514913,
+    "information_sampling": 1.2415594104066292,
+    "solvability": 1.1829805814831456,
+    "waiting": 1.2036094097023713
+  },
+  "penalty": 10,
+  "intercept": 0,
+  "calibration_rows": 224,
+  "source_sha256": {
+    "interventions.csv.gz": "507a770bbe4d204fe8aa572f32f285e7097bd8eddad6ee1ac9f2315cc24febb8",
+    "natural_effects.csv": "4804d406a1662fa3403192006c1f4a26582ff0ba6c431ad8970d9e0f5f49f45c"
+  }
+}

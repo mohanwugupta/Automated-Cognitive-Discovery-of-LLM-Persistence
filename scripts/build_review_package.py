@@ -32,7 +32,7 @@ From the package root, create a Python environment and install the project and p
     python scripts/analyze_llama_mechanistic.py
     PYTHONPATH=src python scripts/analyze_qwen_fresh_contexts.py
 
-Once its completed exports are included, the independent Qwen confirmation can be replayed with:
+The completed independent Qwen confirmation can be replayed with:
 
     python scripts/analyze_qwen_confirmation.py
 

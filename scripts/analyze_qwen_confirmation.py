@@ -57,6 +57,16 @@ def main():
     pd.DataFrame(granular).to_csv(out/'wording_results.csv',index=False)
     norms=df.merge(df[df.method=='frozen'][['pair_id','wording','intervention_norm']].rename(columns={'intervention_norm':'frozen_norm'}),on=['pair_id','wording'],validate='many_to_one');norms['relative_error']=abs(norms.intervention_norm-norms.frozen_norm)/norms.frozen_norm.clip(lower=1e-12)
     norms.groupby(['pair_split','method']).relative_error.agg(['median','max']).reset_index().to_csv(out/'norm_audit.csv',index=False)
+    # Post hoc finite-precision sensitivity; filter on norm error, never outcomes.
+    sensitivity=[]
+    for split,g in norms.groupby('pair_split'):
+        errors=g[g.method!='frozen'].groupby(['pair_id','wording']).relative_error.max()
+        keep=errors[errors<=.05].index
+        subset=g.set_index(['pair_id','wording']).loc[keep].reset_index()
+        scores={method:recovery(rows.natural_effect,rows.neural_counterfactual_effect) for method,rows in subset.groupby('method')}
+        null=[v for k,v in scores.items() if k.startswith('random')]
+        sensitivity.append(dict(split=split,retained=len(keep),total=len(errors),frozen=scores.get('frozen',np.nan),random_max=max(null) if null else np.nan,p=(1+sum(v>=scores['frozen'] for v in null))/100 if null else np.nan,**{m:scores.get(m,np.nan) for m in ['direct_DAS_75001','ridge_persistence_rank2','pca_rank2','output_rank2']}))
+    pd.DataFrame(sensitivity).to_csv(out/'norm_sensitivity.csv',index=False)
     ablation=pd.concat([pd.read_parquet(a.root/f'ablation_{v}.parquet') for v in ['original','rephrased']],ignore_index=True) if raw else pd.read_csv(out/'ablation.csv')
     ab=[]
     for split,g in ablation.groupby('pair_split'):

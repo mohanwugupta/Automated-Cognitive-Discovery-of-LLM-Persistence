@@ -29,7 +29,7 @@ The supplement contains detailed original probe statistics, sequential-study met
 
 ## Completed replication and current work
 
-The broader Qwen test separates weak frozen cognitive-target calibration from stronger natural-effect recovery, initially measured as a secondary diagnostic. The independent Qwen confirmation prospectively tests this endpoint with limited wording variation, generic controls, and 99 random subspaces. Its full results must be retained without retuning.
+The broader Qwen test separates weak frozen cognitive-target calibration from stronger natural-effect recovery, initially measured as a secondary diagnostic. The independent Qwen confirmation prospectively tests this endpoint with limited wording variation, generic controls, and 99 random subspaces. It is complete: natural recovery is 0.779/0.816 and exceeds random, ridge, PCA, and output controls. Direct behavior-target DAS is slightly better at 0.802/0.830. Frozen cognitive-target recovery remains weak at 0.251/-0.428. The comparison supports causal control without cognitive-specific superiority.
 
 Llama response validation is now complete. A new Yes/No interface and an independent behavioral entry test pass the declared criteria. The neural replication achieves cognitive-target recovery of 0.649 within discovery tasks but only 0.011 on neural task holdouts. Generic controls perform better on natural effects. This is partial replication with a transfer boundary, not evidence for a universally shared E state.
 

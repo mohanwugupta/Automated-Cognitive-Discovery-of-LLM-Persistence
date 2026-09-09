@@ -1,0 +1,56 @@
+{
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "seed": 92001,
+  "wordings": [
+    "original",
+    "rephrased"
+  ],
+  "pairs_per_wording": 112,
+  "conditions_per_wording": 224,
+  "random_count": 99,
+  "random_seed": 92002,
+  "primary": "natural effect recovery; both task splits Holm corrected",
+  "calibration": {
+    "global_gain": 1.2583852848222747,
+    "task_gains": {
+      "bandit": 1.4197266495685872,
+      "debugging": 1.287516787186227,
+      "effort": 1.1920300500446084,
+      "foraging": 1.2899053623514913,
+      "information_sampling": 1.2415594104066292,
+      "solvability": 1.1829805814831456,
+      "waiting": 1.2036094097023713
+    },
+    "penalty": 10,
+    "intercept": 0,
+    "calibration_rows": 224,
+    "source_sha256": {
+      "interventions.csv.gz": "507a770bbe4d204fe8aa572f32f285e7097bd8eddad6ee1ac9f2315cc24febb8",
+      "natural_effects.csv": "4804d406a1662fa3403192006c1f4a26582ff0ba6c431ad8970d9e0f5f49f45c"
+    }
+  },
+  "controller": {
+    "artifact": "artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors",
+    "final_training_loss": 0.0639787821,
+    "job_index": 2,
+    "layer": 28,
+    "rank": 2,
+    "scope": "shared",
+    "target_variable": "outcome_history",
+    "task_family": null,
+    "theory": "dual_history",
+    "training_examples": 24,
+    "validation_correlation": 0.8032670349,
+    "validation_examples": 22,
+    "validation_fraction_behavioral_effect_recovered": 0.9698144972,
+    "validation_intercept": -0.0995576403,
+    "validation_mean_cfr": 0.9550630034,
+    "validation_median_cfr": 0.9801644015,
+    "validation_rmse": 0.2115195406,
+    "validation_sign_accuracy": 1.0,
+    "validation_slope": 1.0701200714
+  },
+  "semantic_overlap_count": 0,
+  "script_sha256": "e58c6af5cacbc8fb25b495d371d22d69f123c74961ef2f8c6f4cd0a662cdba6d",
+  "plan_sha256": "d55e9cbfeedb16573698c07126010a8cd157624254a65f9e8e04354de67504d6"
+}
