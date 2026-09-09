@@ -1,0 +1,28 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "layers": [
+    8,
+    16,
+    24,
+    28
+  ],
+  "ranks": [
+    2,
+    8
+  ],
+  "epochs": 3,
+  "learning_rate": 0.03,
+  "activation_penalty": 0.0001,
+  "search_seed": 93104,
+  "random_seed": 93105,
+  "random_count": 99,
+  "design_seeds": [
+    93101,
+    93102,
+    93103
+  ],
+  "selection": "maximum global cognitive-target recovery on selection source tasks; lower rank then layer tie break",
+  "entry": "requires independently successful llama_behavior_v2; no validity data used",
+  "script_sha256": "09d7f4405435899d0f7aad91a06d5653ad59a01ec3d13d0c7d7bd5f8cd55ab8c"
+}

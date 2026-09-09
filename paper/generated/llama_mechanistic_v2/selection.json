@@ -1,0 +1,21 @@
+{
+  "name": "L24_r2",
+  "layer": 24,
+  "rank": 2,
+  "global_cfr": 0.6174273336265894,
+  "correlation": 0.8057806801855387,
+  "slope": 0.8217189493738367,
+  "intercept": 0.021390080114135093,
+  "rmse": 0.13311256746138114,
+  "sign_accuracy": 0.75,
+  "mean_cfr": -9.63927213546964,
+  "median_cfr": 0.5513210019062549,
+  "fraction_behavioral_effect_recovered": 1.0180005163678008,
+  "examples": 64,
+  "thresholded_cfr_threshold": 0.1,
+  "thresholded_cfr_retained": 48,
+  "thresholded_cfr_fraction_retained": 0.75,
+  "thresholded_cfr_median": 0.7629454833369558,
+  "thresholded_cfr_q25": 4.2659759158514277e-07,
+  "thresholded_cfr_q75": 0.98130038265401
+}

@@ -1,0 +1,5 @@
+split,endpoint,retained,total,selected,random_max,p
+mech_pair_test,natural_effect,30,64,0.34789777411376754,0.12860676009892824,0.01
+mech_pair_test,predicted_counterfactual_effect,30,64,0.7712986533979208,0.1507134139300913,0.01
+mech_task_holdout,natural_effect,7,48,0.513157894736842,0.2763157894736842,0.01
+mech_task_holdout,predicted_counterfactual_effect,7,48,0.8384980074304901,0.46680501909566097,0.01

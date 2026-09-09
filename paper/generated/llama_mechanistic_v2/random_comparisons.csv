@@ -1,0 +1,5 @@
+split,endpoint,selected,random_mean,random_max,p,holm_within_endpoint,holm_all_four
+mech_pair_test,natural_effect,0.34485094850948506,0.007705784128548365,0.10027100271002709,0.01,0.02,0.04
+mech_pair_test,predicted_counterfactual_effect,0.6488862150616931,-0.1219383975596771,0.09458261655510514,0.01,0.02,0.04
+mech_task_holdout,natural_effect,0.31875,-0.10883838383838382,0.08125000000000004,0.01,0.02,0.04
+mech_task_holdout,predicted_counterfactual_effect,0.011161886503828433,-0.34681264368988046,-0.11418337959255775,0.01,0.02,0.04

@@ -29,13 +29,14 @@ def dump(path, value):
     path.write_text(json.dumps(value, indent=2, default=str))
 
 
-def prepare(out, revision):
+def prepare(out, revision, *, seed=87001, patterns_override=None):
     config = load_config('configs/discovery_v1.yaml')
     design, _ = generate_design(config, output=out/'backgrounds', conditions=490,
-                                seed=87001, design_id='qwen_fresh_contexts_v1')
+                                seed=seed, design_id='qwen_fresh_contexts_v1')
     patterns = [((-1,-1,-1),(1,-1,-1)), ((1,1,1),(-1,-1,1)),
                 ((-1,-1,-1,-1,-1),(1,1,-1,-1,-1)),
                 ((1,1,1,1,1),(-1,-1,-1,1,1))]
+    if patterns_override is not None: patterns = patterns_override
     heldout = {'waiting','effort','information_sampling'}
     records=[]
     for task in sorted({c.task_family for c in design}):
@@ -87,7 +88,7 @@ def prepare(out, revision):
     pairs.to_parquet(out/'pairs.parquet',index=False)
     predictions.to_parquet(out/'predictions.parquet',index=False)
     jobs=json.loads(Path('artifacts/causal_mech_v1/representations/selected_alignments.json').read_text())
-    protocol=dict(model='Qwen/Qwen3.5-4B',revision=revision,seed=87001,
+    protocol=dict(model='Qwen/Qwen3.5-4B',revision=revision,seed=seed,
                   backgrounds_per_task=4,patterns=patterns,conditions=len(records),pairs=len(pairs),
                   controllers=jobs,random_count=20,random_seed=87002,
                   intervention='source-to-base subspace interchange at final prompt token; explicit pair table sets signed orientation, manifest members are increasing-target order',

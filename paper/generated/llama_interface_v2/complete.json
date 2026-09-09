@@ -1,0 +1,7 @@
+{
+  "chosen": "question",
+  "calibration_observations": 1260,
+  "validation_observations": 980,
+  "validated": true,
+  "seconds": 108.68772087804973
+}

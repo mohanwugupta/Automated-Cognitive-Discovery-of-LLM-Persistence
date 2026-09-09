@@ -27,6 +27,10 @@ The main text leads with method and positive discovery results. It retains conci
 
 The supplement contains detailed original probe statistics, sequential-study methods, alternative-theory/recovery diagnostics, the constant-target shuffle audit, unexecuted necessity-gate clarification, full new experiment protocol, and the complete baseline table. The original intro and verified literature are retained as intellectual foundations rather than presented as a research diary.
 
-## Effect on next experiments
+## Completed replication and current work
 
-A second model would test methodological reach but would not by itself resolve the fresh-history calibration limitation. Stronger mechanism claims need broader controlled counterfactual templates, improved identification controls, and tests of natural causal use. The subsequent frozen Qwen test completed 13,440 intervention evaluations across all three controllers. Primary cognitive-target recovery remains weak (0.268 familiar; 0.026 held out), while a transparently secondary natural-effect diagnostic yields 0.894/0.871 and exceeds all 20 random controls. This distinguishes target calibration from controller fidelity; it does not establish cognitive identity or necessity. All 4,060 Llama behavioral evaluations are retained, but no response format passed every task gate. See [full fresh-context results](qwen-fresh-results.md).
+The broader Qwen test separates weak frozen cognitive-target calibration from stronger natural-effect recovery, initially measured as a secondary diagnostic. The independent Qwen confirmation prospectively tests this endpoint with limited wording variation, generic controls, and 99 random subspaces. Its full results must be retained without retuning.
+
+Llama response validation is now complete. A new Yes/No interface and an independent behavioral entry test pass the declared criteria. The neural replication achieves cognitive-target recovery of 0.649 within discovery tasks but only 0.011 on neural task holdouts. Generic controls perform better on natural effects. This is partial replication with a transfer boundary, not evidence for a universally shared E state.
+
+No further experiments are being launched. The priority is a coherent manuscript that separates these evidential levels and reports both successful and failed tests. Full-search superiority remains untested and is not claimed.

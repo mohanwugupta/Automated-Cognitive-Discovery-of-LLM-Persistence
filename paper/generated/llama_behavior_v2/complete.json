@@ -1,0 +1,12 @@
+{
+  "chosen": "dual_history",
+  "entry_passed": true,
+  "test_scores": {
+    "immediate_state": 0.8212009717823576,
+    "choice_perseveration": 0.8227437988067473,
+    "outcome_history": 0.8334516703078353,
+    "dual_history": 0.8353870156626626
+  },
+  "observations": 4760,
+  "seconds": 201.72576282499358
+}

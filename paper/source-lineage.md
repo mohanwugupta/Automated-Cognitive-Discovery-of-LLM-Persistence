@@ -11,8 +11,8 @@ The rewrite develops the original question: does information decoded from hidden
 | Original material | Treatment in expanded manuscript |
 |---|---|
 | Sequential two-arm bandit with STOP | Retain as motivating prior study; distinguish logsumexp(A,B)-C from later binary semantic logits. |
-| Future-return ridge test R2 .240 | Attribute to original report until original repository outputs are independently audited. |
-| STOP/CONTINUE factorial within-state R2 .784 | Attribute to original report; do not pool 1,187 sequential states with later semantic contrasts. |
+| Future-return ridge test R2 .240 | Independently recomputed as .239862 from stored test predictions; original inference/training not rerun. |
+| STOP/CONTINUE factorial within-state R2 .784 | Independently recomputed as .783644; do not pool 1,187 sequential states with later semantic contrasts. |
 | Return/advantage steering nulls | Limit claims to fitted directions and calibrated intervention scale. Remove universal claims that future reward has no bearing on persistence. |
 | Layer-31 persistence steering | Describe as decision-aligned positive control; this does not identify an upstream persistence computation. |
 | Human waiting/foraging/quitting literature | Restore as hypothesis-generating literature, without inferring shared human/LLM mechanisms. |
