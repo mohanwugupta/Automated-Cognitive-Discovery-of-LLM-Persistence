@@ -1,3 +1,5 @@
+Completed follow-up: [broader Qwen frozen-controller results](paper/qwen-fresh-results.md), including 13,440 interventions and export-only replay. [Llama diagnostics](paper/llama-results.md) retain 4,060 behavioral evaluations; measurement validation remains unresolved. All experiment pods have been deleted.
+
 # Automated Cognitive Discovery of LLM Persistence
 
 This repository implements the coverage-oriented behavioral pipeline in

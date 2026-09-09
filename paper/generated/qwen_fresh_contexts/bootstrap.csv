@@ -1,0 +1,7 @@
+theory,split,global_cfr,ci_low,ci_high,bootstrap,clusters
+dual_history,mech_pair_test,0.26840568616493055,0.11943265362460417,0.4109024128406047,1000 resamples of background clusters within task; all histories/mappings stay together,16
+dual_history,mech_task_holdout,0.02581586625327359,-0.25359321829593595,0.276185556309518,1000 resamples of background clusters within task; all histories/mappings stay together,12
+latent_context,mech_pair_test,-3.7505021024752647,-4.819434152235049,-2.658523099597873,1000 resamples of background clusters within task; all histories/mappings stay together,12
+latent_context,mech_task_holdout,0.018811705576889493,-0.28220855603190614,0.30127063081360456,1000 resamples of background clusters within task; all histories/mappings stay together,12
+outcome_history,mech_pair_test,0.03736968926599993,-0.13177885063401445,0.2055902493527061,1000 resamples of background clusters within task; all histories/mappings stay together,16
+outcome_history,mech_task_holdout,-0.032798541747530274,-0.35808444968639896,0.25803337751013955,1000 resamples of background clusters within task; all histories/mappings stay together,12

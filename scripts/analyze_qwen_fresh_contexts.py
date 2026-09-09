@@ -21,12 +21,12 @@ def main():
                 theory,index=path.stem.rsplit('_random_',1);method=f'random_{index}'
             frame['theory']=theory;frame['method']=method;frames.append(frame)
         data=pd.concat(frames,ignore_index=True)
-        data.to_csv(out/'interventions.csv',index=False)
+        data.to_csv(out/'interventions.csv.gz',index=False,compression={'method':'gzip','mtime':0})
         pd.read_parquet(root/'pairs.parquet').to_csv(out/'pairs.csv',index=False)
         for filename in ['protocol.json','complete.json','resource_audit.json']:
             if (root/filename).exists():shutil.copy2(root/filename,out/filename)
     else:
-        data=pd.read_csv(out/'interventions.csv')
+        data=pd.read_csv(out/'interventions.csv.gz')
     assert len(data)==13440,len(data)
     assert not data.duplicated(['theory','method','pair_id']).any()
     assert data.groupby(['theory','method']).size().groupby(level=0).nunique().eq(1).all()
@@ -93,6 +93,23 @@ def main():
                 analysis_role='secondary natural-effect diagnostic; not original cognitive-target endpoint',
                 **counterfactual_metrics(g.natural_effect,g.neural_counterfactual_effect)))
         pd.DataFrame(natural_recovery).to_csv(out/'natural_effect_recovery.csv',index=False)
+        sensitivity=[]
+        for (theory,split),g in joined_all.groupby(['theory','pair_split']):
+            frozen=g[g.method.eq('frozen')].set_index('pair_id')
+            null=g[g.method.str.startswith('random_')]
+            norms=null.pivot(index='pair_id',columns='method',values='intervention_norm').reindex(frozen.index)
+            error=norms.sub(frozen.intervention_norm,axis=0).abs().div(frozen.intervention_norm.clip(lower=1e-12),axis=0)
+            ids=frozen.index[error.max(axis=1).le(.05)]
+            if not len(ids):continue
+            for endpoint,column in [('cognitive','predicted_counterfactual_effect'),('natural','natural_effect')]:
+                target=frozen.loc[ids,column]
+                score=global_counterfactual_recovery(target,frozen.loc[ids].neural_counterfactual_effect)
+                scores=[global_counterfactual_recovery(target,m.set_index('pair_id').loc[ids].neural_counterfactual_effect)
+                        for _,m in null.groupby('method')]
+                sensitivity.append(dict(theory=theory,split=split,endpoint=endpoint,total_pairs=len(frozen),
+                    retained_pairs=len(ids),frozen_recovery=score,random_max=max(scores),
+                    p_plus_one=(1+sum(x>=score for x in scores))/21))
+        pd.DataFrame(sensitivity).to_csv(out/'norm_sensitivity.csv',index=False)
     print(pd.DataFrame(comparisons).to_string(index=False))
     print('Replayed',len(data),'interventions')
 

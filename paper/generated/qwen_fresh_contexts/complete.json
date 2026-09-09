@@ -1,0 +1,7 @@
+{
+  "seconds": 2878.2651748880744,
+  "torch": "2.8.0.dev20250319+cu128",
+  "transformers": "5.16.1",
+  "peak_vram_bytes": 9294723072,
+  "evaluation_rows": 13440
+}
