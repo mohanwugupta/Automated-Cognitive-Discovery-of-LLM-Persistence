@@ -1,0 +1,84 @@
+{
+  "status": "descriptive_post_hoc_audit_not_confirmatory",
+  "design_rendered_pairs": 2800,
+  "design_semantic_pairs": 1400,
+  "evaluated_rendered_pairs": 560,
+  "evaluated_semantic_pairs": 280,
+  "evaluated_unique_states": 450,
+  "test_state_overlap_by_design_split": {
+    "abstraction_test": 450,
+    "abstraction_train": 260,
+    "abstraction_validation": 166
+  },
+  "evaluated_rows_match_declared_test": true,
+  "thresholds": {
+    "equal_atol": 1e-10,
+    "active_absolute_logit": 0.1
+  },
+  "all_target_pairs": [
+    {
+      "left": "O",
+      "right": "O_star",
+      "rendered_pairs": 560,
+      "correlation": 0.4513593752392354,
+      "rms_difference": 0.625271978062503,
+      "equal_fraction": 0.2571428571428571,
+      "active_pairs": 82,
+      "opposite_sign_active_pairs": 6
+    },
+    {
+      "left": "O",
+      "right": "H",
+      "rendered_pairs": 560,
+      "correlation": 0.9753394984399764,
+      "rms_difference": 0.15745661345742845,
+      "equal_fraction": 0.24642857142857144,
+      "active_pairs": 152,
+      "opposite_sign_active_pairs": 0
+    },
+    {
+      "left": "O",
+      "right": "E",
+      "rendered_pairs": 560,
+      "correlation": 0.19706607919317676,
+      "rms_difference": 1.7435048789624152,
+      "equal_fraction": 0.0,
+      "active_pairs": 94,
+      "opposite_sign_active_pairs": 4
+    },
+    {
+      "left": "O_star",
+      "right": "H",
+      "rendered_pairs": 560,
+      "correlation": 0.3945734631417145,
+      "rms_difference": 0.6998777802603584,
+      "equal_fraction": 0.24642857142857144,
+      "active_pairs": 150,
+      "opposite_sign_active_pairs": 64
+    },
+    {
+      "left": "O_star",
+      "right": "E",
+      "rendered_pairs": 560,
+      "correlation": -0.004412420701479768,
+      "rms_difference": 1.870126228105736,
+      "equal_fraction": 0.0,
+      "active_pairs": 96,
+      "opposite_sign_active_pairs": 64
+    },
+    {
+      "left": "H",
+      "right": "E",
+      "rendered_pairs": 560,
+      "correlation": 0.19937535988790098,
+      "rms_difference": 1.7540514241453409,
+      "equal_fraction": 0.5464285714285714,
+      "active_pairs": 196,
+      "opposite_sign_active_pairs": 2
+    }
+  ],
+  "input_sha256": {
+    "artifacts/abstraction_discovery_v1/design/contrast_manifest.parquet": "abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497",
+    "artifacts/abstraction_discovery_v1/frozen_das/interchange_results.parquet": "8b1be70a4d8a52751987a8b18b278b018665f4484b18eef8a87315b0e98288cc"
+  }
+}

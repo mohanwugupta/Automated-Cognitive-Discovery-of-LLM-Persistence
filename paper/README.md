@@ -64,6 +64,10 @@ untracked build outputs. GitHub collapses generated evidence through
 `.gitattributes`; every evidence file remains available to expand or download.
 Summary tables remain expanded for review.
 
+## Computational discrimination audit
+
+The [saved-data audit](computational-discrimination-audit.md) finds unequal weighting of E evidence and limited separation of some predicted effects. Its [follow-up specification](computational-discrimination-protocol.md) requires behavioral calibration and actual intervention-prediction disagreement before neural testing. Neither document launches GPU work. Run `python scripts/audit_computational_discrimination.py` for the CPU audit.
+
 ## Protocols, historical notes, and remaining work
 
 [Qwen confirmation protocol](next-experiment-protocol.md),
