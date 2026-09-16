@@ -48,6 +48,10 @@ where = ["src"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "--strict-markers"
+markers = [
+  "gpu: requires a configured GPU and is excluded from ordinary CI",
+  "model_download: requires network/model access and is excluded from ordinary CI",
+]
 
 [tool.ruff]
 line-length = 100

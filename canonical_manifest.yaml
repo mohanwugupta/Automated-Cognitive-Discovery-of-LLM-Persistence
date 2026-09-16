@@ -1,0 +1,381 @@
+schema_version: "stage2a-1"
+manifest_scope: "canonical scientific provenance and dependency graph"
+canonical_base:
+  remote_ref: "origin/main"
+  commit: "3a5c8749d881632beccd2f12cc1016992ccc358f"
+  generated_on: "2026-09-16"
+  note: "Runtime commits embedded in some historical artifacts can predate this canonicalization commit."
+
+status_vocabulary:
+  canonical: "Claim-bearing part of the approved primary pipeline."
+  supporting: "Useful evidence or dependency, but not independently a core claim."
+  boundary: "Tests the boundary or generalization of a claim without establishing identity."
+  replication: "Approved conceptual replication in another model or interface."
+  legacy: "Historical or superseded analysis retained for provenance."
+  unresolved: "A planned comparison did not uniquely select an alternative."
+  not_run: "No valid evaluation was executed; this is not a failed result."
+  uninformative_control: "The implemented control did not change the target values and cannot test specificity."
+
+endpoint_definitions:
+  persistence_logit:
+    definition: "log p(continue) - log p(disengage) after renormalization over the two response tokens"
+  cognitive_counterfactual_recovery:
+    definition: "Recovery of the frozen behavioral model's predicted source-minus-base effect."
+    canonical_metric: "global_cfr_v1"
+  natural_effect_recovery:
+    definition: "Recovery of the unmodified language model's empirical source-minus-base effect."
+    canonical_metric: "global_cfr_v1"
+    separation_rule: "Must never be reported as cognitive-counterfactual recovery."
+  global_cfr_v1:
+    formula: "1 - sum((observed_effect - target_effect)^2) / sum((baseline_effect - target_effect)^2)"
+    baseline_effect: 0.0
+    supersedes: "mean of per-example CFR values"
+
+models:
+  qwen_core:
+    model_family: "Qwen"
+    checkpoint: "Qwen/Qwen3.5-4B"
+    revision: null
+    identity_status: "historical_unknown"
+    note: "Core configs pin the checkpoint name, but the historical resolved revision is unknown; do not infer it from later Qwen runs."
+  qwen_confirmation:
+    model_family: "Qwen"
+    checkpoint: "Qwen/Qwen3.5-4B"
+    revision: "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  llama_replication:
+    model_family: "Llama"
+    checkpoint: "meta-llama/Llama-3.1-8B-Instruct"
+    revision: "0e9e39f249a16976918f6564b8830bc894c89659"
+
+stages:
+  external_original_study:
+    status: "legacy"
+    replay_status: "external_dependency"
+    role: "external_historical_provenance"
+    repository: "digital-minds-hackathon"
+    repository_commit: "5b968d0bb8de64f67556a7b300200aa488a591fa"
+    depends_on: []
+    outputs:
+      - path: "paper/generated/original_audit/audit.json"
+        sha256: "bf3086a60c1bf15e0bb33f5b3dd0bdf8363ab04c8a3f3853995024dac3b71a52"
+    availability: "Audit summary committed; full replay requires the external repository and its large-file payloads."
+
+  discovery_v1:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    role: "upstream_behavioral_discovery_and_data"
+    model_ref: "qwen_core"
+    depends_on: []
+    target: "persistence_logit"
+    outputs:
+      - path: "artifacts/discovery_v1/behavior/standardized.parquet"
+        sha256: "36f0102d32563fcf10602707cbe2febd31a94caa88567fe828591f548d5584a2"
+    conclusion_scope: "Upstream behavioral observations and design-space exploration; not the final behavioral conclusion."
+
+  discovery_v2:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    role: "behavioral_model_comparison_and_active_discovery"
+    model_ref: "qwen_core"
+    depends_on: ["discovery_v1"]
+    target: "persistence_logit"
+    outputs:
+      - path: "artifacts/discovery_v2/final_validation/condition_manifest.parquet"
+        sha256: "7418d8683b1c70be517b71faef0fa9de508197a2a8c9597161029da35f6d1de6"
+      - path: "artifacts/discovery_v2/final_validation/metrics.json"
+        sha256: "c92da0fcce9d93734f9de95b4838eae7697c7dd3edb979663260f2d6361aff37"
+      - path: "artifacts/discovery_v2/hierarchy/best_hierarchical_model.pkl"
+        sha256: "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3"
+
+  theory_resolution_v1:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    resolution_status: "unresolved"
+    role: "behavioral_handoff"
+    model_ref: "qwen_core"
+    depends_on: ["discovery_v2"]
+    compared_models: ["dual_history", "latent_context", "outcome_history"]
+    target: "persistence_logit"
+    outputs:
+      - path: "artifacts/theory_resolution_v1/discrimination/frozen_model_metrics.csv"
+        sha256: "3746f88ae0c95f64cc36ddf43cf31e0fe47a53192addbfa4bb6f1081e3577726"
+      - path: "artifacts/theory_resolution_v1/discrimination/theory_decision.json"
+        sha256: "98aec2161a23c9bf2ac2c6cbcb6dd5491cf2d2ffa2c53a3bf5f42ca0f5ea3b28"
+    frozen_models:
+      dual_history:
+        path: "artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl"
+        sha256: "656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3"
+      latent_context:
+        path: "artifacts/theory_resolution_v1/frozen_models/latent_context/model.pkl"
+        sha256: "d92be7907416acb2f74ad66b64a74e8342d87d4ec3062b36f42b90a8fdffed6f"
+      outcome_history:
+        path: "artifacts/theory_resolution_v1/frozen_models/outcome_history/model.pkl"
+        sha256: "fe945cff238ba65ea327f4f4d1d16625017a4f06d02f5781232b6f41313e1667"
+    conclusion_scope: "The comparison remains unresolved; winner is null."
+
+  mechanistic_manifest_v1:
+    status: "canonical"
+    replay_status: "fully_replayable"
+    role: "matched_condition_dependency"
+    model_ref: "qwen_core"
+    depends_on: ["theory_resolution_v1"]
+    outputs:
+      - path: "artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl"
+        sha256: "a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342"
+
+  mechanistic_probe_steering_v1:
+    status: "supporting"
+    replay_status: "historical_unknown"
+    interpretation_status: "legacy"
+    role: "historical_probe_and_steering_analysis"
+    model_ref: "qwen_core"
+    depends_on: ["mechanistic_manifest_v1"]
+    outputs:
+      - path: "artifacts/mechanistic_v1/representation/gates.json"
+        sha256: "be7357a0848e2a7ac44726110008feb20e94180763824bfd925998d247f583fd"
+      - path: "artifacts/mechanistic_v1/report.md"
+        sha256: "ba406e65643484a717bbc700c10d5e0a5714f79451043691a43be3a8ad2c285a"
+    conclusion_scope: "Supporting historical evidence, not the core mechanistic claim."
+
+  action_history_disambiguation_v1:
+    status: "supporting"
+    replay_status: "historical_unknown"
+    role: "action_history_direction_diagnostic"
+    model_ref: "qwen_core"
+    depends_on: ["mechanistic_manifest_v1"]
+    outputs:
+      - path: "artifacts/action_history_disambiguation_v1/gates.json"
+        sha256: "e00167bab30455dd42abfcec8148bdd2e81e7187c8dd2a58a2267c44fd77d725"
+      - path: "artifacts/action_history_disambiguation_v1/report.md"
+        sha256: "faf7fd3f9e1bd32a2fb131b2e5f8b5799403acb4caa422e67a613ff67b275514"
+
+  causal_mech_v1:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    role: "das_alignment_and_level4_causal_representation"
+    model_ref: "qwen_core"
+    depends_on: ["theory_resolution_v1", "mechanistic_manifest_v1"]
+    target: "cognitive_counterfactual_recovery"
+    metric: "global_cfr_v1"
+    pair_splits: ["train", "validation", "test", "task_holdout"]
+    outputs:
+      - path: "artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet"
+        sha256: "6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4"
+      - path: "artifacts/causal_mech_v1/counterfactuals/predicted_effects.parquet"
+        sha256: "dc87d567f8560c079f6671c24d25df81f13f6990b795daf9f7ac4f44ef681351"
+      - path: "artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors"
+        sha256: "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0"
+    primary_controller:
+      behavioral_target: "dual_history outcome-history computation"
+      layer: 28
+      rank: 2
+      basis_sha256: "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0"
+
+  causal_specificity_v2:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    role: "stable_metric_and_specificity_reanalysis"
+    model_ref: "qwen_core"
+    depends_on: ["causal_mech_v1"]
+    target: "cognitive_counterfactual_recovery"
+    metric: "global_cfr_v1"
+    supersedes: "causal_mech_v1 per-example CFR interpretation"
+    outputs:
+      - path: "artifacts/causal_specificity_v2/corrected_metrics/bootstrap_intervals.csv"
+        sha256: "e506a63831faa8aa9a377d267ba3c12d24329170f0a907289e98632e594cfd9d"
+      - path: "artifacts/causal_specificity_v2/candidate_gates.csv"
+        sha256: "28bdf81ab7b53768bd8a0f4badc05786bea007b0f344d5d6ceba90b9a159dd62"
+      - path: "artifacts/causal_specificity_v2/frozen_models/behavioral_hash.json"
+        sha256: "75e677528483c23852594e6c320e664d2f4a5e7293ed81c34d9e29e66ca61bab"
+
+  level5b_necessity_v2:
+    status: "not_run"
+    replay_status: "fully_replayable"
+    role: "necessity_test"
+    depends_on: ["causal_specificity_v2"]
+    outputs:
+      - path: "artifacts/causal_specificity_v2/frozen_models/necessity_jobs.json"
+        sha256: "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    note: "The job list is empty. Absence of a run is not a failed necessity result."
+
+  shuffled_target_dual_history_v2:
+    status: "uninformative_control"
+    replay_status: "fully_replayable"
+    role: "specificity_control"
+    depends_on: ["causal_specificity_v2"]
+    note: "The later audit found that the shuffled-target construction preserved target values."
+
+  shuffled_target_outcome_history_v2:
+    status: "uninformative_control"
+    replay_status: "fully_replayable"
+    role: "specificity_control"
+    depends_on: ["causal_specificity_v2"]
+    note: "The later audit found that the shuffled-target construction preserved target values."
+
+  abstraction_discovery_v1:
+    status: "canonical"
+    replay_status: "historical_unknown"
+    identity_status: "unresolved"
+    role: "causal_abstraction_candidate_analysis"
+    model_ref: "qwen_core"
+    depends_on: ["causal_specificity_v2"]
+    outputs:
+      - path: "artifacts/abstraction_discovery_v1/design/contrast_manifest.parquet"
+        sha256: "abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497"
+      - path: "artifacts/abstraction_discovery_v1/frozen_das/interchange_results.parquet"
+        sha256: "8b1be70a4d8a52751987a8b18b278b018665f4484b18eef8a87315b0e98288cc"
+      - path: "artifacts/abstraction_discovery_v1/gates.json"
+        sha256: "1b7be5e32c5b2f17e62be0e25ad9540cfc0e70601cae97d079cf6e793e5da02c"
+    conclusion_scope: "E is the strongest descriptive downstream candidate, but no abstraction uniquely passes the full identity gate."
+
+  ood_free_generation_v1:
+    status: "boundary"
+    replay_status: "historical_unknown"
+    role: "frozen_free_generation_generalization"
+    model_ref: "qwen_core"
+    depends_on: ["causal_mech_v1", "abstraction_discovery_v1"]
+    target: "natural generation persistence under controller dose"
+    outputs:
+      - path: "artifacts/ood_free_generation_v1/generations/generation_summary.parquet"
+        sha256: "edcfb532e49feb8f0c9482fbefe3e29c225ca39e037ef2841080b63f9bd0157d"
+      - path: "artifacts/ood_free_generation_v1/generations/token_events.parquet"
+        sha256: "7476e408f4502ad86fb7258529a876857d0f0bf31657bb535488901d8121dd69"
+      - path: "artifacts/ood_free_generation_v1/gates.json"
+        sha256: "fbbeadc1e1f25fe8f001e61a3616b4fb37ef3c59277c5fef382a974273c667c0"
+      - path: "artifacts/ood_free_generation_v1/analysis/survival_model.json"
+        sha256: "cfb92d1cbae89611209676e1fc1dcf0a90bab9bf41d21d3d94345c73c1b24095"
+    conclusion_scope: "Boundary/generalization test; does not establish E identity."
+
+  qwen_fixed_setting_stability_v1:
+    status: "supporting"
+    replay_status: "compact_replay_only"
+    role: "multi_seed_stability"
+    model_ref: "qwen_confirmation"
+    depends_on: ["causal_specificity_v2"]
+    outputs:
+      - path: "paper/generated/runpod_protocol.json"
+        sha256: "8f2f4414fa495f33b319676bb10a0563020bb797dc0c10891745b2bc529ea6ce"
+      - path: "paper/generated/runpod_metrics.csv"
+        sha256: "319faaab55387021b8be7b7f0cd5714f182792027eb0ee9c73838ce11cb43a46"
+
+  qwen_fresh_contexts_v1:
+    status: "supporting"
+    replay_status: "compact_replay_only"
+    role: "broader_context_extension"
+    model_ref: "qwen_confirmation"
+    depends_on: ["causal_specificity_v2"]
+    endpoints: ["cognitive_counterfactual_recovery", "natural_effect_recovery"]
+    outputs:
+      - path: "paper/generated/qwen_fresh_contexts/protocol.json"
+        sha256: "aab5baed00a77d852f43b0551b71da1720ba5bf97143bf35f47563a01e865ab0"
+      - path: "paper/generated/qwen_fresh_contexts/metrics.csv"
+        sha256: "2d7bf4e0c512fa51cd25f141d4334ca91ab73631492c5c4f43ca90fbb5dbda2d"
+
+  qwen_confirmation_v2:
+    status: "canonical"
+    replay_status: "compact_replay_only"
+    category: "claim_bearing_extension"
+    role: "independent_natural_effect_confirmation"
+    model_ref: "qwen_confirmation"
+    depends_on: ["causal_mech_v1"]
+    primary_endpoint: "natural_effect_recovery"
+    secondary_endpoint: "cognitive_counterfactual_recovery"
+    metric: "global_cfr_v1"
+    controller:
+      layer: 28
+      rank: 2
+      basis_sha256: "ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0"
+    outputs:
+      - path: "paper/generated/qwen_confirmation_v2/protocol.json"
+        sha256: "8db8a14d9882a504448d6e376a5f0902e99c431b21ba98cf7fba86f1cc4a421e"
+      - path: "paper/generated/qwen_confirmation_v2/interventions.csv.gz"
+        sha256: "5cccfc1b89ee9b6dd5c143e7429e343ecd838ebc95a3568055917acb96d55140"
+      - path: "paper/generated/qwen_confirmation_v2/metrics.csv"
+        sha256: "6b7063f3b56983760af0021de9e7e55d46fabee65ca42121dbfc25d9475fa8fb"
+    availability: "Compact result exports are committed. The raw condition manifest expected by one existing test is not committed."
+
+  llama_label_interface_history:
+    status: "legacy"
+    replay_status: "compact_replay_only"
+    role: "measurement_validity_history"
+    model_ref: "llama_replication"
+    depends_on: []
+    conclusion_scope: "Earlier X/Y, A/B, and order interfaces failed measurement-validity checks and are not negative scientific replications."
+
+  llama_interface_v2:
+    status: "supporting"
+    replay_status: "compact_replay_only"
+    role: "yes_no_interface_validation"
+    model_ref: "llama_replication"
+    depends_on: ["llama_label_interface_history"]
+    outputs:
+      - path: "paper/generated/llama_interface_v2/protocol.json"
+        sha256: "71175c0e4cc703ff04c4b7f931a7471034fe1fefa618b4363be89dab5c042a7f"
+
+  llama_behavior_v2:
+    status: "replication"
+    replay_status: "compact_replay_only"
+    role: "conceptual_behavioral_replication"
+    model_ref: "llama_replication"
+    depends_on: ["llama_interface_v2"]
+    target: "persistence_logit using Yes/No response tokens"
+    outputs:
+      - path: "paper/generated/llama_behavior_v2/protocol.json"
+        sha256: "f35224b2ae6199f8af047284d438d15c69d59b0494ea811848a4b9e86650836b"
+      - path: "paper/generated/llama_behavior_v2/metrics.csv"
+        sha256: "18e62b0aaf5af781eac947e5f39151bca1b367d0c3543c4b3c5f5d47f48f3dc4"
+      - path: "paper/generated/llama_behavior_v2/test_dual_history_predictions.csv"
+        sha256: "f27738b156ad98763370208a1a1de9dbf5ca46d19ac4fed30f8d6354a60bf4e7"
+
+  llama_mechanistic_v2:
+    status: "replication"
+    replay_status: "compact_replay_only"
+    role: "conceptual_mechanistic_replication"
+    model_ref: "llama_replication"
+    depends_on: ["llama_behavior_v2"]
+    primary_endpoint: "cognitive_counterfactual_recovery"
+    secondary_endpoint: "natural_effect_recovery"
+    metric: "global_cfr_v1"
+    controller:
+      layer: 24
+      rank: 2
+      basis_sha256: null
+      identity_status: "unknown_external_archive"
+    outputs:
+      - path: "paper/generated/llama_mechanistic_v2/protocol.json"
+        sha256: "c02af8f14f105e781d3ca80edb79bd48c56f89f2e758a6b23f23f741cb528b88"
+      - path: "paper/generated/llama_mechanistic_v2/theory_freeze.json"
+        sha256: "59cf6bc5641012053eea3197a75c460a493da0360830f6a70721b037fd09cf72"
+      - path: "paper/generated/llama_mechanistic_v2/interventions.csv.gz"
+        sha256: "935969103a2b22fae27fe941a136826141d101d36bf53937ccfa7e7627c6715a"
+      - path: "paper/generated/llama_mechanistic_v2/metrics.csv"
+        sha256: "3673898bda89fb2c52cdc2714c58984bc29d7e1e4bf5693d40dbc85a9d1ef5d2"
+    availability: "Compact exports are committed; the selected neural basis itself is not committed or content-hashed."
+
+  paper_evidence_replay:
+    status: "supporting"
+    replay_status: "fully_replayable"
+    role: "manuscript_arithmetic_and_inventory"
+    depends_on:
+      - "theory_resolution_v1"
+      - "causal_specificity_v2"
+      - "abstraction_discovery_v1"
+      - "ood_free_generation_v1"
+      - "qwen_confirmation_v2"
+      - "llama_behavior_v2"
+      - "llama_mechanistic_v2"
+    outputs:
+      - path: "paper/generated/results_inventory.json"
+        sha256: "dc12093befa8dbfd864c9be26811a2e14805fb89d5798d9ac5d58fd61301c302"
+      - path: "paper/generated/controllers.csv"
+        sha256: "89de8c8429a0552b943f495ea11fb3b3f99b4c0033fe4eeb49eb87ac3abbb1f2"
+
+separate_branches:
+  computational_discrimination_audit:
+    remote_ref: "origin/computational-discrimination-audit"
+    commit: "f28ec42"
+    merge_status: "separate_not_merged"
+    incorporated_owner_decisions:
+      - "Shuffled-target controls that preserve target values are uninformative."
+      - "E is the strongest descriptive downstream candidate, but no abstraction uniquely passes the full identity gate."
+    exclusion_rule: "No other branch conclusion is canonicalized by this manifest."

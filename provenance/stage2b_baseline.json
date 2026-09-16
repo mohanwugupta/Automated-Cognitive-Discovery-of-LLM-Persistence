@@ -1,0 +1,35 @@
+{
+  "baseline_commit": "3a5c8749d881632beccd2f12cc1016992ccc358f",
+  "branch_created": "stage2b-reproducibility",
+  "captured_on": "2026-09-16",
+  "tree_status_before_stage2b_changes": [
+    "?? CANONICAL_PIPELINE.md",
+    "?? CLAIMS.md",
+    "?? REPO_AUDIT.md",
+    "?? STAGE2_REFACTOR_PLAN.md",
+    "?? canonical_manifest.yaml"
+  ],
+  "environment": {
+    "python": "3.11.8",
+    "python_executable": "/Users/mg9965/.pyenv/versions/3.11.8/bin/python",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "packages": {
+      "numpy": "2.2.6",
+      "pandas": "2.3.2",
+      "pytest": "8.4.1",
+      "pyyaml": "6.0.2",
+      "safetensors": "0.6.2",
+      "scikit-learn": "1.7.1",
+      "scipy": "1.16.1",
+      "torch": "2.8.0"
+    },
+    "note": "This records the local audit environment. It does not backfill historical run environments."
+  },
+  "approved_stage2a_file_sha256_before_stage2b": {
+    "CANONICAL_PIPELINE.md": "56f9db4f851f21dce0cd1e192211b82148dead9da3762e0b99c6782b73118cf4",
+    "CLAIMS.md": "988499f74ebd7af70e8dce4e580067e3969b0af8cb212cf86398461e6a7bbc7f",
+    "STAGE2_REFACTOR_PLAN.md": "b2ec310e70ff2e29795db3cdb07a0f3f3a1055eb6585d2b3e9e3365de9f8f973",
+    "canonical_manifest.yaml": "fbe7d3611a7d88d9910bdbf552c997b46601d21bcc92f0e653703f971c325b3e"
+  },
+  "historical_provenance_backfilled": false
+}
