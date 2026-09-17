@@ -174,3 +174,11 @@ def test_replication_smoke_routes_only_model_preflight_to_gpu():
         activation = wrapper.index('conda activate "$CONDA_ENV"')
         assert wrapper.rfind("set +u", 0, activation) >= 0
         assert wrapper.find("set -u", activation) > activation
+
+
+def test_full_replication_conda_activation_is_safe_in_noninteractive_slurm_shells():
+    for name in ("run_replication_gpu.slurm", "run_replication_cpu.slurm"):
+        wrapper = _text(f"slurm/{name}")
+        activation = wrapper.index('conda activate "$CONDA_ENV"')
+        assert wrapper.rfind("set +u", 0, activation) >= 0
+        assert wrapper.find("set -u", activation) > activation
