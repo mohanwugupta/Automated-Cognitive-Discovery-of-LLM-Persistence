@@ -141,3 +141,31 @@ def test_replication_routes_only_model_forward_stages_to_gpu():
     cpu = _text("slurm/run_replication_cpu.slurm")
     assert "--gres" not in cpu
     assert "--gpus" not in cpu
+
+
+def test_replication_smoke_routes_only_model_preflight_to_gpu():
+    submit = _text("scripts/submit_replication_smoke.sh")
+    assert 'SMOKE_PHASE=tests' in submit
+    assert '"$CPU_SCRIPT"' in next(
+        line for line in submit.splitlines() if "SMOKE_PHASE=tests" in line
+    )
+    assert '"$GPU_SCRIPT"' in next(
+        line for line in submit.splitlines() if "--array=" in line
+    )
+    summary_line = next(
+        line for line in submit.splitlines() if "SMOKE_PHASE=summarize" in line
+    )
+    assert '"$CPU_SCRIPT"' in summary_line
+    assert "afterany:" in summary_line
+
+    gpu = _text("slurm/run_replication_smoke.slurm")
+    assert "#SBATCH --gres=gpu:1" in gpu
+    assert "#SBATCH --time=01:00:00" in gpu
+    assert "torch.cuda.is_available" in gpu
+    assert "nvidia-smi" in gpu
+    assert "replication_smoke.py" in gpu
+
+    cpu = _text("slurm/run_replication_smoke_cpu.slurm")
+    assert "--gres" not in cpu
+    assert "--gpus" not in cpu
+    assert "SLURM_JOB_GPUS" in cpu
