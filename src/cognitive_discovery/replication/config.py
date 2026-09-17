@@ -84,6 +84,18 @@ def validate_replication_config(config: Mapping[str, Any]) -> None:
     candidates = config["interface"].get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise ReplicationConfigError("at least one preregistered response interface is required")
+    for candidate in candidates:
+        labels = candidate.get("labels") if isinstance(candidate, Mapping) else None
+        if (
+            not isinstance(labels, list)
+            or len(labels) != 2
+            or any(not isinstance(label, str) or not label for label in labels)
+            or len(set(labels)) != 2
+        ):
+            raise ReplicationConfigError(
+                "response interface labels must be two distinct nonempty strings; "
+                "quote YAML labels such as Yes and No"
+            )
     splits = config["behavior"].get("split_fractions", {})
     contextual_conditions = int(config["behavior"].get("contextual_conditions", 0))
     if contextual_conditions < 6 or contextual_conditions % 2:

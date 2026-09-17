@@ -103,6 +103,12 @@ def test_default_config_freezes_core_endpoint_grid_tasks_and_gates():
     assert config["optional"]["ood"]["requires_stage"] == "specificity"
     assert config["optional"]["ood"]["enabled"] is False
     assert config["specificity"]["maximum_response_mapping_cfr_gap"] == 0.25
+    assert config["interface"]["candidates"][0]["labels"] == ["Yes", "No"]
+    assert all(
+        isinstance(label, str)
+        for candidate in config["interface"]["candidates"]
+        for label in candidate["labels"]
+    )
 
     with pytest.raises(ReplicationConfigError, match="natural-effect"):
         load_replication_config(
@@ -118,6 +124,20 @@ def test_default_config_freezes_core_endpoint_grid_tasks_and_gates():
             model_id="google/gemma-2-9b-it",
             revision="main",
             adapter="gemma",
+        )
+    with pytest.raises(ReplicationConfigError, match="response interface labels"):
+        load_replication_config(
+            CONFIG,
+            model_id="google/gemma-2-9b-it",
+            revision="b" * 40,
+            adapter="gemma",
+            overrides={
+                "interface": {
+                    "candidates": [
+                        {"id": "yaml_boolean_trap", "labels": [True, False]}
+                    ]
+                }
+            },
         )
 
 
