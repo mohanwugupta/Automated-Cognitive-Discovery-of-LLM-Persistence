@@ -80,4 +80,47 @@ bash scripts/submit_replication.sh
 
 The submitter routes model-forward stages to `slurm/run_replication_gpu.slurm` and fitting, hashing, counterfactual construction, and reporting to `slurm/run_replication_cpu.slurm`. This prevents CPU-only work from reserving a GPU. Set `ONLINE_FLAG=--online` only when compute nodes may access Hugging Face; otherwise pre-cache the exact revision.
 
+## Short GPU smoke suite before a full replication
+
+Run the smoke suite before submitting the multi-stage pipeline for a new model.
+It uses the production renderers, response-token checks, generic residual runner,
+intervention hooks, and DAS primitive on seven tiny prompts. It checks checkpoint
+loading, chat rendering, finite binary logits, layer discovery, streamed residual
+capture, an identity edit, a nonzero edit, DAS gradient flow with frozen model
+weights, EOS IDs, and peak CUDA memory. It does **not** fit a cognitive model,
+compute CFR, test specificity, or provide scientific evidence.
+
+Each model is one one-hour GPU array task, with one task active at a time by
+default. CPU regression tests run first; an `afterany` CPU job then writes a
+combined report even when a GPU task fails:
+
+```bash
+cd /scratch/gpfs/JORDANAT/$USER/Automated-Cognitive-Discovery-of-LLM-Persistence
+
+export SMOKE_MODEL_PATHS="/scratch/gpfs/JORDANAT/$USER/models/google--gemma-4-12b-it /scratch/gpfs/JORDANAT/$USER/models/meta-llama--Llama-3.1-8B-Instruct"
+export SMOKE_REVISIONS="<gemma-40-hex-commit> <llama-40-hex-commit>"
+export SMOKE_ADAPTERS="gemma llama"
+export SMOKE_ROOT="/scratch/gpfs/JORDANAT/$USER/replication-smoke/$(date +%Y%m%d-%H%M%S)"
+bash scripts/submit_replication_smoke.sh
+```
+
+`SMOKE_ADAPTERS` is optional and defaults to `auto`. Automatic detection is
+fail-closed: Qwen, Llama, Gemma, and Mistral model types map to registered
+adapters. Nemotron is deliberately reported as unsupported until a dedicated
+adapter has been implemented and tested; it is never silently treated as
+Mistral. To include all three candidate directories in the diagnostic array,
+use three paths/revisions and `SMOKE_ADAPTERS="auto auto auto"`; the aggregate
+report will preserve Nemotron's adapter failure alongside the other results.
+
+Tokenizer paths and revisions default to their corresponding model values. For
+separate tokenizers, provide equal-length `SMOKE_TOKENIZER_PATHS` and
+`SMOKE_TOKENIZER_REVISIONS` lists. Set `SMOKE_MAX_CONCURRENT=2` only if running
+two checkpoint loads simultaneously is appropriate for the allocation. The
+default is one, limiting scheduler and filesystem pressure.
+
+Inspect `SMOKE_ROOT/SMOKE_REPORT.md` and each
+`job_XXXX/smoke_result.json`. No full activations or residual vectors are saved;
+each result contains scalar diagnostics, shapes, hashes, and peak memory only.
+Do not start `submit_replication.sh` for a model unless its smoke result passes.
+
 Do not start Phase B until the owner has selected the genuinely new model and immutable revision. A required ontology change, target mismatch, missing identity, or frozen-gate change is a stop condition requiring review.
