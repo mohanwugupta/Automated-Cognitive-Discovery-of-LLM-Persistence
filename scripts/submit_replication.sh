@@ -1,0 +1,57 @@
+#!/bin/bash
+set -euo pipefail
+
+PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_replication_gpu.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_replication_cpu.slurm"
+MODEL_ID="${MODEL_ID:?MODEL_ID is required}"
+REVISION="${REVISION:?REVISION must be an immutable 40-hex commit}"
+ADAPTER="${ADAPTER:?ADAPTER is required}"
+OUTPUT="${OUTPUT:?OUTPUT is required}"
+CONFIG="${CONFIG:-configs/replication/default.yaml}"
+TOKENIZER_ID="${TOKENIZER_ID:-$MODEL_ID}"
+TOKENIZER_REVISION="${TOKENIZER_REVISION:-$REVISION}"
+
+if ! command -v sbatch >/dev/null 2>&1; then
+  echo "sbatch is unavailable; run this helper on a Della login node" >&2
+  exit 1
+fi
+if [ ! -f "$GPU_SCRIPT" ] || [ ! -f "$CPU_SCRIPT" ]; then
+  echo "Run this helper from the repository root" >&2
+  exit 1
+fi
+if [ -e "$OUTPUT" ]; then
+  echo "OUTPUT already exists; resume it explicitly instead of changing its frozen protocol" >&2
+  exit 1
+fi
+
+cd "$PROJECT_DIR"
+mkdir -p logs
+python -m cognitive_discovery.replicate_model \
+  --model "$MODEL_ID" --revision "$REVISION" \
+  --tokenizer "$TOKENIZER_ID" --tokenizer-revision "$TOKENIZER_REVISION" \
+  --adapter "$ADAPTER" --config "$CONFIG" --output "$OUTPUT" \
+  --stage initialize --execute
+
+interface=$(sbatch --parsable --export="ALL,STAGE=interface,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
+interface="${interface%%;*}"
+behavior=$(sbatch --parsable --dependency="afterok:${interface}" --export="ALL,STAGE=behavior,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
+behavior="${behavior%%;*}"
+comparison=$(sbatch --parsable --dependency="afterok:${behavior}" --export="ALL,STAGE=model_comparison,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
+comparison="${comparison%%;*}"
+freeze=$(sbatch --parsable --dependency="afterok:${comparison}" --export="ALL,STAGE=freeze_theory,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
+freeze="${freeze%%;*}"
+counterfactuals=$(sbatch --parsable --dependency="afterok:${freeze}" --export="ALL,STAGE=counterfactuals,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
+counterfactuals="${counterfactuals%%;*}"
+mechanism=$(sbatch --parsable --dependency="afterok:${counterfactuals}" --export="ALL,STAGE=mechanism,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
+mechanism="${mechanism%%;*}"
+generalization=$(sbatch --parsable --dependency="afterok:${mechanism}" --export="ALL,STAGE=generalization,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
+generalization="${generalization%%;*}"
+specificity=$(sbatch --parsable --dependency="afterok:${generalization}" --export="ALL,STAGE=specificity,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
+specificity="${specificity%%;*}"
+report=$(sbatch --parsable --dependency="afterok:${specificity}" --export="ALL,STAGE=report,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
+report="${report%%;*}"
+
+echo "Replication submitted: interface=$interface behavior=$behavior comparison=$comparison"
+echo "freeze=$freeze counterfactuals=$counterfactuals mechanism=$mechanism"
+echo "generalization=$generalization specificity=$specificity report=$report"

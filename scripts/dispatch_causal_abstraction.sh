@@ -3,8 +3,8 @@ set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 ABSTRACTION_OUTPUT="${ABSTRACTION_OUTPUT:-artifacts/abstraction_discovery_v1}"
-GPU_SCRIPT="$PROJECT_DIR/run_causal_abstraction.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_causal_abstraction_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_abstraction.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_abstraction_cpu.slurm"
 EVALUATION_CONCURRENCY="${EVALUATION_CONCURRENCY:-2}"
 job_count=$(python -c 'import json,os; from pathlib import Path; p=Path(os.environ.get("ABSTRACTION_OUTPUT","artifacts/abstraction_discovery_v1"))/"design/evaluation_jobs.json"; print(len(json.loads(p.read_text())))')
 

@@ -68,7 +68,14 @@ def _relative_artifact_path(value: Any, *, stage_id: str) -> Path:
 def validate_canonical_manifest(
     manifest: Mapping[str, Any], *, root: str | Path | None = None
 ) -> ManifestSummary:
-    required = {"schema_version", "canonical_base", "status_vocabulary", "models", "stages"}
+    required = {
+        "schema_version",
+        "canonical_base",
+        "status_vocabulary",
+        "models",
+        "stages",
+        "claims",
+    }
     missing = required - set(manifest)
     if missing:
         raise CanonicalManifestError(f"canonical manifest missing keys: {sorted(missing)}")
@@ -81,6 +88,11 @@ def validate_canonical_manifest(
         raise CanonicalManifestError("models must be a non-empty mapping")
     if not isinstance(stages, dict) or not stages:
         raise CanonicalManifestError("stages must be a non-empty mapping")
+
+    claims = manifest["claims"]
+    expected_claims = {f"C{index:02d}" for index in range(1, 14)}
+    if not isinstance(claims, dict) or set(claims) != expected_claims:
+        raise CanonicalManifestError("claims must define exactly C01 through C13")
 
     for model_id, model in models.items():
         if not isinstance(model, dict) or not model.get("checkpoint"):
@@ -153,12 +165,83 @@ def validate_canonical_manifest(
     for stage_id in stages:
         visit(stage_id)
 
+    for claim_id, claim in claims.items():
+        if not isinstance(claim, dict):
+            raise CanonicalManifestError(f"claim {claim_id} must be a mapping")
+        analysis_id = claim.get("analysis_id")
+        if analysis_id not in stages:
+            raise CanonicalManifestError(
+                f"claim {claim_id} has unknown analysis_id {analysis_id!r}"
+            )
+        supporting = claim.get("supporting_stage_ids")
+        if not isinstance(supporting, list) or any(stage not in stages for stage in supporting):
+            raise CanonicalManifestError(f"claim {claim_id} has invalid supporting_stage_ids")
+        for field in ("endpoint_id", "code_path", "artifact_paths", "figure_ref"):
+            if not claim.get(field):
+                raise CanonicalManifestError(f"claim {claim_id} lacks {field}")
+        if not isinstance(claim["artifact_paths"], list):
+            raise CanonicalManifestError(f"claim {claim_id} artifact_paths must be a list")
+        for value in claim["artifact_paths"]:
+            _relative_artifact_path(value, stage_id=f"claim {claim_id}")
+        _relative_artifact_path(claim["code_path"], stage_id=f"claim {claim_id}")
+        config_path = claim.get("config_path")
+        if config_path is not None:
+            _relative_artifact_path(config_path, stage_id=f"claim {claim_id}")
+
     if root is not None:
         root_path = Path(root).resolve()
         if not root_path.is_dir():
             raise CanonicalManifestError(f"repository root does not exist: {root_path}")
 
     return ManifestSummary(len(stages), edge_count, artifact_count)
+
+
+def stage_dependency_order(manifest: Mapping[str, Any], stage_id: str) -> list[str]:
+    """Return the selected stage and its transitive dependencies in execution order."""
+
+    validate_canonical_manifest(manifest)
+    if stage_id not in manifest["stages"]:
+        raise CanonicalManifestError(f"unknown stage {stage_id!r}")
+    ordered: list[str] = []
+    visited: set[str] = set()
+
+    def visit(current: str) -> None:
+        if current in visited:
+            return
+        for dependency in manifest["stages"][current].get("depends_on", []):
+            visit(dependency)
+        visited.add(current)
+        ordered.append(current)
+
+    visit(stage_id)
+    return ordered
+
+
+def verify_stage_artifacts(
+    manifest: Mapping[str, Any], *, root: str | Path, stage_id: str
+) -> dict[str, str]:
+    """Verify hashed outputs for one stage, without implicitly replaying its dependencies."""
+
+    validate_canonical_manifest(manifest, root=root)
+    if stage_id not in manifest["stages"]:
+        raise CanonicalManifestError(f"unknown stage {stage_id!r}")
+    root_path = Path(root)
+    verified: dict[str, str] = {}
+    for output in manifest["stages"][stage_id].get("outputs", []):
+        expected = output.get("sha256")
+        if expected is None:
+            continue
+        relative = _relative_artifact_path(output["path"], stage_id=stage_id)
+        path = root_path / relative
+        if not path.is_file():
+            raise CanonicalManifestError(f"missing canonical artifact: {relative}")
+        observed = sha256_file(path)
+        if observed != expected:
+            raise CanonicalManifestError(
+                f"artifact SHA-256 mismatch for {relative}: {observed} != {expected}"
+            )
+        verified[relative.as_posix()] = observed
+    return verified
 
 
 def verify_manifest_artifacts(

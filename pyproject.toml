@@ -40,6 +40,7 @@ cognitive-discovery-causal-mech = "cognitive_discovery.cli:causal_mechanistic_ma
 cognitive-discovery-specificity = "cognitive_discovery.cli:causal_specificity_main"
 cognitive-discovery-abstraction = "cognitive_discovery.cli:causal_abstraction_main"
 cognitive-discovery-ood = "cognitive_discovery.cli:ood_generation_main"
+cognitive-discovery-replicate = "cognitive_discovery.replicate_model:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

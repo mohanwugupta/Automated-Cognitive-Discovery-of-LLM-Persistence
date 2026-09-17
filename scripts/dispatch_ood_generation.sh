@@ -3,8 +3,8 @@ set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 OOD_OUTPUT="${OOD_OUTPUT:-artifacts/ood_free_generation_v1}"
-GPU_SCRIPT="$PROJECT_DIR/run_ood_generation.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_ood_generation_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_ood_generation.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_ood_generation_cpu.slurm"
 EVALUATION_CONCURRENCY="${EVALUATION_CONCURRENCY:-2}"
 job_count=$(python -c 'import json,os; from pathlib import Path; p=Path(os.environ.get("OOD_OUTPUT","artifacts/ood_free_generation_v1"))/"frozen/evaluation_jobs.json"; print(len(json.loads(p.read_text())))')
 

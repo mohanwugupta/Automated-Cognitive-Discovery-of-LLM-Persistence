@@ -2,8 +2,8 @@
 set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
-GPU_SCRIPT="$PROJECT_DIR/run_mechanistic.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_mechanistic_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_mechanistic.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_mechanistic_cpu.slurm"
 
 if ! command -v sbatch >/dev/null 2>&1; then
   echo "sbatch is unavailable; run this helper on a Della login node" >&2

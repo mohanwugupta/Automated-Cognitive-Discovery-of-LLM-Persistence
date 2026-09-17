@@ -1,0 +1,21 @@
+schema_version: canonical-stage-v1
+stage_id: qwen_fresh_contexts_v1
+pipeline_phase: generalization
+status: supporting
+upstream:
+  - stage_id: causal_specificity_v2
+    artifact_ids: [artifacts/causal_specificity_v2/candidate_gates.csv]
+model: {descriptor: qwen_confirmation, checkpoint: Qwen/Qwen3.5-4B, revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a, identity_status: pinned}
+endpoint_id: separate_cognitive_and_natural_endpoints
+metric_id: global_cfr_v1
+split_design: {identity_id: qwen_fresh_contexts_protocol_v1, status: frozen, path: paper/generated/qwen_fresh_contexts/protocol.json, sha256: aab5baed00a77d852f43b0551b71da1720ba5bf97143bf35f47563a01e865ab0}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [87001, 87002, 87003]
+scientific_defaults: {path: paper/generated/qwen_fresh_contexts/protocol.json, sha256: aab5baed00a77d852f43b0551b71da1720ba5bf97143bf35f47563a01e865ab0}
+execution:
+  rerun_allowed: false
+  reason: raw fresh-context run inputs are not committed and the historical wrapper has no safe output override
+  command: null
+  required_inputs: []
+output: {frozen_root: artifacts/qwen_fresh_contexts_v1, rerun_root: artifacts/reruns/qwen_fresh_contexts_v1, overwrite_frozen: false}

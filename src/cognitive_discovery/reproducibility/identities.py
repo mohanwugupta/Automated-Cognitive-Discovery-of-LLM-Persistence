@@ -19,12 +19,33 @@ CORE_QWEN_CONTROLLER_SHA256 = (
 
 
 class EndpointID(str, Enum):
+    PERSISTENCE_LOGIT = "persistence_logit"
+    BEHAVIORAL_MODEL_COMPARISON = "behavioral_model_comparison"
+    MATCHED_CONDITION_IDENTITY = "matched_condition_identity"
+    REPRESENTATION_PROBE_STEERING = "representation_probe_steering"
+    ACTION_HISTORY_DIAGNOSTIC = "action_history_diagnostic"
     COGNITIVE_COUNTERFACTUAL_RECOVERY = "cognitive_counterfactual_recovery"
     NATURAL_EFFECT_RECOVERY = "natural_effect_recovery"
+    SEPARATE_COGNITIVE_AND_NATURAL_ENDPOINTS = "separate_cognitive_and_natural_endpoints"
+    ABSTRACTION_IDENTITY_GATE = "abstraction_identity_gate"
+    FREE_GENERATION_SURVIVAL = "free_generation_survival"
+    BEHAVIORAL_PREDICTION = "behavioral_prediction"
+    MEASUREMENT_VALIDITY = "measurement_validity"
 
 
 class MetricID(str, Enum):
     GLOBAL_CFR_V1 = "global_cfr_v1"
+    STANDARDIZED_BEHAVIOR_V1 = "standardized_behavior_v1"
+    HELDOUT_BEHAVIORAL_PREDICTION_V1 = "heldout_behavioral_prediction_v1"
+    FROZEN_MODEL_COMPARISON_V1 = "frozen_model_comparison_v1"
+    MANIFEST_IDENTITY_V1 = "manifest_identity_v1"
+    PROBE_STEERING_GATE_V1 = "probe_steering_gate_v1"
+    ACTION_HISTORY_DIAGNOSTIC_GATE_V1 = "action_history_diagnostic_gate_v1"
+    SPECIFICITY_GATE_V2 = "specificity_gate_v2"
+    ABSTRACTION_IDENTITY_GATE_V1 = "abstraction_identity_gate_v1"
+    COX_STOPPING_HAZARD_V1 = "cox_stopping_hazard_v1"
+    SEED_STABILITY_GLOBAL_CFR_V1 = "seed_stability_global_cfr_v1"
+    INTERFACE_VALIDITY_GATE_V2 = "interface_validity_gate_v2"
 
 
 @dataclass(frozen=True)
@@ -70,7 +91,7 @@ def canonical_metric(metric_id: MetricID | str):
         raise ValueError(f"metric {metric_id!r} is not canonical") from error
     if parsed is MetricID.GLOBAL_CFR_V1:
         return global_cfr_v1
-    raise AssertionError(parsed)
+    raise ValueError(f"metric {parsed.value!r} is an identity without a shared implementation")
 
 
 def recovery_target(frame, endpoint: EndpointID | str, *, cognitive_column=None):

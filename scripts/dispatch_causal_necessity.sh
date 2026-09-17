@@ -3,8 +3,8 @@ set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 SPECIFICITY_OUTPUT="${SPECIFICITY_OUTPUT:-artifacts/causal_specificity_v2}"
-GPU_SCRIPT="$PROJECT_DIR/run_causal_specificity.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_causal_specificity_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_specificity.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_specificity_cpu.slurm"
 NECESSITY_CONCURRENCY="${NECESSITY_CONCURRENCY:-2}"
 job_count=$(python -c 'import json,os; from pathlib import Path; p=Path(os.environ.get("SPECIFICITY_OUTPUT","artifacts/causal_specificity_v2"))/"frozen_models/necessity_jobs.json"; print(len(json.loads(p.read_text())))')
 

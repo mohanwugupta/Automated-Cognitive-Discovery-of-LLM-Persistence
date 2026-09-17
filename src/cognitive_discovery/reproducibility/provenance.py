@@ -42,6 +42,28 @@ def _require_sha(value: Any, field: str) -> None:
         raise ProvenanceError(f"{field} must be a lowercase SHA-256")
 
 
+def _require_sha_or_not_applicable(value: Any, field: str) -> None:
+    if value == "not_applicable":
+        return
+    _require_sha(value, field)
+
+
+def _validate_optional_object(value: Any, field: str, *, neural: bool = False) -> None:
+    if not isinstance(value, dict):
+        raise ProvenanceError(f"{field} must be a mapping")
+    if value.get("status") == "not_applicable":
+        if set(value) != {"status"}:
+            raise ProvenanceError(f"{field} not_applicable identity must not contain object fields")
+        return
+    _require_sha(value.get("sha256"), f"{field}.sha256")
+    if neural:
+        for name in ("layer", "rank"):
+            if not isinstance(value.get(name), int) or value[name] < 1:
+                raise ProvenanceError(f"{field}.{name} must be a positive integer")
+        if not value.get("target_definition"):
+            raise ProvenanceError(f"{field}.target_definition is required")
+
+
 def validate_run_provenance(record: Mapping[str, Any]) -> None:
     missing = REQUIRED_FIELDS - set(record)
     if missing:
@@ -61,21 +83,13 @@ def validate_run_provenance(record: Mapping[str, Any]) -> None:
         raise ProvenanceError("dataset_hashes must be non-empty")
     for name, digest in record["dataset_hashes"].items():
         _require_sha(digest, f"dataset_hashes.{name}")
-    for field in ("pair_hash", "split_hash", "config_hash"):
-        _require_sha(record[field], field)
+    for field in ("pair_hash", "split_hash"):
+        _require_sha_or_not_applicable(record[field], field)
+    _require_sha(record["config_hash"], "config_hash")
     behavior = record["behavioral_object"]
     neural = record["neural_object"]
-    if not isinstance(behavior, dict):
-        raise ProvenanceError("behavioral_object must be a mapping")
-    _require_sha(behavior.get("sha256"), "behavioral_object.sha256")
-    if not isinstance(neural, dict):
-        raise ProvenanceError("neural_object must be a mapping")
-    _require_sha(neural.get("sha256"), "neural_object.sha256")
-    for field in ("layer", "rank"):
-        if not isinstance(neural.get(field), int) or neural[field] < 1:
-            raise ProvenanceError(f"neural_object.{field} must be a positive integer")
-    if not neural.get("target_definition"):
-        raise ProvenanceError("neural_object.target_definition is required")
+    _validate_optional_object(behavior, "behavioral_object")
+    _validate_optional_object(neural, "neural_object", neural=True)
     try:
         EndpointID(record["endpoint_id"])
     except ValueError as error:

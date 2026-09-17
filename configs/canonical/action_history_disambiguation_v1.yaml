@@ -1,0 +1,22 @@
+schema_version: canonical-stage-v1
+stage_id: action_history_disambiguation_v1
+pipeline_phase: causal_mechanistic_discovery
+status: supporting
+upstream:
+  - stage_id: mechanistic_manifest_v1
+    artifact_ids: [artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: action_history_diagnostic
+metric_id: action_history_diagnostic_gate_v1
+split_design: {identity_id: action_history_config_v1, status: frozen, path: configs/action_history_disambiguation_v1.yaml, sha256: d0b1c541d68295152046a572cb35c89d7b25c97464495c9bd3e5220a1bc92ae4}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: historical_unknown, sha256: null, target_definition: action_history}
+seeds: [73001]
+scientific_defaults: {path: configs/action_history_disambiguation_v1.yaml, sha256: d0b1c541d68295152046a572cb35c89d7b25c97464495c9bd3e5220a1bc92ae4}
+execution:
+  rerun_allowed: false
+  reason: supporting diagnostic and historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: mechanistic_conditions, path: artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl, sha256: a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342, availability: committed}
+output: {frozen_root: artifacts/action_history_disambiguation_v1, rerun_root: artifacts/reruns/action_history_disambiguation_v1, overwrite_frozen: false}

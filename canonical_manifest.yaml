@@ -16,6 +16,136 @@ status_vocabulary:
   not_run: "No valid evaluation was executed; this is not a failed result."
   uninformative_control: "The implemented control did not change the target values and cannot test specificity."
 
+claims:
+  C01:
+    analysis_id: "theory_resolution_v1"
+    supporting_stage_ids: ["discovery_v1", "discovery_v2"]
+    endpoint_id: "behavioral_model_comparison"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/theory_resolution_v1.yaml"
+    artifact_paths:
+      - "artifacts/theory_resolution_v1/discrimination/theory_decision.json"
+    figure_ref: "paper/main.tex#tab:tasks"
+  C02:
+    analysis_id: "causal_mech_v1"
+    supporting_stage_ids: ["causal_specificity_v2"]
+    endpoint_id: "cognitive_counterfactual_recovery"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/causal_mech_v1.yaml"
+    artifact_paths:
+      - "artifacts/causal_specificity_v2/corrected_metrics/bootstrap_intervals.csv"
+      - "paper/generated/controllers.csv"
+    figure_ref: "paper/main.tex#fig:recovery"
+  C03:
+    analysis_id: "causal_specificity_v2"
+    supporting_stage_ids:
+      - "level5b_necessity_v2"
+      - "shuffled_target_dual_history_v2"
+      - "shuffled_target_outcome_history_v2"
+    endpoint_id: "cognitive_counterfactual_recovery"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/causal_specificity_v2.yaml"
+    artifact_paths:
+      - "artifacts/causal_specificity_v2/candidate_gates.csv"
+      - "artifacts/causal_specificity_v2/frozen_models/necessity_jobs.json"
+    figure_ref: "paper/main.tex#tab:controllers"
+  C04:
+    analysis_id: "abstraction_discovery_v1"
+    supporting_stage_ids: []
+    endpoint_id: "abstraction_identity_gate"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/abstraction_discovery_v1.yaml"
+    artifact_paths: ["artifacts/abstraction_discovery_v1/gates.json"]
+    figure_ref: "paper/main.tex#tab:controllers"
+  C05:
+    analysis_id: "ood_free_generation_v1"
+    supporting_stage_ids: []
+    endpoint_id: "free_generation_survival"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/ood_free_generation_v1.yaml"
+    artifact_paths:
+      - "artifacts/ood_free_generation_v1/gates.json"
+      - "artifacts/ood_free_generation_v1/analysis/survival_model.json"
+    figure_ref: "paper/main.tex#tab:controllers"
+  C06:
+    analysis_id: "qwen_fixed_setting_stability_v1"
+    supporting_stage_ids: []
+    endpoint_id: "cognitive_counterfactual_recovery"
+    code_path: "scripts/analyze_qwen_runpod.py"
+    config_path: "configs/canonical/qwen_fixed_setting_stability_v1.yaml"
+    artifact_paths:
+      - "paper/generated/runpod_protocol.json"
+      - "paper/generated/runpod_metrics.csv"
+    figure_ref: "paper/main.tex#tab:runpod"
+  C07:
+    analysis_id: "qwen_confirmation_v2"
+    supporting_stage_ids: []
+    endpoint_id: "natural_effect_recovery"
+    code_path: "scripts/analyze_qwen_confirmation.py"
+    config_path: "configs/canonical/qwen_confirmation_v2.yaml"
+    artifact_paths:
+      - "paper/generated/qwen_confirmation_v2/interventions.csv.gz"
+      - "paper/generated/qwen_confirmation_v2/metrics.csv"
+    figure_ref: "paper/main.tex#tab:confirmation"
+  C08:
+    analysis_id: "qwen_confirmation_v2"
+    supporting_stage_ids: []
+    endpoint_id: "cognitive_counterfactual_recovery"
+    code_path: "scripts/analyze_qwen_confirmation.py"
+    config_path: "configs/canonical/qwen_confirmation_v2.yaml"
+    artifact_paths:
+      - "paper/generated/qwen_confirmation_v2/interventions.csv.gz"
+      - "paper/generated/qwen_confirmation_v2/metrics.csv"
+    figure_ref: "paper/main.tex#tab:confirmation"
+  C09:
+    analysis_id: "qwen_fresh_contexts_v1"
+    supporting_stage_ids: []
+    endpoint_id: "separate_cognitive_and_natural_endpoints"
+    code_path: "scripts/analyze_qwen_fresh_contexts.py"
+    config_path: "configs/canonical/qwen_fresh_contexts_v1.yaml"
+    artifact_paths:
+      - "paper/generated/qwen_fresh_contexts/metrics.csv"
+      - "paper/generated/qwen_fresh_contexts/natural_effect_recovery.csv"
+    figure_ref: "paper/main.tex#tab:freshcontexts"
+  C10:
+    analysis_id: "llama_behavior_v2"
+    supporting_stage_ids: ["llama_interface_v2"]
+    endpoint_id: "behavioral_prediction"
+    code_path: "scripts/analyze_llama_behavior.py"
+    config_path: "configs/canonical/llama_behavior_v2.yaml"
+    artifact_paths:
+      - "paper/generated/llama_behavior_v2/metrics.csv"
+      - "paper/generated/llama_behavior_v2/test_dual_history_predictions.csv"
+    figure_ref: "paper/llama-behavior-results.md"
+  C11:
+    analysis_id: "llama_mechanistic_v2"
+    supporting_stage_ids: []
+    endpoint_id: "separate_cognitive_and_natural_endpoints"
+    code_path: "scripts/analyze_llama_mechanistic.py"
+    config_path: "configs/canonical/llama_mechanistic_v2.yaml"
+    artifact_paths:
+      - "paper/generated/llama_mechanistic_v2/interventions.csv.gz"
+      - "paper/generated/llama_mechanistic_v2/metrics.csv"
+    figure_ref: "paper/llama-mechanistic-results.md"
+  C12:
+    analysis_id: "llama_label_interface_history"
+    supporting_stage_ids: ["llama_interface_v2"]
+    endpoint_id: "measurement_validity"
+    code_path: "scripts/paper_results.py"
+    config_path: "configs/canonical/llama_interface_v2.yaml"
+    artifact_paths:
+      - "paper/generated/llama_pilots/llama_label_validation_v1_gates.json"
+      - "paper/generated/llama_order/calibration_gates.json"
+    figure_ref: "paper/llama-results.md"
+  C13:
+    analysis_id: "external_original_study"
+    supporting_stage_ids: []
+    endpoint_id: "external_historical_audit"
+    code_path: "scripts/audit_original_study.py"
+    config_path: null
+    artifact_paths: ["paper/generated/original_audit/audit.json"]
+    figure_ref: "paper/original-study-audit.md"
+
 endpoint_definitions:
   persistence_logit:
     definition: "log p(continue) - log p(disengage) after renormalization over the two response tokens"

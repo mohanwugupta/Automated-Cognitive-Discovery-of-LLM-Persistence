@@ -23,7 +23,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** `discovery_v1/behavior/standardized.parquet` hash `36f0102d32563fcf10602707cbe2febd31a94caa88567fe828591f548d5584a2`; `discovery_v2/final_validation/condition_manifest.parquet` hash `7418d8683b1c70be517b71faef0fa9de508197a2a8c9597161029da35f6d1de6`; theory training-condition identity is recorded by the frozen-model metadata.
 - **Metric/version:** Held-out behavioral prediction metrics plus the paired uncertainty/equivalence rule in `theory_decision.json`; not a neural CFR claim.
 - **Supporting artifact:** `artifacts/theory_resolution_v1/discrimination/theory_decision.json` (`98aec2161a23c9bf2ac2c6cbcb6dd5491cf2d2ffa2c53a3bf5f42ca0f5ea3b28`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C01`
 - **Limitation:** The winner is `null`. Downstream analyses must not rewrite the behavioral handoff as a unique dual-history, latent-context, or outcome-history victory.
 
 ## C02 — Low-dimensional Qwen controllers recover cognitive-model counterfactuals
@@ -36,7 +36,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Pair manifest SHA-256 `6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4`; splits are train, validation, test, and task holdout. Neural fitting tasks are bandit, debugging, foraging, and solvability; held-out tasks are effort, information sampling, and waiting.
 - **Metric/version:** `cognitive_counterfactual_recovery` using `global_cfr_v1`, with paired/bootstrap uncertainty and a companion correlation gate.
 - **Supporting artifact:** `artifacts/causal_specificity_v2/corrected_metrics/bootstrap_intervals.csv` (`e506a63831faa8aa9a377d267ba3c12d24329170f0a907289e98632e594cfd9d`) and `paper/generated/controllers.csv` (`89de8c8429a0552b943f495ea11fb3b3f99b4c0033fe4eeb49eb87ac3abbb1f2`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C02`
 - **Limitation:** This is Level-4 causal representation evidence, not necessity, unique theory identity, or natural-effect recovery. Old per-example CFR interpretations are superseded.
 
 ## C03 — Corrected Qwen specificity is partial; Level-5B is absent
@@ -49,7 +49,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Frozen `causal_mech_v1` pair manifest `6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4`; corrected bootstrap and candidate-gate tables are exact downstream views of those pairs.
 - **Metric/version:** `global_cfr_v1`, bootstrap lower-bound and correlation criteria, plus individually named specificity controls.
 - **Supporting artifact:** `artifacts/causal_specificity_v2/candidate_gates.csv` (`28bdf81ab7b53768bd8a0f4badc05786bea007b0f344d5d6ceba90b9a159dd62`) and empty `frozen_models/necessity_jobs.json` (`37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C03`
 - **Limitation:** Level-5B is `not_run`, not failed. Target shuffles found by the later audit to preserve dual-history or outcome-history target values are `uninformative_control`, not passes or failures. No unmerged branch conclusion beyond these owner decisions is implied.
 
 ## C04 — E is descriptive, not an identified abstraction
@@ -62,7 +62,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Contrast manifest SHA-256 `abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497`; 2,800 rendered rows covering train, validation, and test; interchange results hash `8b1be70a4d8a52751987a8b18b278b018665f4484b18eef8a87315b0e98288cc`.
 - **Metric/version:** Full abstraction identity gate combining held-out geometry, `global_cfr_v1`, correlation, random-control, and uniqueness checks.
 - **Supporting artifact:** `artifacts/abstraction_discovery_v1/gates.json` (`1b7be5e32c5b2f17e62be0e25ad9540cfc0e70601cae97d079cf6e793e5da02c`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C04`
 - **Limitation:** E's descriptive geometry/recovery does not license an identity claim; the random/uniqueness portion of the full gate is not passed.
 
 ## C05 — Free-generation OOD is a boundary result
@@ -75,7 +75,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** 1,500 primary generations from six prompts, 50 seeds, and five doses; `generation_summary.parquet` hash `edcfb532e49feb8f0c9482fbefe3e29c225ca39e037ef2841080b63f9bd0157d` and `token_events.parquet` hash `7476e408f4502ad86fb7258529a876857d0f0bf31657bb535488901d8121dd69`.
 - **Metric/version:** Saved Cox/survival dose coefficient with direction, dose, random-direction, prompt, and topic gates. The saved dose coefficient is -0.0138 with interval [-0.0501, 0.0225] and random p-value 0.257.
 - **Supporting artifact:** `artifacts/ood_free_generation_v1/gates.json` (`fbbeadc1e1f25fe8f001e61a3616b4fb37ef3c59277c5fef382a974273c667c0`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C05`
 - **Limitation:** The primary direction/dose/random gates do not pass. This experiment is not evidence that E identity was established.
 
 ## C06 — Fixed-setting Qwen results are seed-stable
@@ -88,7 +88,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Pair and seed identity specified in `paper/generated/runpod_protocol.json` (`8f2f4414fa495f33b319676bb10a0563020bb797dc0c10891745b2bc529ea6ce`).
 - **Metric/version:** Seed-level and pooled `global_cfr_v1` with bootstrap summaries.
 - **Supporting artifact:** `paper/generated/runpod_metrics.csv` (`319faaab55387021b8be7b7f0cd5714f182792027eb0ee9c73838ce11cb43a46`).
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C06`
 - **Limitation:** This is supporting stability in the fixed setting, not independent context/model generalization.
 
 ## C07 — Independent Qwen confirmation supports natural-effect generalization
@@ -101,7 +101,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Protocol SHA-256 `8db8a14d9882a504448d6e376a5f0902e99c431b21ba98cf7fba86f1cc4a421e`; two wordings, both mappings, seven tasks, and disjoint semantic pairs. Compact interventions hash `5cccfc1b89ee9b6dd5c143e7429e343ecd838ebc95a3568055917acb96d55140`.
 - **Metric/version:** **Natural-effect recovery**, `global_cfr_v1`, semantic-pair bootstrap. Saved frozen-controller CFR: 0.779 familiar [0.736, 0.837] and 0.816 held out [0.790, 0.835]. Direct DAS is a separately named comparison.
 - **Supporting artifact:** `paper/generated/qwen_confirmation_v2/metrics.csv` (`6b7063f3b56983760af0021de9e7e55d46fabee65ca42121dbfc25d9475fa8fb`).
-- **Replay command:** `python scripts/analyze_qwen_confirmation.py`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C07`
 - **Limitation:** Compact exports replay the arithmetic, but the raw condition manifest expected by one existing clean-clone test is absent. This claim does not imply strong cognitive-target recovery.
 
 ## C08 — The same Qwen confirmation does not recover the cognitive target well
@@ -114,7 +114,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Same frozen protocol/intervention identities as C07.
 - **Metric/version:** **Cognitive-counterfactual recovery**, `global_cfr_v1`. Saved values: 0.251 familiar [0.101, 0.386] and -0.428 held out [-0.885, -0.059].
 - **Supporting artifact:** `paper/generated/qwen_confirmation_v2/metrics.csv` (`6b7063f3b56983760af0021de9e7e55d46fabee65ca42121dbfc25d9475fa8fb`).
-- **Replay command:** `python scripts/analyze_qwen_confirmation.py`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C08`
 - **Limitation:** These values must not be pooled with, renamed as, or used to negate the distinct natural-effect endpoint in C07.
 
 ## C09 — Broader fresh-context Qwen evidence is supporting, not the independent confirmation
@@ -127,7 +127,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Fresh-context protocol hash `aab5baed00a77d852f43b0551b71da1720ba5bf97143bf35f47563a01e865ab0`; compact metrics hash `2d7bf4e0c512fa51cd25f141d4334ca91ab73631492c5c4f43ca90fbb5dbda2d`.
 - **Metric/version:** `global_cfr_v1`, reported separately for cognitive and natural endpoints.
 - **Supporting artifact:** `paper/generated/qwen_fresh_contexts/metrics.csv` and `natural_effect_recovery.csv`.
-- **Replay command:** `PYTHONPATH=src python scripts/analyze_qwen_fresh_contexts.py`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C09`
 - **Limitation:** Natural-effect analysis is post-hoc/supporting and is not a substitute for C07's independent confirmation protocol.
 
 ## C10 — Llama Yes/No behavior is a conceptual replication
@@ -140,7 +140,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** 2,800 training, 980 selection, and 980 test observations; behavior protocol hash `f35224b2ae6199f8af047284d438d15c69d59b0494ea811848a4b9e86650836b`; final-test dual-history predictions hash `f27738b156ad98763370208a1a1de9dbf5ca46d19ac4fed30f8d6354a60bf4e7`.
 - **Metric/version:** Held-out R-squared on the untouched test split. Saved dual-history R-squared is 0.835 versus 0.821 for immediate state.
 - **Supporting artifact:** `paper/generated/llama_behavior_v2/metrics.csv` (`18e62b0aaf5af781eac947e5f39151bca1b367d0c3543c4b3c5f5d47f48f3dc4`).
-- **Replay command:** `python scripts/analyze_llama_behavior.py`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C10`
 - **Limitation:** This is a conceptual replication with a new validated interface, not evidence that the unresolved Qwen model comparison has become resolved.
 
 ## C11 — Llama provides qualified conceptual mechanistic replication
@@ -153,7 +153,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** 64 familiar and 48 held-out semantic pairs; protocol hash `c02af8f14f105e781d3ca80edb79bd48c56f89f2e758a6b23f23f741cb528b88`; compact interventions hash `935969103a2b22fae27fe941a136826141d101d36bf53937ccfa7e7627c6715a`.
 - **Metric/version:** Primary **cognitive-counterfactual recovery** and secondary **natural-effect recovery**, each using `global_cfr_v1`. Saved cognitive CFR: 0.649 familiar and 0.011 held out. Saved natural CFR: 0.345 familiar and 0.319 held out.
 - **Supporting artifact:** `paper/generated/llama_mechanistic_v2/metrics.csv` (`3673898bda89fb2c52cdc2714c58984bc29d7e1e4bf5693d40dbc85a9d1ef5d2`).
-- **Replay command:** `python scripts/analyze_llama_mechanistic.py`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C11`
 - **Limitation:** Generic controls can outperform the selected controller on natural familiar effects; the held-out cognitive endpoint does not pass. Missing basis identity prevents a full clean-clone neural replay.
 
 ## C12 — Failed early Llama labels are measurement-validity history
@@ -166,7 +166,7 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** Historical compact exports under `paper/generated/llama_pilots/` and `paper/generated/llama_order/`.
 - **Metric/version:** Calibration direction, order sensitivity, and task-level validity gates.
 - **Supporting artifact:** `paper/generated/llama_pilots/llama_label_validation_v1_gates.json` and `paper/generated/llama_order/calibration_gates.json`.
-- **Replay command:** `python scripts/paper_results.py --output /tmp/persistence-paper-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C12`
 - **Limitation:** These runs cannot be counted as negative behavioral or mechanistic replications because the measurement interface itself failed.
 
 ## C13 — The original hackathon study is external historical provenance
@@ -179,5 +179,5 @@ Both use `global_cfr_v1` when expressed as recovery: `1 - sum((observed-target)^
 - **Data/pair/split identity:** External repository commit `5b968d0bb8de64f67556a7b300200aa488a591fa`; large-file payloads are not part of this repository.
 - **Metric/version:** Arithmetic checks captured by the local audit, not a current canonical endpoint.
 - **Supporting artifact:** `paper/generated/original_audit/audit.json` (`bf3086a60c1bf15e0bb33f5b3dd0bdf8363ab04c8a3f3853995024dac3b71a52`).
-- **Replay command:** `python scripts/audit_original_study.py --root /path/to/digital-minds-hackathon --output /tmp/original-study-audit`
+- **Replay command:** `python -m cognitive_discovery.reproduce claim C13` (compact local audit); full audit: `python scripts/audit_original_study.py --root /path/to/digital-minds-hackathon --output /tmp/original-study-audit`.
 - **Limitation:** Full replay requires the external repository and its LFS artifacts; this evidence must not be presented as a clean-clone product of the current repository.

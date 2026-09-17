@@ -1,0 +1,21 @@
+schema_version: canonical-stage-v1
+stage_id: llama_interface_v2
+pipeline_phase: replication
+status: supporting
+upstream:
+  - stage_id: llama_label_interface_history
+    artifact_ids: [paper/generated/llama_pilots/llama_label_validation_v1_gates.json, paper/generated/llama_order/calibration_gates.json]
+model: {descriptor: llama_replication, checkpoint: meta-llama/Llama-3.1-8B-Instruct, revision: 0e9e39f249a16976918f6564b8830bc894c89659, identity_status: pinned}
+endpoint_id: measurement_validity
+metric_id: interface_validity_gate_v2
+split_design: {identity_id: llama_interface_protocol_v2, status: frozen, path: paper/generated/llama_interface_v2/protocol.json, sha256: 71175c0e4cc703ff04c4b7f931a7471034fe1fefa618b4363be89dab5c042a7f}
+behavioral_object: {status: not_applicable}
+neural_object: {status: not_applicable}
+seeds: [91001, 91002]
+scientific_defaults: {path: paper/generated/llama_interface_v2/protocol.json, sha256: 71175c0e4cc703ff04c4b7f931a7471034fe1fefa618b4363be89dab5c042a7f}
+execution:
+  rerun_allowed: false
+  reason: historical wrapper writes a fixed canonical path; use the preserved script only for provenance inspection
+  command: null
+  required_inputs: []
+output: {frozen_root: artifacts/llama_interface_v2, rerun_root: artifacts/reruns/llama_interface_v2, overwrite_frozen: false}

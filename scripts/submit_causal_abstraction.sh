@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
-CPU_SCRIPT="$PROJECT_DIR/run_causal_abstraction_cpu.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_abstraction_cpu.slurm"
 if ! command -v sbatch >/dev/null 2>&1; then
   echo "sbatch is unavailable; run this helper on a Della login node" >&2
   exit 1

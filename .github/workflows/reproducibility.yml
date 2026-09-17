@@ -19,9 +19,9 @@ jobs:
       - name: Validate canonical graph and hashes
         run: python scripts/validate_canonical.py
       - name: Run provenance and regression suite
-        run: pytest -q tests/provenance tests/regression -m "not gpu and not model_download"
+        run: pytest -q tests/provenance tests/regression tests/test_replication_harness.py tests/test_reproduce_cli.py tests/test_stage_configs.py -m "not gpu and not model_download"
       - name: Replay compact claims
-        run: python scripts/replay_canonical_claims.py --check --output /tmp/canonical-claim-replay.json
+        run: python -m cognitive_discovery.reproduce claims --json
       - name: Check artifact sizes
         run: python scripts/check_artifact_sizes.py
       - name: Run complete ordinary CPU suite

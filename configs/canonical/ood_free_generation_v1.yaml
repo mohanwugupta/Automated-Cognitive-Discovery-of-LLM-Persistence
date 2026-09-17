@@ -1,0 +1,24 @@
+schema_version: canonical-stage-v1
+stage_id: ood_free_generation_v1
+pipeline_phase: abstraction_boundary
+status: boundary
+upstream:
+  - stage_id: causal_mech_v1
+    artifact_ids: [artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors]
+  - stage_id: abstraction_discovery_v1
+    artifact_ids: [artifacts/abstraction_discovery_v1/gates.json]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: free_generation_survival
+metric_id: cox_stopping_hazard_v1
+split_design: {identity_id: ood_prompt_seed_dose_design_v1, status: frozen, path: configs/ood_free_generation_v1.yaml, sha256: 621db29f02967f361004ade816c10780c44952c043a8d330d17ac47d3e25934d}
+behavioral_object: {status: not_applicable}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [94001]
+scientific_defaults: {path: configs/ood_free_generation_v1.yaml, sha256: 621db29f02967f361004ade816c10780c44952c043a8d330d17ac47d3e25934d}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: frozen_qwen_basis, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, availability: committed}
+output: {frozen_root: artifacts/ood_free_generation_v1, rerun_root: artifacts/reruns/ood_free_generation_v1, overwrite_frozen: false}

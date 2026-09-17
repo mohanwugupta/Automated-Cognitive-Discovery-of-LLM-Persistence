@@ -1,0 +1,21 @@
+schema_version: canonical-stage-v1
+stage_id: llama_mechanistic_v2
+pipeline_phase: replication
+status: replication
+upstream:
+  - stage_id: llama_behavior_v2
+    artifact_ids: [paper/generated/llama_behavior_v2/test_dual_history_predictions.csv]
+model: {descriptor: llama_replication, checkpoint: meta-llama/Llama-3.1-8B-Instruct, revision: 0e9e39f249a16976918f6564b8830bc894c89659, identity_status: pinned}
+endpoint_id: separate_cognitive_and_natural_endpoints
+metric_id: global_cfr_v1
+split_design: {identity_id: llama_mechanistic_protocol_v2, status: frozen, path: paper/generated/llama_mechanistic_v2/protocol.json, sha256: c02af8f14f105e781d3ca80edb79bd48c56f89f2e758a6b23f23f741cb528b88}
+behavioral_object: {status: frozen, path: paper/generated/llama_mechanistic_v2/theory_freeze.json, sha256: 59cf6bc5641012053eea3197a75c460a493da0360830f6a70721b037fd09cf72}
+neural_object: {status: external_required, sha256: null, layer: 24, rank: 2, target_definition: llama_dual_history}
+seeds: [93101, 93102, 93103, 93104, 93105]
+scientific_defaults: {path: paper/generated/llama_mechanistic_v2/protocol.json, sha256: c02af8f14f105e781d3ca80edb79bd48c56f89f2e758a6b23f23f741cb528b88}
+execution:
+  rerun_allowed: false
+  reason: selected Llama neural basis is external/unavailable and the historical wrapper has no safe output override
+  command: null
+  required_inputs: []
+output: {frozen_root: artifacts/llama_mechanistic_v2, rerun_root: artifacts/reruns/llama_mechanistic_v2, overwrite_frozen: false}

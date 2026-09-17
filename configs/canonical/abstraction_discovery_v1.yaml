@@ -1,0 +1,22 @@
+schema_version: canonical-stage-v1
+stage_id: abstraction_discovery_v1
+pipeline_phase: abstraction_boundary
+status: canonical
+upstream:
+  - stage_id: causal_specificity_v2
+    artifact_ids: [artifacts/causal_specificity_v2/candidate_gates.csv]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: abstraction_identity_gate
+metric_id: abstraction_identity_gate_v1
+split_design: {identity_id: abstraction_contrast_manifest_v1, status: frozen, path: artifacts/abstraction_discovery_v1/design/contrast_manifest.parquet, sha256: abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497, pair_sha256: abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [73001]
+scientific_defaults: {path: configs/causal_abstraction_v1.yaml, sha256: b84e21dc1769bf46b5778c5efe549232c98664f5598f3bebaa31f8479a9fb161}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: contrast_manifest, path: artifacts/abstraction_discovery_v1/design/contrast_manifest.parquet, sha256: abc4b863d19aa62417264e1e8ffd34636808a6b01e6be4b90f724337aec06497, availability: committed}
+output: {frozen_root: artifacts/abstraction_discovery_v1, rerun_root: artifacts/reruns/abstraction_discovery_v1, overwrite_frozen: false}
