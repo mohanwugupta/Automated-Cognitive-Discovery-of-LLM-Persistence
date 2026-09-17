@@ -22,7 +22,8 @@ task_families:
 
 interface:
   candidates:
-    - {id: yes_no, labels: [Yes, No], style: yes_no_question}
+    # Quote Yes/No: YAML 1.1 parsers otherwise coerce them to booleans.
+    - {id: yes_no, labels: ["Yes", "No"], style: yes_no_question}
     - {id: continue_stop, labels: [Continue, Stop]}
     - {id: a_b, labels: [A, B]}
     - {id: x_y, labels: [X, Y]}
