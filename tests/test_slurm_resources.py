@@ -169,3 +169,8 @@ def test_replication_smoke_routes_only_model_preflight_to_gpu():
     assert "--gres" not in cpu
     assert "--gpus" not in cpu
     assert "SLURM_JOB_GPUS" in cpu
+
+    for wrapper in (gpu, cpu):
+        activation = wrapper.index('conda activate "$CONDA_ENV"')
+        assert wrapper.rfind("set +u", 0, activation) >= 0
+        assert wrapper.find("set -u", activation) > activation

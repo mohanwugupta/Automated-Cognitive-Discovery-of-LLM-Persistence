@@ -52,10 +52,15 @@ if ! [[ "$TASK_INDEX" =~ ^[0-9]+$ ]] || [ "$TASK_INDEX" -ge "$expected" ]; then
 fi
 
 cd "$PROJECT_DIR"
+# Princeton's module/Conda shell initialization reads interactive variables
+# such as PS1, which are unset in Slurm batch shells. Limit nounset relaxation
+# to environment activation, then restore fail-fast behavior immediately.
+set +u
 module purge
 module load anaconda3/2025.6
 eval "$(conda shell.bash hook)"
 conda activate "$CONDA_ENV"
+set -u
 export PYTHONPATH="$PROJECT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
