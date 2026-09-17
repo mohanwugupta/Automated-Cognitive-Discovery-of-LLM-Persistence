@@ -1,0 +1,23 @@
+schema_version: canonical-stage-v1
+stage_id: causal_specificity_v2
+pipeline_phase: causal_mechanistic_discovery
+status: canonical
+upstream:
+  - stage_id: causal_mech_v1
+    artifact_ids: [artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet, artifacts/causal_mech_v1/counterfactuals/predicted_effects.parquet]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+split_design: {identity_id: causal_mech_pair_manifest_v1, status: frozen, path: artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet, sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4, pair_sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4}
+behavioral_object: {status: frozen, path: artifacts/causal_specificity_v2/frozen_models/behavioral_hash.json, sha256: 75e677528483c23852594e6c320e664d2f4a5e7293ed81c34d9e29e66ca61bab}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [73001]
+scientific_defaults: {path: configs/causal_specificity_v2.yaml, sha256: 8f2cef29ea10306c75dc744b59202d98e191adfc8aea8da9f94448012ac2aa8d}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: pair_manifest, path: artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet, sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4, availability: committed}
+    - {id: predicted_effects, path: artifacts/causal_mech_v1/counterfactuals/predicted_effects.parquet, sha256: dc87d567f8560c079f6671c24d25df81f13f6990b795daf9f7ac4f44ef681351, availability: committed}
+output: {frozen_root: artifacts/causal_specificity_v2, rerun_root: artifacts/reruns/causal_specificity_v2, overwrite_frozen: false}

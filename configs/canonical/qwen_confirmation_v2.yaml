@@ -1,0 +1,21 @@
+schema_version: canonical-stage-v1
+stage_id: qwen_confirmation_v2
+pipeline_phase: generalization
+status: canonical
+upstream:
+  - stage_id: causal_mech_v1
+    artifact_ids: [artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors]
+model: {descriptor: qwen_confirmation, checkpoint: Qwen/Qwen3.5-4B, revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a, identity_status: pinned}
+endpoint_id: natural_effect_recovery
+metric_id: global_cfr_v1
+split_design: {identity_id: qwen_confirmation_protocol_v2, status: frozen, path: paper/generated/qwen_confirmation_v2/protocol.json, sha256: 8db8a14d9882a504448d6e376a5f0902e99c431b21ba98cf7fba86f1cc4a421e}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [92001, 92002]
+scientific_defaults: {path: paper/generated/qwen_confirmation_v2/protocol.json, sha256: 8db8a14d9882a504448d6e376a5f0902e99c431b21ba98cf7fba86f1cc4a421e}
+execution:
+  rerun_allowed: false
+  reason: raw condition manifest is not committed and the historical wrapper has no safe output override
+  command: null
+  required_inputs: []
+output: {frozen_root: artifacts/qwen_confirmation_v2, rerun_root: artifacts/reruns/qwen_confirmation_v2, overwrite_frozen: false}

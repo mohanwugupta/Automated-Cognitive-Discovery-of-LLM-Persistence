@@ -2,8 +2,8 @@
 set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
-GPU_SCRIPT="$PROJECT_DIR/run_theory_resolution.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_theory_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_theory_resolution.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_theory_cpu.slurm"
 SHARD_COUNT="${SHARD_COUNT:-8}"
 
 if ! command -v sbatch >/dev/null 2>&1; then

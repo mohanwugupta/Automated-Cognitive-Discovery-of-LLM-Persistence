@@ -3,8 +3,8 @@ set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 CAUSAL_OUTPUT="${CAUSAL_OUTPUT:-artifacts/causal_mech_v1}"
-CPU_SCRIPT="$PROJECT_DIR/run_causal_mechanistic_cpu.slurm"
-GPU_SCRIPT="$PROJECT_DIR/run_causal_mechanistic.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_mechanistic_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_causal_mechanistic.slurm"
 status=$(python -c 'import json,os; from pathlib import Path; p=Path(os.environ.get("CAUSAL_OUTPUT","artifacts/causal_mech_v1"))/"gates.json"; print(json.loads(p.read_text()).get("circuit",{}).get("status","not_eligible"))')
 if [ "$status" != "eligible" ]; then
   echo "Circuit analysis is not eligible (status=$status); no GPU job was submitted." >&2

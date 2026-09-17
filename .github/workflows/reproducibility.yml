@@ -1,0 +1,31 @@
+name: reproducibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cpu-reproducibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install CPU test dependencies
+        run: python -m pip install -e ".[dev,parquet]"
+      - name: Validate canonical graph and hashes
+        run: python scripts/validate_canonical.py
+      - name: Run provenance and regression suite
+        run: pytest -q tests/provenance tests/regression tests/test_replication_harness.py tests/test_reproduce_cli.py tests/test_stage_configs.py -m "not gpu and not model_download"
+      - name: Replay compact claims
+        run: python -m cognitive_discovery.reproduce claims --json
+      - name: Check artifact sizes
+        run: python scripts/check_artifact_sizes.py
+      - name: Run complete ordinary CPU suite
+        run: pytest -q -m "not gpu and not model_download"
+
+# GPU inference and model-download tests are intentionally excluded from ordinary CI.
+# They require an explicitly provisioned runner, pinned model access, and a reviewed run request.

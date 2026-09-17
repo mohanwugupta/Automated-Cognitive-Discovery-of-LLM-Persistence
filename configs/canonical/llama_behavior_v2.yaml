@@ -1,0 +1,21 @@
+schema_version: canonical-stage-v1
+stage_id: llama_behavior_v2
+pipeline_phase: replication
+status: replication
+upstream:
+  - stage_id: llama_interface_v2
+    artifact_ids: [paper/generated/llama_interface_v2/protocol.json]
+model: {descriptor: llama_replication, checkpoint: meta-llama/Llama-3.1-8B-Instruct, revision: 0e9e39f249a16976918f6564b8830bc894c89659, identity_status: pinned}
+endpoint_id: behavioral_prediction
+metric_id: heldout_behavioral_prediction_v1
+split_design: {identity_id: llama_behavior_protocol_v2, status: frozen, path: paper/generated/llama_behavior_v2/protocol.json, sha256: f35224b2ae6199f8af047284d438d15c69d59b0494ea811848a4b9e86650836b}
+behavioral_object: {status: frozen, path: paper/generated/llama_behavior_v2/test_dual_history_predictions.csv, sha256: f27738b156ad98763370208a1a1de9dbf5ca46d19ac4fed30f8d6354a60bf4e7}
+neural_object: {status: not_applicable}
+seeds: [93001, 93002, 93003]
+scientific_defaults: {path: paper/generated/llama_behavior_v2/protocol.json, sha256: f35224b2ae6199f8af047284d438d15c69d59b0494ea811848a4b9e86650836b}
+execution:
+  rerun_allowed: false
+  reason: raw Yes/No interface observations are not committed and the historical wrapper has no safe output override
+  command: null
+  required_inputs: []
+output: {frozen_root: artifacts/llama_behavior_v2, rerun_root: artifacts/reruns/llama_behavior_v2, overwrite_frozen: false}

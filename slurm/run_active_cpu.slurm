@@ -11,4 +11,4 @@
 set -eo pipefail
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR"
-exec bash "$PROJECT_DIR/run_active_discovery.slurm"
+exec bash "$PROJECT_DIR/slurm/run_active_discovery.slurm"

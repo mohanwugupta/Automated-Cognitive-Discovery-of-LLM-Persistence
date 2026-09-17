@@ -1,0 +1,22 @@
+schema_version: canonical-stage-v1
+stage_id: theory_resolution_v1
+pipeline_phase: computational_theory
+status: canonical
+upstream:
+  - stage_id: discovery_v2
+    artifact_ids: [artifacts/discovery_v2/hierarchy/best_hierarchical_model.pkl]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: behavioral_model_comparison
+metric_id: frozen_model_comparison_v1
+split_design: {identity_id: theory_resolution_split_seed_380230, status: frozen, path: configs/theory_resolution_v1.yaml, sha256: f7546a43cb9e1bbcf9babb8ce04ebae2f97cb2b1b4b860eb2db7f0f39d7ddf99}
+behavioral_object: {status: historical_unknown, architecture_set: [dual_history, latent_context, outcome_history], sha256: null}
+neural_object: {status: not_applicable}
+seeds: [380226, 380227, 380228, 380229, 380230, 40300227]
+scientific_defaults: {path: configs/theory_resolution_v1.yaml, sha256: f7546a43cb9e1bbcf9babb8ce04ebae2f97cb2b1b4b860eb2db7f0f39d7ddf99}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: discovery_v2_model, path: artifacts/discovery_v2/hierarchy/best_hierarchical_model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3, availability: committed}
+output: {frozen_root: artifacts/theory_resolution_v1, rerun_root: artifacts/reruns/theory_resolution_v1, overwrite_frozen: false}

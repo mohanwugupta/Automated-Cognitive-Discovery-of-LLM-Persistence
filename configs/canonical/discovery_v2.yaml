@@ -1,0 +1,22 @@
+schema_version: canonical-stage-v1
+stage_id: discovery_v2
+pipeline_phase: behavioral_discovery
+status: canonical
+upstream:
+  - stage_id: discovery_v1
+    artifact_ids: [artifacts/discovery_v1/behavior/standardized.parquet]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: persistence_logit
+metric_id: heldout_behavioral_prediction_v1
+split_design: {identity_id: discovery_v2_split_seed_280228, status: frozen, path: configs/discovery_v2.yaml, sha256: ecf483d529d467cdcc0d6690108bdb721d61f9cad40164fca6732ba93b0a5da1}
+behavioral_object: {status: not_applicable}
+neural_object: {status: not_applicable}
+seeds: [280226, 280227, 280228, 2028227]
+scientific_defaults: {path: configs/discovery_v2.yaml, sha256: ecf483d529d467cdcc0d6690108bdb721d61f9cad40164fca6732ba93b0a5da1}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: discovery_v1_behavior, path: artifacts/discovery_v1/behavior/standardized.parquet, sha256: 36f0102d32563fcf10602707cbe2febd31a94caa88567fe828591f548d5584a2, availability: committed}
+output: {frozen_root: artifacts/discovery_v2, rerun_root: artifacts/reruns/discovery_v2, overwrite_frozen: false}

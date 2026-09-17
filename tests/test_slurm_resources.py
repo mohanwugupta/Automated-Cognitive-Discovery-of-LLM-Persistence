@@ -47,7 +47,7 @@ def test_cpu_wrappers_have_no_gpu_directive():
         "run_causal_specificity_cpu.slurm",
         "run_causal_abstraction_cpu.slurm",
     ):
-        text = _text(script)
+        text = _text(f"slurm/{script}")
         assert "--gres" not in text
         assert "--gpus" not in text
 
@@ -73,14 +73,14 @@ def test_action_history_gpu_is_reserved_only_for_qwen_forward_phases():
 
 
 def test_counterfactual_mechanistic_gpu_phases_all_run_qwen_forwards():
-    runner = _text("run_causal_mechanistic.slurm")
+    runner = _text("slurm/run_causal_mechanistic.slurm")
     for phase in ("localize", "das", "validate", "circuit"):
         marker = f"\n  {phase})\n"
         assert marker in runner
         block = runner.split(marker, 1)[1].split(";;", 1)[0]
         assert "scripts/causal_mechanistic.py" in block
         assert '"$MODEL_PATH"' in block
-    cpu = _text("run_causal_mechanistic_cpu.slurm")
+    cpu = _text("slurm/run_causal_mechanistic_cpu.slurm")
     assert "--gres" not in cpu
     assert "--gpus" not in cpu
 
@@ -105,7 +105,7 @@ def test_stable_specificity_uses_cpu_preparation_and_exact_gpu_work_array():
     assert 'if [ "$job_count" -eq 0 ]' in necessity
     assert 'PHASE=necessity "$GPU_SCRIPT"' in necessity
     assert 'PHASE=finalize "$CPU_SCRIPT"' in necessity
-    runner = _text("run_causal_specificity.slurm")
+    runner = _text("slurm/run_causal_specificity.slurm")
     block = runner.split("\n  evaluate)\n", 1)[1].split(";;", 1)[0]
     assert "scripts/causal_specificity.py" in block
     assert '"$MODEL_PATH"' in block
@@ -120,7 +120,7 @@ def test_causal_abstraction_reserves_gpus_only_for_frozen_qwen_evaluation():
     assert 'if [ "$job_count" -eq 0 ]' in dispatcher
     assert 'PHASE=evaluate "$GPU_SCRIPT"' in dispatcher
     assert 'PHASE=aggregate "$CPU_SCRIPT"' in dispatcher
-    runner = _text("run_causal_abstraction.slurm")
+    runner = _text("slurm/run_causal_abstraction.slurm")
     evaluation = runner.rsplit("\n  evaluate)\n", 1)[1].split(";;", 1)[0]
     assert "scripts/causal_abstraction.py" in evaluation
     assert '"$MODEL_PATH"' in evaluation
@@ -128,3 +128,16 @@ def test_causal_abstraction_reserves_gpus_only_for_frozen_qwen_evaluation():
         0
     ]
     assert "CPU-only" in cpu_phases
+
+
+def test_replication_routes_only_model_forward_stages_to_gpu():
+    submit = _text("scripts/submit_replication.sh")
+    for phase in ("model_comparison", "freeze_theory", "counterfactuals", "report"):
+        line = next(line for line in submit.splitlines() if f"STAGE={phase}" in line)
+        assert '"$CPU_SCRIPT"' in line
+    for phase in ("interface", "behavior", "mechanism", "generalization", "specificity"):
+        line = next(line for line in submit.splitlines() if f"STAGE={phase}" in line)
+        assert '"$GPU_SCRIPT"' in line
+    cpu = _text("slurm/run_replication_cpu.slurm")
+    assert "--gres" not in cpu
+    assert "--gpus" not in cpu

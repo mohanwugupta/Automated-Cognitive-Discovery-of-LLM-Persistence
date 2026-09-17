@@ -1,0 +1,22 @@
+schema_version: canonical-stage-v1
+stage_id: mechanistic_probe_steering_v1
+pipeline_phase: causal_mechanistic_discovery
+status: supporting
+upstream:
+  - stage_id: mechanistic_manifest_v1
+    artifact_ids: [artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: representation_probe_steering
+metric_id: probe_steering_gate_v1
+split_design: {identity_id: mechanistic_conditions_v1, status: frozen, path: artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl, sha256: a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: historical_unknown, sha256: null, interpretation: supporting_legacy}
+seeds: [73001]
+scientific_defaults: {path: configs/mechanistic_v1.yaml, sha256: d5a4b059252c0d302714264db90a74193a935a75543838746da8bdfa696e74e8}
+execution:
+  rerun_allowed: false
+  reason: supporting legacy interpretation and historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: mechanistic_conditions, path: artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl, sha256: a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342, availability: committed}
+output: {frozen_root: artifacts/mechanistic_v1, rerun_root: artifacts/reruns/mechanistic_probe_steering_v1, overwrite_frozen: false}

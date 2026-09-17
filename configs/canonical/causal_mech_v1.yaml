@@ -1,0 +1,24 @@
+schema_version: canonical-stage-v1
+stage_id: causal_mech_v1
+pipeline_phase: causal_mechanistic_discovery
+status: canonical
+upstream:
+  - stage_id: theory_resolution_v1
+    artifact_ids: [artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl]
+  - stage_id: mechanistic_manifest_v1
+    artifact_ids: [artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl]
+model: {descriptor: qwen_core, checkpoint: Qwen/Qwen3.5-4B, revision: null, identity_status: historical_unknown}
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+split_design: {identity_id: causal_mech_pair_manifest_v1, status: frozen, path: artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet, sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4, pair_sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: dual_history:outcome_history}
+seeds: [73001]
+scientific_defaults: {path: configs/causal_mech_v1.yaml, sha256: 4d667f9daf24e07b84ede57e2c5f2d826a7bf2e7ad6eba2a032c260871ebea91}
+execution:
+  rerun_allowed: false
+  reason: historical core Qwen revision is unknown
+  command: null
+  required_inputs:
+    - {id: mechanistic_conditions, path: artifacts/mechanistic_v1/manifests/mechanistic_conditions.jsonl, sha256: a75c0795779c62aa8ff7f36765f84826021f458585176a4642a46a4132255342, availability: committed}
+output: {frozen_root: artifacts/causal_mech_v1, rerun_root: artifacts/reruns/causal_mech_v1, overwrite_frozen: false}

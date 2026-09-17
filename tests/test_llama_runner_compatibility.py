@@ -14,7 +14,13 @@ from cognitive_discovery.mechanistic.activations.qwen_runner import MechanisticQ
 
 
 def test_llama_patch_identity_effect_and_alignment_gradient(monkeypatch):
-    from transformers import LlamaConfig, LlamaForCausalLM
+    try:
+        from transformers import LlamaConfig, LlamaForCausalLM
+    except (ModuleNotFoundError, RuntimeError) as error:
+        pytest.skip(
+            "optional_backend_unavailable: Transformers could not load its local "
+            f"Llama backend ({type(error).__name__})"
+        )
     import cognitive_discovery.mechanistic.activations.qwen_runner as runner_module
     from cognitive_discovery.causal_mechanistic.das import DASAlignment
 

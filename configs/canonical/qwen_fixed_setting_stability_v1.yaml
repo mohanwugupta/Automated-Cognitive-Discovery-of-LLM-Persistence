@@ -1,0 +1,25 @@
+schema_version: canonical-stage-v1
+stage_id: qwen_fixed_setting_stability_v1
+pipeline_phase: generalization
+status: supporting
+upstream:
+  - stage_id: causal_specificity_v2
+    artifact_ids: [artifacts/causal_specificity_v2/candidate_gates.csv]
+model: {descriptor: qwen_confirmation, checkpoint: Qwen/Qwen3.5-4B, revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a, identity_status: pinned}
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+split_design: {identity_id: qwen_runpod_protocol_v1, status: frozen, path: paper/generated/runpod_protocol.json, sha256: 8f2f4414fa495f33b319676bb10a0563020bb797dc0c10891745b2bc529ea6ce, pair_sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4}
+behavioral_object: {status: frozen, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3}
+neural_object: {status: frozen, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, layer: 28, rank: 2, target_definition: fixed_setting_selected_from_dual_history:outcome_history}
+seeds: [75001, 75002, 75003, 75004, 75005, 76001]
+scientific_defaults: {path: paper/generated/runpod_protocol.json, sha256: 8f2f4414fa495f33b319676bb10a0563020bb797dc0c10891745b2bc529ea6ce}
+execution:
+  rerun_allowed: true
+  reason: pinned checkpoint and all required lightweight inputs are committed
+  command: ["{python}", scripts/qwen_runpod_experiment.py, --output, "{output}", --revision, "{revision}"]
+  required_inputs:
+    - {id: pair_manifest, path: artifacts/causal_mech_v1/counterfactuals/pair_manifest.parquet, sha256: 6591f8430e52232932e56f79a768409363ddece9c9da0bcd1b6bd089b4e266e4, availability: committed}
+    - {id: predicted_effects, path: artifacts/causal_mech_v1/counterfactuals/predicted_effects.parquet, sha256: dc87d567f8560c079f6671c24d25df81f13f6990b795daf9f7ac4f44ef681351, availability: committed}
+    - {id: dual_history_model, path: artifacts/theory_resolution_v1/frozen_models/dual_history/model.pkl, sha256: 656639e358adf65bf2079d924f9e6dcadd6f2549508957743effd3aa6dd39ca3, availability: committed}
+    - {id: selected_qwen_basis, path: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors, sha256: ef8776641159fe67d02fdd1eae16d342305c4118ccb640114e9eb62cf4fedab0, availability: committed}
+output: {frozen_root: artifacts/qwen_runpod_v1, rerun_root: artifacts/reruns/qwen_fixed_setting_stability_v1, overwrite_frozen: false}

@@ -2,8 +2,8 @@
 set -euo pipefail
 
 PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
-GPU_SCRIPT="$PROJECT_DIR/run_action_history_disambiguation.slurm"
-CPU_SCRIPT="$PROJECT_DIR/run_action_history_cpu.slurm"
+GPU_SCRIPT="$PROJECT_DIR/slurm/run_action_history_disambiguation.slurm"
+CPU_SCRIPT="$PROJECT_DIR/slurm/run_action_history_cpu.slurm"
 RANDOM_SHARD_COUNT="${RANDOM_SHARD_COUNT:-10}"
 RANDOM_ARRAY_CONCURRENCY="${RANDOM_ARRAY_CONCURRENCY:-2}"
 

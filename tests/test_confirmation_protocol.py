@@ -1,13 +1,20 @@
 import importlib.util,sys
 from pathlib import Path
 import pandas as pd
+import pytest
 from cognitive_discovery.mechanistic.dataset.matched_conditions import load_mechanistic_manifest
+from cognitive_discovery.reproducibility.replay import ReplayStatus, replay_all_claims
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from qwen_confirmation import transformed,calibrate
 from llama_interface_validation import InterfaceParticipant
 
 def test_wording_preserves_all_context_statements():
-    records=load_mechanistic_manifest('artifacts/qwen_confirmation_v2/conditions.jsonl')
+    path=Path('artifacts/qwen_confirmation_v2/conditions.jsonl')
+    if not path.exists():
+        replay=replay_all_claims(Path(__file__).resolve().parents[1])['C07']
+        assert replay.replay_status is ReplayStatus.COMPACT_REPLAY_ONLY
+        pytest.skip('replay_status=compact_replay_only: raw Qwen confirmation condition manifest is not committed')
+    records=load_mechanistic_manifest(path)
     from cognitive_discovery.causal_mechanistic import pipeline as p
     for r in records:
         original=list(p._trial(r).messages);changed=transformed(original,'rephrased')

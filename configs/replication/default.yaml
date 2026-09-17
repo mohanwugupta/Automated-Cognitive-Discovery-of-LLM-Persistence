@@ -1,0 +1,126 @@
+schema_version: model-agnostic-replication-v1
+
+model:
+  id: null
+  revision: null
+  adapter: null
+  tokenizer_id: null
+  tokenizer_revision: null
+
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+ontology_config: configs/discovery_v1.yaml
+
+task_families:
+  - bandit
+  - foraging
+  - solvability
+  - information_sampling
+  - waiting
+  - effort
+  - debugging
+
+interface:
+  candidates:
+    - {id: yes_no, labels: [Yes, No], style: yes_no_question}
+    - {id: continue_stop, labels: [Continue, Stop]}
+    - {id: a_b, labels: [A, B]}
+    - {id: x_y, labels: [X, Y]}
+  calibration_conditions_per_task: 30
+  validation_conditions_per_task: 70
+  require_single_tokens: true
+  require_polarity_reversal: true
+  maximum_mapping_gap: 0.25
+  maximum_wording_order_effect: 0.25
+  minimum_logit_sd: 0.15
+  require_all_tasks: true
+
+behavior:
+  broad_conditions: 2800
+  contextual_conditions: 420
+  active_conditions: 1400
+  validation_conditions: 980
+  split_fractions:
+    behavior_train: 0.60
+    behavior_selection: 0.20
+    behavior_test: 0.20
+  group_keys: [semantic_pair, response_mapping, wording]
+
+model_comparison:
+  minimum_bank: [immediate_state, outcome_history, dual_history, latent_context]
+  optional_bank:
+    - dynamic_reevaluation
+    - choice_perseveration
+    - latent_motivation
+    - option_termination
+    - task_set_reinstatement
+    - meta_control
+  flexible_baselines: [mlp, gru]
+  minimum_history_test_r2: 0.60
+  minimum_improvement_over_immediate: 0.01
+  equivalence_margin_mse: 0.02
+  allow_unresolved_set: true
+
+mechanism:
+  relative_depths: [0.25, 0.50, 0.75, 0.90]
+  ranks: [2, 8]
+  fitting_tasks: [bandit, debugging, foraging, solvability]
+  holdout_tasks: [effort, information_sampling, waiting]
+  neural_split_fractions: [0.60, 0.20, 0.20]
+  intervention: das_residual_subspace_interchange_v1
+  activation_position: final_prompt_token
+  selection_metric: global_cfr_v1
+  selection_tiebreak: [lower_rank, earlier_layer]
+  epochs: 3
+  learning_rate: 0.03
+  activation_change_penalty: 0.0001
+  gates:
+    require_test_global_cfr_positive: true
+    require_bootstrap_lower_bound_positive: true
+    require_positive_target_correlation: true
+    require_random_null_superiority: true
+    require_response_mapping_invariance: true
+
+specificity:
+  controls:
+    - matched_random_subspace
+    - shuffled_source_base
+    - output_readout_direction
+    - predictive_ridge_direction
+    - pca_variance_subspace
+  random_subspaces_development: 100
+  random_subspaces_final: 500
+  random_pvalue_correction: finite_sample_plus_one
+  maximum_response_mapping_cfr_gap: 0.25
+  require_target_shuffle_integrity: true
+  endpoint_id: cognitive_counterfactual_recovery
+
+optional:
+  abstraction:
+    enabled: false
+    requires_stage: specificity
+    allowed_outcomes: [candidate_supported, descriptive_only, identity_unresolved, no_candidate_passed]
+  ood:
+    enabled: false
+    requires_stage: specificity
+    interpretation: construct_boundary_only
+
+seeds:
+  interface_calibration: 11001
+  interface_validation: 11002
+  behavior_design: 12001
+  behavior_split: 12002
+  behavior_fit: 12003
+  counterfactual_design: 13001
+  neural_split: 13002
+  mechanism_search: 14001
+  random_controls: 14002
+  bootstrap: 15001
+
+artifact_policy:
+  save_full_activations: false
+  stream_activations: true
+  save_scalar_projections: true
+  save_pair_interventions: true
+  delete_temporary_activations: true
+  maximum_tracked_file_mb: 10
