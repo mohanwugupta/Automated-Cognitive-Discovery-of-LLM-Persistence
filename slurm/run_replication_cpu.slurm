@@ -24,10 +24,15 @@ if [ -n "${SLURM_JOB_GPUS:-}" ]; then
 fi
 
 cd "$PROJECT_DIR"
+# Princeton's module/Conda shell initialization reads interactive variables
+# such as PS1, which are unset in Slurm batch shells. Limit nounset relaxation
+# to environment activation, then restore fail-fast behavior immediately.
+set +u
 module purge
 module load anaconda3/2025.6
 eval "$(conda shell.bash hook)"
 conda activate "$CONDA_ENV"
+set -u
 export PYTHONPATH="$PROJECT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 mkdir -p logs
 python -m cognitive_discovery.replicate_model \
