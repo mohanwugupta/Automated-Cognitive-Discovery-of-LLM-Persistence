@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 import pytest
+import yaml
 
 from cognitive_discovery.replication.adapters import (
     LlamaAdapter,
@@ -26,6 +27,10 @@ from cognitive_discovery.replication.controls import (
 )
 from cognitive_discovery.replication.frozen_replay import replay_llama_phase_a
 from cognitive_discovery.replication.harness import initialize_replication, plan_replication
+from cognitive_discovery.replication.neural import (
+    _increasing_outcome_pattern,
+    _records_for_counterfactuals,
+)
 from cognitive_discovery.replication.provenance import (
     ReplicationProvenanceError,
     validate_replication_provenance,
@@ -202,6 +207,48 @@ def test_behavior_and_neural_splits_are_deterministic_group_safe_and_hashed():
         "neural_selection",
         "neural_test",
     }
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ((-1, -1, -1), (1, -1, -1)),
+        ((1, 1, 1), (-1, -1, 1)),
+        ((-1, -1, -1, -1, -1), (1, 1, -1, -1, -1)),
+        ((1, 1, 1, 1, 1), (-1, -1, -1, 1, 1)),
+    ],
+)
+def test_replication_history_patterns_are_ordered_from_lower_to_higher_target(
+    left, right
+):
+    from cognitive_discovery.mechanistic.targets.history_targets import outcome_history
+
+    lower, higher = _increasing_outcome_pattern(left, right)
+    assert outcome_history(higher) > outcome_history(lower)
+    assert {tuple(lower), tuple(higher)} == {tuple(left), tuple(right)}
+
+
+def test_every_generated_replication_contrast_has_a_genuinely_increasing_target(
+    tmp_path,
+):
+    config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+    records = _records_for_counterfactuals(
+        ROOT,
+        tmp_path,
+        config,
+        persist_design=False,
+    )
+    grouped = {}
+    for record in records:
+        key = (record.contrast_id, record.condition.response_mapping.mapping_id)
+        grouped.setdefault(key, {})[record.contrast_member] = record
+    assert grouped
+    for (contrast_id, _), members in grouped.items():
+        assert set(members) == {-1, 1}, contrast_id
+        target_name = members[1].target_name
+        assert members[1].targets[target_name] > members[-1].targets[target_name], contrast_id
+    repaired = grouped[("replication:bandit:bg0:pattern1:outcome_history", "continue_x")]
+    assert repaired[1].targets["outcome_history"] > repaired[-1].targets["outcome_history"]
 
 
 def test_controls_cannot_switch_endpoint_and_target_preserving_shuffle_is_uninformative():

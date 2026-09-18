@@ -38,6 +38,7 @@ from cognitive_discovery.mechanistic.dataset.matched_conditions import (
 from cognitive_discovery.mechanistic.targets.behavioral_targets import (
     compute_condition_targets,
 )
+from cognitive_discovery.mechanistic.targets.history_targets import outcome_history
 from cognitive_discovery.pipeline import generate_design
 from cognitive_discovery.reproducibility.metrics import global_cfr_v1
 
@@ -56,7 +57,27 @@ THEORY_TARGET = {
 }
 
 
-def _records_for_counterfactuals(root: Path, output: Path, config: dict):
+def _increasing_outcome_pattern(left, right):
+    """Return a low-to-high outcome-history pair without changing its members."""
+
+    left_target = outcome_history(left)
+    right_target = outcome_history(right)
+    if np.isclose(left_target, right_target, atol=1e-12, rtol=0.0):
+        raise ValueError(
+            "replication counterfactual pattern has no outcome-history contrast"
+        )
+    if left_target < right_target:
+        return left, right
+    return right, left
+
+
+def _records_for_counterfactuals(
+    root: Path,
+    output: Path,
+    config: dict,
+    *,
+    persist_design: bool = True,
+):
     ontology = _ontology_config(root, config)
     seed = int(config["seeds"]["counterfactual_design"])
     design, _ = generate_design(
@@ -65,6 +86,7 @@ def _records_for_counterfactuals(root: Path, output: Path, config: dict):
         conditions=int(config["mechanism"].get("background_conditions", 490)),
         seed=seed,
         design_id="model_agnostic_replication_counterfactuals",
+        persist=persist_design,
     )
     patterns = [
         ((-1, -1, -1), (1, -1, -1)),
@@ -95,7 +117,8 @@ def _records_for_counterfactuals(root: Path, output: Path, config: dict):
         if len(backgrounds) < 3:
             raise RuntimeError(f"insufficient distinct mechanistic backgrounds for {task}")
         for background_index, template in enumerate(backgrounds):
-            for pattern_index, (left, right) in enumerate(patterns):
+            for pattern_index, raw_pattern in enumerate(patterns):
+                left, right = _increasing_outcome_pattern(*raw_pattern)
                 actions = tuple(
                     ("continue", "disengage", "continue", "continue", "disengage")[
                         : len(left)
