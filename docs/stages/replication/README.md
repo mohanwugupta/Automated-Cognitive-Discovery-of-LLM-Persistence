@@ -47,6 +47,23 @@ python -m cognitive_discovery.replicate_model \
   --execute
 ```
 
+If a run stopped at the counterfactual-sign validation bug fixed after the
+initial behavioral stages completed, commit and pull the repair into a clean
+working tree, then submit only the remaining chain:
+
+```bash
+OUTPUT=/absolute/path/to/the/existing/run \
+  bash scripts/submit_replication_resume.sh
+```
+
+The helper requires interface, behavior, model comparison, and theory freezing
+to be complete. It records the original and repaired repository commits under
+`submission/resume_counterfactuals_<commit>.json` and in the progressive
+provenance before submitting counterfactuals (CPU), mechanism (GPU),
+generalization (GPU), specificity (GPU), and the final report (CPU). This makes
+the mixed-code repair history explicit. Start a fresh run instead when a
+single-commit provenance record is required.
+
 Valid core stages are `interface`, `behavior`, `model_comparison`, `freeze_theory`, `counterfactuals`, `mechanism`, `generalization`, `specificity`, and `report`. `--stage all` skips already completed stages. Optional abstraction and OOD work is disabled in the default protocol and is not silently entered.
 
 ## Frozen prospective choices
@@ -95,7 +112,8 @@ It uses the production renderers, response-token checks, paired collection,
 generic residual runner, intervention hooks, and DAS primitive. In addition to
 checkpoint and chat validation, it now measures each candidate interface's
 actual full-vocabulary action mass and whether an action token is the top token.
-It collects both response mappings for every task and writes tiny-sample previews
+It collects both response mappings for every task, validates the complete
+deterministic counterfactual manifest and its signed targets, and writes tiny-sample previews
 of the same interface gates used by the full run. Those previews test plumbing
 only: they are explicitly not measurement-gate evidence. Neural checks cover
 layer discovery, streamed residual capture, an identity edit, a nonzero edit,

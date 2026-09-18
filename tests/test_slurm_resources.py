@@ -160,6 +160,24 @@ def test_replication_routes_only_model_forward_stages_to_gpu():
     assert "--gres" not in cpu
     assert "--gpus" not in cpu
 
+    resume = _text("scripts/submit_replication_resume.sh")
+    for phase in ("counterfactuals", "report"):
+        line = next(
+            line
+            for line in resume.splitlines()
+            if f"STAGE={phase}" in line and "--export" in line
+        )
+        assert '"$CPU_SCRIPT"' in line
+    for phase in ("mechanism", "generalization", "specificity"):
+        line = next(
+            line
+            for line in resume.splitlines()
+            if f"STAGE={phase}" in line and "--export" in line
+        )
+        assert '"$GPU_SCRIPT"' in line
+    assert "code_repair_history" in resume
+    assert "mixed_code_run" in resume
+
 
 def test_replication_smoke_routes_only_model_preflight_to_gpu():
     submit = _text("scripts/submit_replication_smoke.sh")
@@ -289,3 +307,94 @@ def test_passing_interface_dispatches_resource_separated_pipeline(tmp_path):
             else "run_replication_cpu.slurm"
         )
         assert expected in line
+
+
+def test_counterfactual_repair_resume_reuses_completed_stages_and_records_commits(
+    tmp_path,
+):
+    output = tmp_path / "run"
+    output.mkdir()
+    stages = {
+        name: {"status": "pending", "outcome": None, "artifacts": {}}
+        for name in (
+            "interface",
+            "behavior",
+            "model_comparison",
+            "freeze_theory",
+            "counterfactuals",
+            "mechanism",
+            "generalization",
+            "specificity",
+            "abstraction",
+            "ood",
+            "report",
+        )
+    }
+    for name in ("interface", "behavior", "model_comparison", "freeze_theory"):
+        stages[name] = {"status": "complete", "outcome": "pass", "artifacts": {}}
+    stages["counterfactuals"] = {
+        "status": "blocked",
+        "outcome": "signed target did not increase",
+        "artifacts": {},
+    }
+    (output / "run_state.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "replication-state-v1",
+                "replication_status": "blocked",
+                "run_id": "test",
+                "stages": stages,
+            }
+        ),
+        encoding="utf-8",
+    )
+    original_commit = "a" * 40
+    repaired_commit = "b" * 40
+    (output / "provenance.json").write_text(
+        json.dumps({"git_commit": original_commit}), encoding="utf-8"
+    )
+    executable_root = tmp_path / "bin"
+    executable_root.mkdir()
+    log = tmp_path / "sbatch.log"
+    (executable_root / "sbatch").write_text(
+        "#!/bin/bash\nprintf '%s\\n' \"$*\" >> \"$FAKE_SBATCH_LOG\"\necho 9001\n",
+        encoding="utf-8",
+    )
+    (executable_root / "git").write_text(
+        "#!/bin/bash\n"
+        f'if [ "$1" = "rev-parse" ]; then echo "{repaired_commit}"; '
+        'elif [ "$1" = "status" ]; then exit 0; else exit 2; fi\n',
+        encoding="utf-8",
+    )
+    (executable_root / "sbatch").chmod(0o755)
+    (executable_root / "git").chmod(0o755)
+    environment = {
+        **os.environ,
+        "PATH": f"{executable_root}:{os.environ['PATH']}",
+        "OUTPUT": str(output),
+        "SLURM_SUBMIT_DIR": str(ROOT),
+        "FAKE_SBATCH_LOG": str(log),
+    }
+    completed = subprocess.run(
+        ["bash", str(ROOT / "scripts/submit_replication_resume.sh")],
+        cwd=ROOT,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    submissions = log.read_text(encoding="utf-8").splitlines()
+    assert len(submissions) == 5
+    assert all("STAGE=behavior" not in line for line in submissions)
+    metadata = json.loads(
+        next((output / "submission").glob("resume_counterfactuals_*.json")).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert metadata["initial_git_commit"] == original_commit
+    assert metadata["resume_git_commit"] == repaired_commit
+    assert metadata["mixed_code_run"] is True
+    assert metadata["submission_status"] == "submitted"
+    provenance = json.loads((output / "provenance.json").read_text(encoding="utf-8"))
+    assert provenance["code_repair_history"][0]["resume_git_commit"] == repaired_commit

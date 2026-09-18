@@ -20,7 +20,7 @@ ROOT = Path(__file__).parents[1]
 
 def _passing_result(model_id="example/model"):
     return {
-        "schema_version": "replication-gpu-smoke-v2",
+        "schema_version": "replication-gpu-smoke-v3",
         "purpose": "engineering_preflight_not_scientific_evidence",
         "status": "passed",
         "model": {
@@ -58,6 +58,7 @@ def test_protocol_exercises_the_real_neural_boundaries_without_claim_metrics():
         "cuda_available",
         "immutable_revisions",
         "interface_configuration",
+        "counterfactual_manifest",
         "checkpoint_load",
         "chat_template",
         "seven_task_rendering",

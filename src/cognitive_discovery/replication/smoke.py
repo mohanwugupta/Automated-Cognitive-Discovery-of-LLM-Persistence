@@ -30,12 +30,13 @@ from .workflow import (
 )
 
 
-SMOKE_SCHEMA_VERSION = "replication-gpu-smoke-v2"
+SMOKE_SCHEMA_VERSION = "replication-gpu-smoke-v3"
 SMOKE_PURPOSE = "engineering_preflight_not_scientific_evidence"
 REQUIRED_SMOKE_CHECKS = (
     "cuda_available",
     "immutable_revisions",
     "interface_configuration",
+    "counterfactual_manifest",
     "checkpoint_load",
     "chat_template",
     "seven_task_rendering",
@@ -329,8 +330,31 @@ def run_model_smoke(
         _mark(result, current_check)
 
         current_check = "interface_configuration"
-        candidates = _load_interfaces(root / Path(config_path))
+        config_file = root / Path(config_path)
+        candidates = _load_interfaces(config_file)
         _mark(result, current_check, candidates=len(candidates))
+
+        current_check = "counterfactual_manifest"
+        from .neural import _records_for_counterfactuals
+
+        replication_config = yaml.safe_load(config_file.read_text(encoding="utf-8"))
+        counterfactual_records = _records_for_counterfactuals(
+            root,
+            destination,
+            replication_config,
+            persist_design=False,
+        )
+        contrast_ids = {record.contrast_id for record in counterfactual_records}
+        families = {record.contrast_family for record in counterfactual_records}
+        if not contrast_ids or "outcome_history" not in families:
+            raise RuntimeError("counterfactual preflight produced an incomplete manifest")
+        _mark(
+            result,
+            current_check,
+            rows=len(counterfactual_records),
+            contrasts=len(contrast_ids),
+            families=sorted(families),
+        )
 
         current_check = "checkpoint_load"
         selected_adapter, architecture_config = _resolve_adapter(
@@ -705,7 +729,7 @@ def summarize_smoke_runs(
     }
     status = "passed" if all_passed else "failed"
     summary = {
-        "schema_version": "replication-gpu-smoke-summary-v2",
+        "schema_version": "replication-gpu-smoke-summary-v3",
         "purpose": SMOKE_PURPOSE,
         "status": status,
         "expected_jobs": expected_jobs,
