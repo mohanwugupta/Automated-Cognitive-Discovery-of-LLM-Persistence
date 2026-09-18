@@ -15,7 +15,7 @@ CONDA_ENV="${CONDA_ENV:-llm-cognitive-discovery}"
 OUTPUT="${OUTPUT:?OUTPUT is required}"
 STAGE="${STAGE:?STAGE is required}"
 case "$STAGE" in
-  model_comparison|freeze_theory|counterfactuals|report) ;;
+  dispatch_interface|model_comparison|freeze_theory|counterfactuals|report) ;;
   *) echo "STAGE=$STAGE is not a CPU-only replication stage" >&2; exit 2 ;;
 esac
 if [ -n "${SLURM_JOB_GPUS:-}" ]; then
@@ -35,5 +35,9 @@ conda activate "$CONDA_ENV"
 set -u
 export PYTHONPATH="$PROJECT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 mkdir -p logs
-python -m cognitive_discovery.replicate_model \
-  --resume "$OUTPUT" --stage "$STAGE" --execute
+if [ "$STAGE" = "dispatch_interface" ]; then
+  bash "$PROJECT_DIR/scripts/dispatch_replication_after_interface.sh"
+else
+  python -m cognitive_discovery.replicate_model \
+    --resume "$OUTPUT" --stage "$STAGE" --execute
+fi

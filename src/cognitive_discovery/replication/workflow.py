@@ -27,7 +27,6 @@ from cognitive_discovery.experiments.contextual_history import (
 )
 from cognitive_discovery.hierarchy.random_effects import fit_hierarchical_model
 from cognitive_discovery.pipeline import generate_design, load_config
-from cognitive_discovery.participants.token_mapping import binary_choice_metrics
 
 from .adapters import adapter_registry
 from .interface import select_valid_interface
@@ -111,9 +110,26 @@ class AdapterParticipant:
             messages, labels, self.interface
         )
         positive = mapping[positive_label]
-        logits = self.adapter.get_response_logits(actual, candidate_labels)
-        result = binary_choice_metrics(logits, positive)
-        return result
+        return self.adapter.get_response_metrics(
+            actual,
+            candidate_labels,
+            positive_label=positive,
+        )
+
+
+def _require_full_vocabulary_diagnostics(frame: pd.DataFrame) -> None:
+    """Fail closed rather than converting absent token diagnostics to failures."""
+
+    required = {"p_action_mass_raw", "top_token_is_action"}
+    missing = required - set(frame)
+    if missing or frame[list(required)].isna().any().any():
+        raise RuntimeError(
+            "full-vocabulary response diagnostics are missing: "
+            f"{sorted(missing) if missing else 'null values'}"
+        )
+    masses = frame.p_action_mass_raw.to_numpy(dtype=float)
+    if not np.isfinite(masses).all() or ((masses < 0.0) | (masses > 1.0)).any():
+        raise RuntimeError("full-vocabulary action mass must be finite and lie in [0, 1]")
 
 
 def _load_run(output: Path):
@@ -193,6 +209,7 @@ def execute_interface_stage(root: Path, output: Path, *, online: bool = False) -
                     expand_history_prefixes=False,
                 )
             )
+            _require_full_vocabulary_diagnostics(frame)
         except ValueError as error:
             candidate_errors[candidate["id"]] = str(error)
             gates = {
@@ -266,6 +283,7 @@ def execute_interface_stage(root: Path, output: Path, *, online: bool = False) -
             expand_history_prefixes=False,
         )
     )
+    _require_full_vocabulary_diagnostics(validation)
     write_records(validation.to_dict("records"), stage_root / "validation_observations.parquet")
     validation_gates = {
         task: pilot_gate(group, ontology) for task, group in validation.groupby("task_family")
@@ -361,6 +379,7 @@ def execute_behavior_stage(root: Path, output: Path, *, online: bool = False) ->
             expand_history_prefixes=False,
         )
     )
+    _require_full_vocabulary_diagnostics(observations)
     observation_path = write_records(
         observations.to_dict("records"), stage_root / "observations.parquet"
     )

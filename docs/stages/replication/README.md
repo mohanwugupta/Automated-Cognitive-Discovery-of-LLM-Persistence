@@ -78,17 +78,30 @@ OUTPUT="$PWD/artifacts/replications/<run-id>" \
 bash scripts/submit_replication.sh
 ```
 
-The submitter routes model-forward stages to `slurm/run_replication_gpu.slurm` and fitting, hashing, counterfactual construction, and reporting to `slurm/run_replication_cpu.slurm`. This prevents CPU-only work from reserving a GPU. Set `ONLINE_FLAG=--online` only when compute nodes may access Hugging Face; otherwise pre-cache the exact revision.
+The submitter first runs only the model-forward interface stage, then schedules
+an `afterany` CPU dispatcher. A passing interface causes the dispatcher to
+submit the remaining resource-separated chain. A measurement failure submits
+only a CPU report, so a behavior job cannot reserve a GPU merely to discover
+that the interface gate stopped the run. Model-forward stages use
+`slurm/run_replication_gpu.slurm`; fitting, hashing, counterfactual construction,
+dispatch, and reporting use `slurm/run_replication_cpu.slurm`. Set
+`ONLINE_FLAG=--online` only when compute nodes may access Hugging Face;
+otherwise pre-cache the exact revision.
 
 ## Short GPU smoke suite before a full replication
 
 Run the smoke suite before submitting the multi-stage pipeline for a new model.
-It uses the production renderers, response-token checks, generic residual runner,
-intervention hooks, and DAS primitive on seven tiny prompts. It checks checkpoint
-loading, chat rendering, finite binary logits, layer discovery, streamed residual
-capture, an identity edit, a nonzero edit, DAS gradient flow with frozen model
-weights, EOS IDs, and peak CUDA memory. It does **not** fit a cognitive model,
-compute CFR, test specificity, or provide scientific evidence.
+It uses the production renderers, response-token checks, paired collection,
+generic residual runner, intervention hooks, and DAS primitive. In addition to
+checkpoint and chat validation, it now measures each candidate interface's
+actual full-vocabulary action mass and whether an action token is the top token.
+It collects both response mappings for every task and writes tiny-sample previews
+of the same interface gates used by the full run. Those previews test plumbing
+only: they are explicitly not measurement-gate evidence. Neural checks cover
+layer discovery, streamed residual capture, an identity edit, a nonzero edit,
+DAS gradient flow with frozen model weights, EOS IDs, and peak CUDA memory. The
+smoke suite does **not** fit a cognitive model, compute CFR, test specificity, or
+provide scientific evidence.
 
 Each model is one one-hour GPU array task, with one task active at a time by
 default. CPU regression tests run first; an `afterany` CPU job then writes a
