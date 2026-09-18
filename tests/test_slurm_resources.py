@@ -177,6 +177,8 @@ def test_replication_routes_only_model_forward_stages_to_gpu():
         assert '"$GPU_SCRIPT"' in line
     assert "code_repair_history" in resume
     assert "mixed_code_run" in resume
+    assert "--untracked-files=no" in resume
+    assert "resume_tracked_code_clean" in resume
 
 
 def test_replication_smoke_routes_only_model_preflight_to_gpu():
