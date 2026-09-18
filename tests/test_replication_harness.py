@@ -4,11 +4,13 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 
 from cognitive_discovery.replication.adapters import (
+    LlamaAdapter,
     ReplicationModelAdapter,
     adapter_registry,
     resolve_relative_layers,
@@ -35,7 +37,10 @@ from cognitive_discovery.replication.splits import (
     split_manifest_hash,
 )
 from cognitive_discovery.replication.state import ReplicationRunState, StageTransitionError
-from cognitive_discovery.replication.workflow import AdapterParticipant
+from cognitive_discovery.replication.workflow import (
+    AdapterParticipant,
+    _require_full_vocabulary_diagnostics,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +55,7 @@ def test_adapter_contract_and_family_registry_are_model_agnostic():
         "render_chat",
         "validate_response_tokens",
         "get_response_logits",
+        "get_response_metrics",
         "num_layers",
         "get_residual_state",
         "run_with_residual_intervention",
@@ -248,14 +254,64 @@ def test_stage_state_is_restartable_and_enforces_measurement_gate():
     assert state.replication_status == "measurement_failure"
 
 
-def test_adapter_participant_does_not_fabricate_full_vocabulary_validity_fields():
+def test_huggingface_adapter_computes_real_full_vocabulary_validity_fields():
+    import torch
+
+    class FakeTokenizer:
+        def apply_chat_template(self, messages, *, tokenize, **kwargs):
+            del messages, kwargs
+            return torch.tensor([[10, 11]]) if tokenize else "prompt:"
+
+        def encode(self, text, *, add_special_tokens):
+            assert add_special_tokens is False
+            values = {
+                "prompt:": [10, 11],
+                "prompt:Yes": [10, 11, 2],
+                "prompt:No": [10, 11, 3],
+            }
+            return values[text]
+
+    class FakeModel(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.anchor = torch.nn.Parameter(torch.zeros(()))
+
+        def forward(self, **kwargs):
+            del kwargs
+            logits = torch.full((1, 2, 6), -5.0)
+            logits[0, -1, 2] = 2.0
+            logits[0, -1, 3] = 1.0
+            logits[0, -1, 4] = 3.0
+            return SimpleNamespace(logits=logits, hidden_states=None)
+
+    adapter = LlamaAdapter(model_id="fake/llama", revision="a" * 40)
+    adapter.tokenizer = FakeTokenizer()
+    adapter.model = FakeModel()
+    result = adapter.get_response_metrics(
+        [{"role": "user", "content": "test"}],
+        ("Yes", "No"),
+        positive_label="Yes",
+    )
+    assert result["top_token_is_action"] is False
+    assert 0.0 < result["p_action_mass_raw"] < 1.0
+    assert result["choice_logit"] == pytest.approx(1.0)
+
+
+def test_adapter_participant_propagates_measured_full_vocabulary_validity_fields():
     class FakeAdapter:
         model_id = "fake/model"
         revision = "a" * 40
 
-        def get_response_logits(self, messages, labels):
+        def get_response_metrics(self, messages, labels, *, positive_label):
             del messages
-            return {labels[0]: 2.0, labels[1]: -1.0}
+            assert positive_label == labels[0]
+            return {
+                "p_positive": 0.75,
+                "p_negative": 0.25,
+                "choice_logit": 1.0986122886681098,
+                "top_token_is_action": True,
+                "p_action_mass_raw": 0.8,
+            }
 
     participant = AdapterParticipant(
         FakeAdapter(), {"id": "x_y", "labels": ["X", "Y"]}
@@ -265,8 +321,22 @@ def test_adapter_participant_does_not_fabricate_full_vocabulary_validity_fields(
         ["X", "Y"],
         positive_label="X",
     )
-    assert "top_token_is_action" not in result
-    assert "p_action_mass_raw" not in result
+    assert result["top_token_is_action"] is True
+    assert result["p_action_mass_raw"] == pytest.approx(0.8)
+
+
+def test_interface_gate_fails_closed_when_full_vocabulary_diagnostics_are_missing():
+    complete = pd.DataFrame(
+        {
+            "top_token_is_action": [True, False],
+            "p_action_mass_raw": [0.8, 0.4],
+        }
+    )
+    _require_full_vocabulary_diagnostics(complete)
+    with pytest.raises(RuntimeError, match="full-vocabulary"):
+        _require_full_vocabulary_diagnostics(
+            complete.assign(top_token_is_action=[None, None])
+        )
 
 
 def test_initialization_is_dry_run_safe_and_writes_complete_initial_provenance(tmp_path):

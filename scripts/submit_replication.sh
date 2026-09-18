@@ -35,23 +35,9 @@ python -m cognitive_discovery.replicate_model \
 
 interface=$(sbatch --parsable --export="ALL,STAGE=interface,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
 interface="${interface%%;*}"
-behavior=$(sbatch --parsable --dependency="afterok:${interface}" --export="ALL,STAGE=behavior,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
-behavior="${behavior%%;*}"
-comparison=$(sbatch --parsable --dependency="afterok:${behavior}" --export="ALL,STAGE=model_comparison,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
-comparison="${comparison%%;*}"
-freeze=$(sbatch --parsable --dependency="afterok:${comparison}" --export="ALL,STAGE=freeze_theory,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
-freeze="${freeze%%;*}"
-counterfactuals=$(sbatch --parsable --dependency="afterok:${freeze}" --export="ALL,STAGE=counterfactuals,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
-counterfactuals="${counterfactuals%%;*}"
-mechanism=$(sbatch --parsable --dependency="afterok:${counterfactuals}" --export="ALL,STAGE=mechanism,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
-mechanism="${mechanism%%;*}"
-generalization=$(sbatch --parsable --dependency="afterok:${mechanism}" --export="ALL,STAGE=generalization,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
-generalization="${generalization%%;*}"
-specificity=$(sbatch --parsable --dependency="afterok:${generalization}" --export="ALL,STAGE=specificity,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
-specificity="${specificity%%;*}"
-report=$(sbatch --parsable --dependency="afterok:${specificity}" --export="ALL,STAGE=report,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
-report="${report%%;*}"
+dispatch=$(sbatch --parsable --dependency="afterany:${interface}" --export="ALL,STAGE=dispatch_interface,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
+dispatch="${dispatch%%;*}"
 
-echo "Replication submitted: interface=$interface behavior=$behavior comparison=$comparison"
-echo "freeze=$freeze counterfactuals=$counterfactuals mechanism=$mechanism"
-echo "generalization=$generalization specificity=$specificity report=$report"
+echo "Replication submitted: interface=$interface conditional_dispatch=$dispatch"
+echo "Downstream jobs are submitted only if the interface measurement gate passes."
+echo "A measurement failure submits a CPU report and reserves no additional GPU."

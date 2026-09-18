@@ -16,23 +16,32 @@ from typing import Any, Iterable, Mapping
 import yaml
 
 from cognitive_discovery.causal_mechanistic.das import DASAlignment
+from cognitive_discovery.data.validation import pilot_gate, validate_records
+from cognitive_discovery.experiments.collection import collect_conditions
 from cognitive_discovery.experiments.registry import get_renderer
 from cognitive_discovery.pipeline import generate_design, load_config
 
 from .adapters import adapter_registry, resolve_relative_layers
 from .config import REVISION_PATTERN
-from .workflow import _interface_messages
+from .workflow import (
+    AdapterParticipant,
+    _interface_messages,
+    _require_full_vocabulary_diagnostics,
+)
 
 
-SMOKE_SCHEMA_VERSION = "replication-gpu-smoke-v1"
+SMOKE_SCHEMA_VERSION = "replication-gpu-smoke-v2"
 SMOKE_PURPOSE = "engineering_preflight_not_scientific_evidence"
 REQUIRED_SMOKE_CHECKS = (
     "cuda_available",
     "immutable_revisions",
+    "interface_configuration",
     "checkpoint_load",
     "chat_template",
     "seven_task_rendering",
     "response_tokens_and_logits",
+    "full_vocabulary_diagnostics",
+    "paired_interface_collection",
     "layer_discovery",
     "residual_capture",
     "identity_intervention",
@@ -181,7 +190,20 @@ def _load_interfaces(path: Path) -> list[dict[str, Any]]:
     candidates = value.get("interface", {}).get("candidates", [])
     if not isinstance(candidates, list) or not candidates:
         raise SmokeConfigurationError("replication config has no interface candidates")
-    return [dict(candidate) for candidate in candidates]
+    normalized = []
+    for candidate in candidates:
+        labels = candidate.get("labels") if isinstance(candidate, Mapping) else None
+        if (
+            not isinstance(labels, list)
+            or len(labels) != 2
+            or any(not isinstance(label, str) or not label for label in labels)
+            or len(set(labels)) != 2
+        ):
+            raise SmokeConfigurationError(
+                "smoke interface labels must be two distinct nonempty strings"
+            )
+        normalized.append(dict(candidate))
+    return normalized
 
 
 def _render_smoke_trials(project_root: Path, seed: int):
@@ -205,7 +227,25 @@ def _render_smoke_trials(project_root: Path, seed: int):
         raise RuntimeError(
             f"tiny design did not cover the seven-task battery: {sorted(observed)}"
         )
-    return trials
+    return design, trials, ontology
+
+
+def _compact_gate_preview(gate: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep tiny-sample gate diagnostics without treating them as evidence."""
+
+    value = {
+        "approved_on_tiny_sample": bool(gate["approved"]),
+        "checks": {key: bool(item) for key, item in gate["checks"].items()},
+    }
+    for key in (
+        "mean_p_continue",
+        "persistence_logit_sd",
+        "mean_absolute_mapping_gap",
+        "top_token_action_rate",
+    ):
+        item = float(gate[key])
+        value[key] = item if math.isfinite(item) else None
+    return value
 
 
 def _resolve_adapter(
@@ -288,6 +328,10 @@ def run_model_smoke(
             )
         _mark(result, current_check)
 
+        current_check = "interface_configuration"
+        candidates = _load_interfaces(root / Path(config_path))
+        _mark(result, current_check, candidates=len(candidates))
+
         current_check = "checkpoint_load"
         selected_adapter, architecture_config = _resolve_adapter(
             requested=adapter,
@@ -310,22 +354,25 @@ def run_model_smoke(
         _mark(result, current_check)
 
         current_check = "seven_task_rendering"
-        trials = _render_smoke_trials(root, seed)
+        design, trials, ontology = _render_smoke_trials(root, seed)
         result["diagnostics"]["task_prompt_hashes"] = {
             trial.task_family: _prompt_hash(trial.messages) for trial in trials
         }
         _mark(result, current_check, count=len(trials))
 
         current_check = "response_tokens_and_logits"
-        candidates = _load_interfaces(root / Path(config_path))
         interface_errors = {}
         selected = None
         selected_messages = None
         selected_labels = None
         positive_label = None
         selected_logits = None
+        selected_metrics = None
+        usable_candidates = []
+        candidate_diagnostics = {}
         for candidate in candidates:
             try:
+                instance.validate_response_tokens(candidate["labels"])
                 messages, labels, mapping = _interface_messages(
                     trials[0].messages,
                     (trials[0].continue_label, trials[0].disengage_label),
@@ -334,17 +381,39 @@ def run_model_smoke(
                 rendered = instance.render_chat(messages)
                 if not isinstance(rendered, str) or not rendered.strip():
                     raise ValueError("chat template returned an empty prompt")
-                logits = instance.get_response_logits(messages, labels)
+                candidate_positive = mapping[trials[0].continue_label]
+                metrics = instance.get_response_metrics(
+                    messages,
+                    labels,
+                    positive_label=candidate_positive,
+                )
+                logits = {label: metrics[f"logit_{label}"] for label in labels}
                 if set(logits) != set(labels) or not all(
                     math.isfinite(float(value)) for value in logits.values()
                 ):
                     raise ValueError("response logits are missing or non-finite")
-                selected = candidate
-                selected_messages = messages
-                selected_labels = tuple(labels)
-                positive_label = mapping[trials[0].continue_label]
-                selected_logits = logits
-                break
+                mass = metrics.get("p_action_mass_raw")
+                top_is_action = metrics.get("top_token_is_action")
+                if (
+                    not isinstance(top_is_action, bool)
+                    or mass is None
+                    or not math.isfinite(float(mass))
+                    or not 0.0 <= float(mass) <= 1.0
+                ):
+                    raise RuntimeError("full-vocabulary response diagnostics are invalid")
+                usable_candidates.append(candidate)
+                candidate_diagnostics[candidate["id"]] = {
+                    "labels": list(labels),
+                    "p_action_mass_raw": float(mass),
+                    "top_token_is_action": top_is_action,
+                }
+                if selected is None:
+                    selected = candidate
+                    selected_messages = messages
+                    selected_labels = tuple(labels)
+                    positive_label = candidate_positive
+                    selected_logits = logits
+                    selected_metrics = metrics
             except (RuntimeError, ValueError) as error:
                 interface_errors[str(candidate.get("id", "unnamed"))] = str(error)[:500]
         if selected is None:
@@ -380,6 +449,52 @@ def run_model_smoke(
             "logits": {key: float(value) for key, value in selected_logits.items()},
         }
         _mark(result, current_check)
+
+        current_check = "full_vocabulary_diagnostics"
+        result["diagnostics"]["interface_candidates"] = candidate_diagnostics
+        result["diagnostics"]["interface"]["p_action_mass_raw"] = float(
+            selected_metrics["p_action_mass_raw"]
+        )
+        result["diagnostics"]["interface"]["top_token_is_action"] = bool(
+            selected_metrics["top_token_is_action"]
+        )
+        _mark(result, current_check, candidates_measured=len(usable_candidates))
+
+        current_check = "paired_interface_collection"
+        previews = {}
+        for candidate in usable_candidates:
+            observations = validate_records(
+                collect_conditions(
+                    design,
+                    AdapterParticipant(instance, candidate),
+                    model_revision=revision,
+                    sample_actions=False,
+                    expand_history_prefixes=False,
+                )
+            )
+            _require_full_vocabulary_diagnostics(observations)
+            task_counts = observations.groupby("task_family").size().to_dict()
+            if set(task_counts.values()) != {2} or set(task_counts) != {
+                trial.task_family for trial in trials
+            }:
+                raise RuntimeError(
+                    f"tiny paired collection is incomplete for {candidate['id']}: "
+                    f"{task_counts}"
+                )
+            previews[candidate["id"]] = {
+                task: _compact_gate_preview(pilot_gate(group, ontology))
+                for task, group in observations.groupby("task_family")
+            }
+        result["diagnostics"]["tiny_interface_gate_preview"] = previews
+        result["diagnostics"]["tiny_interface_gate_preview_interpretation"] = (
+            "engineering_only_not_a_measurement_gate"
+        )
+        _mark(
+            result,
+            current_check,
+            candidates_collected=len(previews),
+            rows_per_candidate=len(design),
+        )
         instance.bind_response_interface(selected_labels, positive_label=positive_label)
 
         current_check = "layer_discovery"
@@ -590,7 +705,7 @@ def summarize_smoke_runs(
     }
     status = "passed" if all_passed else "failed"
     summary = {
-        "schema_version": "replication-gpu-smoke-summary-v1",
+        "schema_version": "replication-gpu-smoke-summary-v2",
         "purpose": SMOKE_PURPOSE,
         "status": status,
         "expected_jobs": expected_jobs,

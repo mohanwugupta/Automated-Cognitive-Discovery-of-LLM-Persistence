@@ -56,6 +56,10 @@ class ReplicationModelAdapter(ABC):
         """Return next-token logits for each response label."""
 
     @abstractmethod
+    def get_response_metrics(self, messages, labels, *, positive_label):
+        """Return binary metrics plus measured full-vocabulary validity fields."""
+
+    @abstractmethod
     def num_layers(self) -> int:
         """Return the number of residual-stream transformer blocks."""
 
@@ -164,17 +168,52 @@ class HuggingFaceResidualAdapter(ReplicationModelAdapter):
             self.load_tokenizer()
         return verify_chat_choice_tokens(self.tokenizer, messages, tuple(labels))
 
-    def get_response_logits(self, messages, labels):
+    def _next_token_logits(self, messages, labels):
         import torch
 
         token_ids = self._chat_token_ids(messages, labels)
         with torch.inference_mode():
-            output = self.model(**self._tokenize(messages), output_hidden_states=False, use_cache=False)
-        logits = output.logits[0, -1]
+            output = self.model(
+                **self._tokenize(messages),
+                output_hidden_states=False,
+                use_cache=False,
+            )
+        if getattr(output, "hidden_states", None) is not None:
+            raise RuntimeError("behavior-only adapter unexpectedly received hidden states")
+        return token_ids, output.logits[0, -1]
+
+    def get_response_logits(self, messages, labels):
+        token_ids, logits = self._next_token_logits(messages, labels)
         return {
             label: float(logits[token_id].detach().float().cpu())
             for label, token_id in token_ids.items()
         }
+
+    def get_response_metrics(self, messages, labels, *, positive_label):
+        """Measure action logits and their mass/rank in the full vocabulary."""
+
+        import torch
+
+        from cognitive_discovery.participants.token_mapping import binary_choice_metrics
+
+        labels = tuple(labels)
+        token_ids, logits = self._next_token_logits(messages, labels)
+        selected = {
+            label: float(logits[token_id].detach().float().cpu())
+            for label, token_id in token_ids.items()
+        }
+        result = binary_choice_metrics(selected, positive_label)
+        selected_ids = torch.tensor(list(token_ids.values()), device=logits.device)
+        result["p_action_mass_raw"] = float(
+            torch.exp(
+                torch.logsumexp(logits[selected_ids].float(), dim=0)
+                - torch.logsumexp(logits.float(), dim=0)
+            ).cpu()
+        )
+        result["top_token_is_action"] = int(logits.argmax().item()) in set(
+            token_ids.values()
+        )
+        return result
 
     def _runner(self):
         from cognitive_discovery.mechanistic.activations.qwen_runner import MechanisticQwenRunner
@@ -240,7 +279,7 @@ class HuggingFaceResidualAdapter(ReplicationModelAdapter):
 
 class QwenAdapter(HuggingFaceResidualAdapter):
     adapter_name = "qwen"
-    adapter_version = "qwen-hf-residual-v1"
+    adapter_version = "qwen-hf-residual-v2"
 
     def load_model(self):
         """Load Qwen text or hybrid checkpoints behind the Qwen adapter boundary."""
@@ -278,17 +317,17 @@ class QwenAdapter(HuggingFaceResidualAdapter):
 
 class LlamaAdapter(HuggingFaceResidualAdapter):
     adapter_name = "llama"
-    adapter_version = "llama-hf-residual-v1"
+    adapter_version = "llama-hf-residual-v2"
 
 
 class GemmaAdapter(HuggingFaceResidualAdapter):
     adapter_name = "gemma"
-    adapter_version = "gemma-hf-residual-v1"
+    adapter_version = "gemma-hf-residual-v2"
 
 
 class MistralAdapter(HuggingFaceResidualAdapter):
     adapter_name = "mistral"
-    adapter_version = "mistral-hf-residual-v1"
+    adapter_version = "mistral-hf-residual-v2"
 
 
 class AdapterRegistry:
