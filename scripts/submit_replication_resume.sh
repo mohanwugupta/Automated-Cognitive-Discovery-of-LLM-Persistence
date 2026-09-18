@@ -30,9 +30,27 @@ if ! [[ "$current_commit" =~ ^[0-9a-f]{40}$ ]]; then
   echo "Current repository commit is not an immutable lowercase 40-hex identity" >&2
   exit 2
 fi
-if [ -n "$(git status --porcelain)" ]; then
-  echo "Refusing a repair resume from a dirty working tree; commit the repair first" >&2
+tracked_changes=$(git status --porcelain --untracked-files=no)
+if [ -n "$tracked_changes" ]; then
+  echo "Refusing a repair resume with tracked or staged changes:" >&2
+  echo "$tracked_changes" >&2
+  echo "Commit or restore these files before resuming" >&2
   exit 2
+fi
+execution_changes=$(
+  git status --porcelain --untracked-files=all -- \
+    src scripts configs slurm tests pyproject.toml uv.lock
+)
+if [ -n "$execution_changes" ]; then
+  echo "Refusing a repair resume with untracked execution/configuration files:" >&2
+  echo "$execution_changes" >&2
+  echo "Commit or remove these files before resuming" >&2
+  exit 2
+fi
+if [ -n "$(git status --porcelain --untracked-files=normal)" ]; then
+  worktree_dirty=true
+else
+  worktree_dirty=false
 fi
 
 state_path="$OUTPUT/run_state.json"
@@ -71,7 +89,11 @@ fi
 python -c '
 from datetime import datetime, timezone
 import json, pathlib, sys
-provenance_path, state_path, metadata_path, commit = map(pathlib.Path, sys.argv[1:])
+provenance_path = pathlib.Path(sys.argv[1])
+state_path = pathlib.Path(sys.argv[2])
+metadata_path = pathlib.Path(sys.argv[3])
+commit = sys.argv[4]
+git_dirty = sys.argv[5] == "true"
 provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
 state = json.loads(state_path.read_text(encoding="utf-8"))
 record = {
@@ -80,9 +102,10 @@ record = {
     "resume_from_stage": "counterfactuals",
     "prepared_at_utc": datetime.now(timezone.utc).isoformat(),
     "initial_git_commit": provenance["git_commit"],
-    "resume_git_commit": commit.name,
-    "resume_git_dirty": False,
-    "mixed_code_run": provenance["git_commit"] != commit.name,
+    "resume_git_commit": commit,
+    "resume_git_dirty": git_dirty,
+    "resume_tracked_code_clean": True,
+    "mixed_code_run": provenance["git_commit"] != commit,
     "completed_stage_snapshot": {
         name: state["stages"][name]
         for name in ("interface", "behavior", "model_comparison", "freeze_theory")
@@ -95,7 +118,7 @@ for path, value in ((provenance_path, provenance), (metadata_path, record)):
     temporary = path.with_name(f".{path.name}.tmp")
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     temporary.replace(path)
-' "$provenance_path" "$state_path" "$metadata_path" "$current_commit"
+' "$provenance_path" "$state_path" "$metadata_path" "$current_commit" "$worktree_dirty"
 
 counterfactuals_submission=$(sbatch --parsable --export="ALL,STAGE=counterfactuals,OUTPUT=$OUTPUT" "$CPU_SCRIPT")
 counterfactuals="${counterfactuals_submission%%;*}"
