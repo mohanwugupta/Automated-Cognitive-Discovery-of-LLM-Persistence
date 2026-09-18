@@ -1,0 +1,11 @@
+{
+  "approved_task_count": 7,
+  "labels": [
+    "Yes",
+    "No"
+  ],
+  "passed": true,
+  "replication_status": "interface_valid",
+  "selected": "yes_no",
+  "style": "yes_no_question"
+}

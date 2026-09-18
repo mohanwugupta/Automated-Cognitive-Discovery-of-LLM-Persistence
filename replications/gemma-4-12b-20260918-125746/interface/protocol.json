@@ -1,0 +1,44 @@
+{
+  "calibration_seed": 11001,
+  "candidate_errors": {},
+  "candidates": [
+    {
+      "id": "yes_no",
+      "labels": [
+        "Yes",
+        "No"
+      ],
+      "style": "yes_no_question"
+    },
+    {
+      "id": "continue_stop",
+      "labels": [
+        "Continue",
+        "Stop"
+      ]
+    },
+    {
+      "id": "a_b",
+      "labels": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "x_y",
+      "labels": [
+        "X",
+        "Y"
+      ]
+    }
+  ],
+  "model": {
+    "adapter": "gemma",
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7",
+    "tokenizer_id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "tokenizer_revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  },
+  "selection_uses_scientific_outcomes": false,
+  "validation_seed": 11002
+}

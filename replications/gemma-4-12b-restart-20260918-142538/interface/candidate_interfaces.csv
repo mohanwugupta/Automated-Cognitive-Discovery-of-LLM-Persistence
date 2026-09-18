@@ -1,0 +1,5 @@
+interface_id,labels,style
+yes_no,"[""Yes"", ""No""]",yes_no_question
+continue_stop,"[""Continue"", ""Stop""]",choice_mapping
+a_b,"[""A"", ""B""]",choice_mapping
+x_y,"[""X"", ""Y""]",choice_mapping

@@ -1,0 +1,16 @@
+[
+  {
+    "changed_fraction": 0.9649122807017544,
+    "control": "shuffled_source_base",
+    "status": "informative_control",
+    "theory": "latent_context"
+  },
+  {
+    "changed_rows": 112,
+    "control": "shuffled_target",
+    "maximum_absolute_change": 1.8417200681792307,
+    "rows": 114,
+    "status": "informative_control",
+    "theory": "latent_context"
+  }
+]

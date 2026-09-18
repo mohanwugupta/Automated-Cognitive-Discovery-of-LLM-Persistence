@@ -1,0 +1,150 @@
+# Replication report
+
+## Component summary
+
+Measurement interface:                  PASS
+Behavioral history-sensitive structure: FAIL
+Behavioral theory uniquely resolved:    NO / UNRESOLVED
+Low-dimensional causal controller:      PASS
+Held-out example generalization:        FAIL
+Held-out task-family generalization:    FAIL
+Specificity vs random controls:         INCOMPLETE CONTROLS
+Abstraction identity:                   NOT_RUN
+Far-OOD continuation generalization:    NOT RUN
+
+## 1. Model identity
+
+- Model: `/scratch/gpfs/JORDANAT/mg9965/models/meta-llama--Llama-3.1-8B-Instruct`
+- Revision: `0e9e39f249a16976918f6564b8830bc894c89659`
+- Adapter: `llama`
+
+## 2. Measurement-interface result
+
+Selected `yes_no`; approved tasks: 7.
+
+## 3. Behavioral model comparison
+
+Behavioral replication status: `partial`.  
+Frozen history-sensitive model set: `['dual_history', 'latent_context', 'outcome_history']`.
+
+## 4. Frozen behavioral theory status
+
+Status: `unresolved`. Selection is frozen before neural fitting.
+
+## 5. Mechanistic search grid
+
+Selected controller(s): `dual_history=L16/rank2, latent_context=L24/rank2, outcome_history=L16/rank2`. The fresh-run grid is defined by relative depth, not a fixed Qwen layer.
+
+## 6. Selected controller
+
+Endpoint: `cognitive_counterfactual_recovery`; metric: `global_cfr_v1`.
+
+## 7. Held-out within-task cognitive recovery
+
+Global CFR: {'dual_history': 0.4792727202, 'latent_context': 0.8286623183, 'outcome_history': 0.4168458747}; interval: {'dual_history': [-0.151538827, 0.6898932038], 'latent_context': [0.3071716451, 0.8949370168], 'outcome_history': [-0.4204922018, 0.7271286898]}.
+
+## 8. Held-out task-family cognitive recovery
+
+Global CFR: {'dual_history': 0.1481763532, 'latent_context': -4.6092019524, 'outcome_history': -0.1191694678}; interval: {'dual_history': [-0.1914894841, 0.3804694769], 'latent_context': [-10.132089724, -2.3318579388], 'outcome_history': [-0.5366667568, 0.1805830915]}.
+
+## 9. Specificity controls
+
+Matched random-subspace comparison: INCOMPLETE CONTROLS.
+
+## 10. Optional abstraction result
+
+`not_run`
+
+## 11. Optional OOD boundary result
+
+`not_run`
+
+## 12. Limitations
+
+Component outcomes remain separate. A failure or non-run optional boundary test does not retroactively change the structured-task result.
+
+## 13. Exact provenance hashes
+
+```json
+{
+  "adapter": {
+    "name": "llama",
+    "version": "llama-hf-residual-v2"
+  },
+  "behavioral_condition_manifest_hash": "74243cdcbe4166907ffeb8b03bf55b68882c191a1d1b82fdbf6235cb030f9dc5",
+  "behavioral_design_hash": "e8209ec6749724ec79808c518cb6167c8734c5d75ef340246381524149144361",
+  "behavioral_split_hash": "d9670b1df541e58267487eb15ebda60176600463d7996afdc7ac86dc1379bbed",
+  "config_hash": "6e48418e1e121f6f47f65da79fa55754ce1171430643d89ed0987c45339dbc33",
+  "counterfactual_pair_manifest_hash": "23ae80776eda6aacef105254babe873383156d3ab837e5184f6ecf1cb9a2308b",
+  "counterfactual_prediction_hash": "b064fd0e1ea7aac14457aeba9a16a99018b58072a48c13d769a6a56572848f9d",
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "environment": {
+    "lockfile": "uv.lock",
+    "lockfile_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661"
+  },
+  "frozen_model_hashes": {
+    "dual_history/model.pkl": "26b35df1b4282f6768483b21bc771770ff4e14416bd114ec67df0d18621cea74",
+    "dual_history/model_spec.json": "c1c9ebd3a7f197a9e9b73e96dc6a6a5310f9e385917e69b3be491bae7acb3f9f",
+    "dual_history/parameters.csv": "587ad9995a8690d1f4bfc42ae8e27e0e8e207e39769feea6804a555cdd629605",
+    "dual_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+    "latent_context/model.pkl": "d61e00181e1aa477eb52ad9172c2d39afb606a9f2bf426a2c7bb0d743800d78a",
+    "latent_context/model_spec.json": "05b3cc3fb5ff2b9445ebccdb6c4329bdededa1b25b1ff0369abb8cd3d7e4f7ef",
+    "latent_context/parameters.csv": "f3eb75542b7a1652f51319bf4d5ff60a575eb4b87c45cdab5aef868de90e2d06",
+    "latent_context/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+    "outcome_history/model.pkl": "b1ac87a78360b1af2f19a532316353d26be783f81f4b3935504739370f382800",
+    "outcome_history/model_spec.json": "955d41d07519ad1d1bb22d8b9056d3e1c417f091540d72cf0dfc3b3c83a5de10",
+    "outcome_history/parameters.csv": "7ef9e254cb7f43dceeedd491af4a947bda72ac2cdab6cdcb8654ac5d03bc28dc",
+    "outcome_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8"
+  },
+  "git_commit": "00d427489b1ad8e81c9c60e2488d0689aa74f917",
+  "git_dirty": true,
+  "layer_rank_grid": {
+    "ranks": [
+      2,
+      8
+    ],
+    "relative_depths": [
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/meta-llama--Llama-3.1-8B-Instruct",
+    "revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "neural_split_hash": "918440f243bbf4c9f3d2103ff01eb87a832f0728b0e88746c3641d8f31e7fe50",
+  "output_path": "/scratch/gpfs/JORDANAT/mg9965/replications/llama-3.1-8b-restart-20260918-142501",
+  "resolved_layers": [
+    8,
+    16,
+    24,
+    28
+  ],
+  "schema_version": "replication-provenance-v1",
+  "seeds": {
+    "behavior_design": 12001,
+    "behavior_fit": 12003,
+    "behavior_split": 12002,
+    "bootstrap": 15001,
+    "counterfactual_design": 13001,
+    "interface_calibration": 11001,
+    "interface_validation": 11002,
+    "mechanism_search": 14001,
+    "neural_split": 13002,
+    "random_controls": 14002
+  },
+  "selected_controller_artifact_hashes": {
+    "dual_history": "14d7cb2fd299c59138cbc13431ddc81d027cd606f9c808c90f5cd4753e42453c",
+    "latent_context": "de950d96ff307be541b27d76c8a7a8dfa6f772c3be83ce18416ed596c934d7c6",
+    "outcome_history": "606a43ebc5f008aeda1aff6b90a1cabfec8c63f02fe03000aa122f07fe7fc3d4"
+  },
+  "selected_controller_hash": "be2faa89eb69bbe83aa42eda72628fc33c5617bad35e4c722dbb602d62bf0387",
+  "tokenizer": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/meta-llama--Llama-3.1-8B-Instruct",
+    "revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  }
+}
+```

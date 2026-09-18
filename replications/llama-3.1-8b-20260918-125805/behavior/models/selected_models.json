@@ -1,0 +1,11 @@
+{
+  "behavioral_replication": "partial",
+  "behavioral_theory_status": "unresolved",
+  "selected_models": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "selection_uses_test_for_choice": false,
+  "test_is_used_only_for_preregistered_confirmation": true
+}

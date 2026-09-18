@@ -1,0 +1,101 @@
+{
+  "replication_status": "complete",
+  "run_id": "scratch-gpfs-jordanat-mg9965-models-google-gemma-4-12b-it-707f0a3b",
+  "schema_version": "replication-state-v1",
+  "stages": {
+    "abstraction": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "behavior": {
+      "artifacts": {
+        "condition_manifest": "74243cdcbe4166907ffeb8b03bf55b68882c191a1d1b82fdbf6235cb030f9dc5",
+        "condition_manifest_table": "e8209ec6749724ec79808c518cb6167c8734c5d75ef340246381524149144361",
+        "observations": "b12af938033d50f4231e2a44be0500a178192c0cf67dcb5a8d669a485aef90c0",
+        "split_manifest": "3cf236703562f095e3be4082b793831a3cd1bcae69cf9cb55cbf261df690b323"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "counterfactuals": {
+      "artifacts": {
+        "condition_manifest": "cb8ce5cb2cb07b54ac1b8bd28d8f05cc36ed8172b5397f2b10e12706eca827d7",
+        "neural_split": "d65de8245e9ef7b47cfe40c837a6d8c8dedf14fd28376a3fb5b7858e01b8988c",
+        "pair_manifest": "54a9f2581c9318a3474a66f0ab88e8ef900b25e356b8bff873807ebede53b0ba",
+        "predictions": "4b4a86296d01bd8e200e305823cca8fb3580f07ae74803ee473b22feed508d90"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "freeze_theory": {
+      "artifacts": {
+        "latent_context/model.pkl": "b9d4e464240a671725719714e0c5139a9aa0ffa0432387c9bf041d0f75999eb1",
+        "latent_context/model_spec.json": "05b3cc3fb5ff2b9445ebccdb6c4329bdededa1b25b1ff0369abb8cd3d7e4f7ef",
+        "latent_context/parameters.csv": "3eec303a7f92df9ea83ff9bf30f5d96c8d97aabd4f4c651e4bdeaec3a4340686",
+        "latent_context/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8"
+      },
+      "outcome": "resolved",
+      "status": "complete"
+    },
+    "generalization": {
+      "artifacts": {
+        "gates": "0e63f3a7997fdc2120df882e5d95e08c0ced53a1b049cec59836b3ffc16e6a79",
+        "interventions": "be27021f9b3ba6caa7f3cf39dd884216f079b6129e850b2cd93d840b9b0f92ee",
+        "metrics": "45a2cc084224d715dbe913e5e6995deec377c58dba3f35ebf0002a43bf0cf0b2"
+      },
+      "outcome": "partial_or_fail",
+      "status": "complete"
+    },
+    "interface": {
+      "artifacts": {
+        "gates": "5ef977dcf05617e90cd09a5cca3659b6ba46fa63904ab8f718e25e2254245f14",
+        "selected_interface": "c41a68d97553f39dd3867e998e22acb4495a28b252b281f620244abb2ddfa285"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "mechanism": {
+      "artifacts": {
+        "search_grid": "96349c9258350438564d6af91e7df4aeed21198f8d40679d8df3f4cb0b77fd28",
+        "selected_controller": "e0efd37feec6306e4f64f2afae7fc7bbbc93931145b3fbf853212b2048518b2d",
+        "selection_results": "b335e29c7567f1b117c5daf5650a9150b85e392f81e38ac09b1df53665bb7276",
+        "train_results": "067e3ce58e9be56f0109a5551b2e6cd69b747c685eb1943828c5e1734f12bde9"
+      },
+      "outcome": "selected",
+      "status": "complete"
+    },
+    "model_comparison": {
+      "artifacts": {
+        "comparison": "9eaf14384ab3a1a54e155ec4df0d0aca04b8cf3aba25e3e63618747a45f243bd",
+        "selection": "e6167971e7f27d303bb4db8f03d29cde366209211df66a20fbc6e3e420d07592"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "ood": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "report": {
+      "artifacts": {
+        "report": "952ca70147ec4b1b7a309383df363bd769989292e12a138b892a993d97114c85",
+        "results": "58da193984ce9cf4dd82b2e3fa455456e861eb5f0e931053817b954a732d7cca"
+      },
+      "outcome": "complete",
+      "status": "complete"
+    },
+    "specificity": {
+      "artifacts": {
+        "controls": "d8ff950c6b7b3738449602e99219b161ee400f6a30289d747f149dc299bd1aa7",
+        "effects": "815badc1bc473b4edc6be22fc9b57f85a37ec128dcf77f86a0e5be0492191bf9",
+        "gates": "c319f686cc0a0663bfc25e90ead4dc6601430e174fb4c9fc9728f665e490df65",
+        "random_null": "f8ba1c69bd2e7507118b8aa54d510150a3bd4b54bb29ec23ce1c46e70b967cc8",
+        "shuffle_audit": "fde02f698d250286d57477d646bd658ba8306789dbdb665b1265c21efadc9322"
+      },
+      "outcome": "fail",
+      "status": "complete"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "neural_selection": 42,
+    "neural_task_holdout": 192,
+    "neural_test": 42,
+    "neural_train": 140
+  },
+  "fitting_tasks": [
+    "bandit",
+    "debugging",
+    "foraging",
+    "solvability"
+  ],
+  "frozen_before_das": true,
+  "holdout_tasks": [
+    "effort",
+    "information_sampling",
+    "waiting"
+  ],
+  "schema_version": "neural-split-v1",
+  "seed": 13002,
+  "sha256": "918440f243bbf4c9f3d2103ff01eb87a832f0728b0e88746c3641d8f31e7fe50"
+}

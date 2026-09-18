@@ -1,0 +1,10 @@
+{
+  "architecture": "latent_context",
+  "feature_definition": "canonical cognitive_discovery model registry",
+  "fit_seed": 12003,
+  "ridge_alphas": [
+    1.0
+  ],
+  "split_hash": "d9670b1df541e58267487eb15ebda60176600463d7996afdc7ac86dc1379bbed",
+  "variant": "M3"
+}

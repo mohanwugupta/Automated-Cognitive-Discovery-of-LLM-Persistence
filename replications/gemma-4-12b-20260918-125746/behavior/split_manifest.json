@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "behavior_selection": 602,
+    "behavior_test": 602,
+    "behavior_train": 1806
+  },
+  "group_column": "paired_condition_id_or_contextual_critical_contrast_id",
+  "schema_version": "behavior-split-v1",
+  "seed": 12002,
+  "sha256": "d9670b1df541e58267487eb15ebda60176600463d7996afdc7ac86dc1379bbed"
+}

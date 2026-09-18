@@ -1,0 +1,61 @@
+{
+  "adapter": {
+    "name": "gemma",
+    "version": "gemma-hf-residual-v2"
+  },
+  "behavioral_condition_manifest_hash": "74243cdcbe4166907ffeb8b03bf55b68882c191a1d1b82fdbf6235cb030f9dc5",
+  "behavioral_design_hash": "e8209ec6749724ec79808c518cb6167c8734c5d75ef340246381524149144361",
+  "behavioral_split_hash": "d9670b1df541e58267487eb15ebda60176600463d7996afdc7ac86dc1379bbed",
+  "config_hash": "043bb5688f8e7b792cee243d32150611a48f341b999a0aac08b5fa96e84dc13f",
+  "counterfactual_pair_manifest_hash": "pending",
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "environment": {
+    "lockfile": "uv.lock",
+    "lockfile_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661"
+  },
+  "frozen_model_hashes": {
+    "latent_context/model.pkl": "b9d4e464240a671725719714e0c5139a9aa0ffa0432387c9bf041d0f75999eb1",
+    "latent_context/model_spec.json": "05b3cc3fb5ff2b9445ebccdb6c4329bdededa1b25b1ff0369abb8cd3d7e4f7ef",
+    "latent_context/parameters.csv": "3eec303a7f92df9ea83ff9bf30f5d96c8d97aabd4f4c651e4bdeaec3a4340686",
+    "latent_context/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8"
+  },
+  "git_commit": "78cd510ce3ea18853aca56c9e981a5f4a5b2dd91",
+  "git_dirty": true,
+  "layer_rank_grid": {
+    "ranks": [
+      2,
+      8
+    ],
+    "relative_depths": [
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  },
+  "neural_split_hash": "pending",
+  "output_path": "/scratch/gpfs/JORDANAT/mg9965/replications/gemma-4-12b-20260918-125746",
+  "schema_version": "replication-provenance-v1",
+  "seeds": {
+    "behavior_design": 12001,
+    "behavior_fit": 12003,
+    "behavior_split": 12002,
+    "bootstrap": 15001,
+    "counterfactual_design": 13001,
+    "interface_calibration": 11001,
+    "interface_validation": 11002,
+    "mechanism_search": 14001,
+    "neural_split": 13002,
+    "random_controls": 14002
+  },
+  "selected_controller_hash": "pending",
+  "tokenizer": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  }
+}

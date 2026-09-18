@@ -1,0 +1,47 @@
+{
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "splits": [
+    {
+      "bootstrap_lower_bound_positive": false,
+      "positive_global_cfr": true,
+      "positive_target_correlation": true,
+      "split": "neural_task_holdout",
+      "theory": "dual_history"
+    },
+    {
+      "bootstrap_lower_bound_positive": false,
+      "positive_global_cfr": true,
+      "positive_target_correlation": true,
+      "split": "neural_test",
+      "theory": "dual_history"
+    },
+    {
+      "bootstrap_lower_bound_positive": false,
+      "positive_global_cfr": false,
+      "positive_target_correlation": true,
+      "split": "neural_task_holdout",
+      "theory": "latent_context"
+    },
+    {
+      "bootstrap_lower_bound_positive": true,
+      "positive_global_cfr": true,
+      "positive_target_correlation": true,
+      "split": "neural_test",
+      "theory": "latent_context"
+    },
+    {
+      "bootstrap_lower_bound_positive": false,
+      "positive_global_cfr": false,
+      "positive_target_correlation": true,
+      "split": "neural_task_holdout",
+      "theory": "outcome_history"
+    },
+    {
+      "bootstrap_lower_bound_positive": false,
+      "positive_global_cfr": true,
+      "positive_target_correlation": true,
+      "split": "neural_test",
+      "theory": "outcome_history"
+    }
+  ]
+}

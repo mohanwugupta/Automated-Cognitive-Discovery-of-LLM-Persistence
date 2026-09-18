@@ -1,0 +1,11 @@
+interface_status=complete
+interface_outcome=pass
+replication_status=running
+behavior=14111747
+model_comparison=14111748
+freeze_theory=14111749
+counterfactuals=14111750
+mechanism=14111751
+generalization=14111752
+specificity=14111753
+report=14111754

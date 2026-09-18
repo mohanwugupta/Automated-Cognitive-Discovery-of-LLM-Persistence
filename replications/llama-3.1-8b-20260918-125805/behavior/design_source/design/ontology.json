@@ -1,0 +1,72 @@
+{
+  "continuation_cost": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "continuation_value": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "controllability": [
+    "low",
+    "high"
+  ],
+  "disengagement_value": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "environmental_stability": [
+    "stable",
+    "changing"
+  ],
+  "goal_continuity": [
+    "same",
+    "new"
+  ],
+  "history_length": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "history_valence": [
+    "negative",
+    "neutral",
+    "mixed",
+    "positive"
+  ],
+  "prior_investment": [
+    "low",
+    "high"
+  ],
+  "progress_evidence": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "response_mapping": [
+    "continue_x",
+    "continue_y"
+  ],
+  "success_evidence": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "task_family": [
+    "bandit",
+    "foraging",
+    "solvability",
+    "information_sampling",
+    "waiting",
+    "effort",
+    "debugging"
+  ],
+  "uncertainty": [
+    "low",
+    "high"
+  ]
+}

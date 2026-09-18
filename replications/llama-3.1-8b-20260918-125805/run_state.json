@@ -1,0 +1,86 @@
+{
+  "replication_status": "blocked",
+  "run_id": "scratch-gpfs-jordanat-mg9965-models-meta-llama-llama-3-1-8b-instruct-0e9e39f2",
+  "schema_version": "replication-state-v1",
+  "stages": {
+    "abstraction": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "behavior": {
+      "artifacts": {
+        "condition_manifest": "74243cdcbe4166907ffeb8b03bf55b68882c191a1d1b82fdbf6235cb030f9dc5",
+        "condition_manifest_table": "e8209ec6749724ec79808c518cb6167c8734c5d75ef340246381524149144361",
+        "observations": "1b16d19ddc4a48795aa018fa596b7e9940a0a966121a20b6487a6914637e3b43",
+        "split_manifest": "3cf236703562f095e3be4082b793831a3cd1bcae69cf9cb55cbf261df690b323"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "counterfactuals": {
+      "artifacts": {},
+      "outcome": "ValueError: signed target does not increase in replication:bandit:bg0:pattern1:outcome_history",
+      "status": "blocked"
+    },
+    "freeze_theory": {
+      "artifacts": {
+        "dual_history/model.pkl": "26b35df1b4282f6768483b21bc771770ff4e14416bd114ec67df0d18621cea74",
+        "dual_history/model_spec.json": "c1c9ebd3a7f197a9e9b73e96dc6a6a5310f9e385917e69b3be491bae7acb3f9f",
+        "dual_history/parameters.csv": "587ad9995a8690d1f4bfc42ae8e27e0e8e207e39769feea6804a555cdd629605",
+        "dual_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+        "latent_context/model.pkl": "d61e00181e1aa477eb52ad9172c2d39afb606a9f2bf426a2c7bb0d743800d78a",
+        "latent_context/model_spec.json": "05b3cc3fb5ff2b9445ebccdb6c4329bdededa1b25b1ff0369abb8cd3d7e4f7ef",
+        "latent_context/parameters.csv": "f3eb75542b7a1652f51319bf4d5ff60a575eb4b87c45cdab5aef868de90e2d06",
+        "latent_context/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+        "outcome_history/model.pkl": "b1ac87a78360b1af2f19a532316353d26be783f81f4b3935504739370f382800",
+        "outcome_history/model_spec.json": "955d41d07519ad1d1bb22d8b9056d3e1c417f091540d72cf0dfc3b3c83a5de10",
+        "outcome_history/parameters.csv": "7ef9e254cb7f43dceeedd491af4a947bda72ac2cdab6cdcb8654ac5d03bc28dc",
+        "outcome_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8"
+      },
+      "outcome": "unresolved",
+      "status": "complete"
+    },
+    "generalization": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "interface": {
+      "artifacts": {
+        "gates": "7298eca79e667ee26b950365c46f60a3a8d505529f8c25f90a4b18f86348f667",
+        "selected_interface": "82e4288d33d9018ed28103f2d63642dd628761db6f281d76bbd9dedf661e777c"
+      },
+      "outcome": "pass",
+      "status": "complete"
+    },
+    "mechanism": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "model_comparison": {
+      "artifacts": {
+        "comparison": "28c5240736c5ddd4695e55cb6685e206497f5450d2c35b5ab7ac3d1fd1e661b9",
+        "selection": "3c81d2b07ee14337aaeb3363003a2d882d239b9e73ab30df8c708d34457bef77"
+      },
+      "outcome": "partial",
+      "status": "complete"
+    },
+    "ood": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "report": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "specificity": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    }
+  }
+}

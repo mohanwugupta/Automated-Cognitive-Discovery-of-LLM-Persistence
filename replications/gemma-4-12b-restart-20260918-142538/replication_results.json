@@ -1,0 +1,1021 @@
+{
+  "behavior": {
+    "model_comparison": [
+      {
+        "model": "immediate_state",
+        "mse": 7.8070565215,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.73779974,
+        "task": "all"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 14.800739144,
+        "n": 654,
+        "phase": "train",
+        "r2": 0.7352410901,
+        "task": "bandit"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 6.2972849173,
+        "n": 652,
+        "phase": "train",
+        "r2": 0.6927839813,
+        "task": "debugging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 4.2369509733,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7769748489,
+        "task": "effort"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.824462527,
+        "n": 640,
+        "phase": "train",
+        "r2": 0.6434230055,
+        "task": "foraging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 2.6591884973,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.6860971996,
+        "task": "information_sampling"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 11.5443606402,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7399369078,
+        "task": "solvability"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 5.2863984902,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7225841724,
+        "task": "waiting"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.5213407413,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7138630294,
+        "task": "task_macro"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.9002902585,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7238995295,
+        "task": "all"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 13.5282863567,
+        "n": 222,
+        "phase": "selection",
+        "r2": 0.7504796889,
+        "task": "bandit"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.1610976253,
+        "n": 210,
+        "phase": "selection",
+        "r2": 0.5980413925,
+        "task": "debugging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 6.1581261828,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.5853209258,
+        "task": "effort"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 8.3267536148,
+        "n": 212,
+        "phase": "selection",
+        "r2": 0.6235223352,
+        "task": "foraging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 2.8064427213,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.6644215214,
+        "task": "information_sampling"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 10.9363806183,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7353952834,
+        "task": "solvability"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 4.2964933094,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7810698733,
+        "task": "waiting"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.6019400612,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.6768930029,
+        "task": "task_macro"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.7623862126,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7381694854,
+        "task": "all"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 17.032986904,
+        "n": 204,
+        "phase": "test",
+        "r2": 0.7134503053,
+        "task": "bandit"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 6.4735852181,
+        "n": 218,
+        "phase": "test",
+        "r2": 0.639960688,
+        "task": "debugging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 3.9855887291,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7762358351,
+        "task": "effort"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 8.2020502111,
+        "n": 228,
+        "phase": "test",
+        "r2": 0.6222079562,
+        "task": "foraging"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 2.4025752219,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.6993991278,
+        "task": "information_sampling"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 10.0470017976,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7524139605,
+        "task": "solvability"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 3.9238333775,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.785214591,
+        "task": "waiting"
+      },
+      {
+        "model": "immediate_state",
+        "mse": 7.438231637,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7126974948,
+        "task": "task_macro"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.9116446784,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7678721774,
+        "task": "all"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 13.151441653,
+        "n": 654,
+        "phase": "train",
+        "r2": 0.76474409,
+        "task": "bandit"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 5.4214598252,
+        "n": 652,
+        "phase": "train",
+        "r2": 0.735511522,
+        "task": "debugging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 3.9369678394,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7927653984,
+        "task": "effort"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.792254121,
+        "n": 640,
+        "phase": "train",
+        "r2": 0.6904628846,
+        "task": "foraging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 2.4291591034,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7132509238,
+        "task": "information_sampling"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 9.8747538844,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7775486135,
+        "task": "solvability"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 5.0873296772,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7330307627,
+        "task": "waiting"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.6704808719,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7439020279,
+        "task": "task_macro"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 7.0842988561,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7524169134,
+        "task": "all"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 11.571288744,
+        "n": 222,
+        "phase": "selection",
+        "r2": 0.786575218,
+        "task": "bandit"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.740313489,
+        "n": 210,
+        "phase": "selection",
+        "r2": 0.6216603702,
+        "task": "debugging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 5.9532985208,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.5991137165,
+        "task": "effort"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 7.0148361036,
+        "n": 212,
+        "phase": "selection",
+        "r2": 0.6828380859,
+        "task": "foraging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 2.6685035827,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.6809155,
+        "task": "information_sampling"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 10.018270294,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7576088777,
+        "task": "solvability"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 4.0149434991,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7954163952,
+        "task": "waiting"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.8544934619,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7034468805,
+        "task": "task_macro"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.950547347,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7655533571,
+        "task": "all"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 15.5310710383,
+        "n": 204,
+        "phase": "test",
+        "r2": 0.7387173671,
+        "task": "bandit"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 5.831556391,
+        "n": 218,
+        "phase": "test",
+        "r2": 0.6756681993,
+        "task": "debugging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 3.4399773154,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.8068682687,
+        "task": "effort"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 7.014519864,
+        "n": 228,
+        "phase": "test",
+        "r2": 0.6769064164,
+        "task": "foraging"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 2.3916840238,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7007617921,
+        "task": "information_sampling"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 8.8983709815,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7807194152,
+        "task": "solvability"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 3.5654537021,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.8048318168,
+        "task": "waiting"
+      },
+      {
+        "model": "outcome_history",
+        "mse": 6.6675190452,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7406390394,
+        "task": "task_macro"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.7744690473,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7724792256,
+        "task": "all"
+      },
+      {
+        "model": "dual_history",
+        "mse": 13.0679132845,
+        "n": 654,
+        "phase": "train",
+        "r2": 0.766238264,
+        "task": "bandit"
+      },
+      {
+        "model": "dual_history",
+        "mse": 5.4053131384,
+        "n": 652,
+        "phase": "train",
+        "r2": 0.7362992457,
+        "task": "debugging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 3.8515961743,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7972592027,
+        "task": "effort"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.572475016,
+        "n": 640,
+        "phase": "train",
+        "r2": 0.7004786745,
+        "task": "foraging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 2.3989191111,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7168205911,
+        "task": "information_sampling"
+      },
+      {
+        "model": "dual_history",
+        "mse": 9.6015080157,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7837041009,
+        "task": "solvability"
+      },
+      {
+        "model": "dual_history",
+        "mse": 4.8001305996,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7481021899,
+        "task": "waiting"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.5282650485,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7498431813,
+        "task": "task_macro"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.9945275603,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7555542534,
+        "task": "all"
+      },
+      {
+        "model": "dual_history",
+        "mse": 11.5706584768,
+        "n": 222,
+        "phase": "selection",
+        "r2": 0.7865868429,
+        "task": "bandit"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.6281186178,
+        "n": 210,
+        "phase": "selection",
+        "r2": 0.6279579655,
+        "task": "debugging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 5.8766168331,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.6042773475,
+        "task": "effort"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.8617887273,
+        "n": 212,
+        "phase": "selection",
+        "r2": 0.6897578197,
+        "task": "foraging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 2.5600922287,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.6938787139,
+        "task": "information_sampling"
+      },
+      {
+        "model": "dual_history",
+        "mse": 9.8336566933,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7620755866,
+        "task": "solvability"
+      },
+      {
+        "model": "dual_history",
+        "mse": 4.01515353,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.795405693,
+        "task": "waiting"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.7637264439,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7085628527,
+        "task": "task_macro"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.8524947809,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7688607362,
+        "task": "all"
+      },
+      {
+        "model": "dual_history",
+        "mse": 15.7195670669,
+        "n": 204,
+        "phase": "test",
+        "r2": 0.7355462568,
+        "task": "bandit"
+      },
+      {
+        "model": "dual_history",
+        "mse": 5.7652252753,
+        "n": 218,
+        "phase": "test",
+        "r2": 0.6793573157,
+        "task": "debugging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 3.3133074917,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.8139799326,
+        "task": "effort"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.9063478617,
+        "n": 228,
+        "phase": "test",
+        "r2": 0.6818888928,
+        "task": "foraging"
+      },
+      {
+        "model": "dual_history",
+        "mse": 2.2622610596,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7169546903,
+        "task": "information_sampling"
+      },
+      {
+        "model": "dual_history",
+        "mse": 8.2626689621,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7963848792,
+        "task": "solvability"
+      },
+      {
+        "model": "dual_history",
+        "mse": 3.6708885068,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7990604561,
+        "task": "waiting"
+      },
+      {
+        "model": "dual_history",
+        "mse": 6.5571808892,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7461674891,
+        "task": "task_macro"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.7769424227,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7723961572,
+        "task": "all"
+      },
+      {
+        "model": "latent_context",
+        "mse": 12.8769512867,
+        "n": 654,
+        "phase": "train",
+        "r2": 0.7696542346,
+        "task": "bandit"
+      },
+      {
+        "model": "latent_context",
+        "mse": 5.2572628753,
+        "n": 652,
+        "phase": "train",
+        "r2": 0.7435219478,
+        "task": "debugging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 3.8173626577,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7990611907,
+        "task": "effort"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.4818441042,
+        "n": 640,
+        "phase": "train",
+        "r2": 0.7046089132,
+        "task": "foraging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 2.4159409537,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7148112548,
+        "task": "information_sampling"
+      },
+      {
+        "model": "latent_context",
+        "mse": 9.9483659077,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7758903346,
+        "task": "solvability"
+      },
+      {
+        "model": "latent_context",
+        "mse": 5.0725339045,
+        "n": 480,
+        "phase": "train",
+        "r2": 0.7338072047,
+        "task": "waiting"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.5528945271,
+        "n": 3866,
+        "phase": "train",
+        "r2": 0.7487650115,
+        "task": "task_macro"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.9100065577,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7585081055,
+        "task": "all"
+      },
+      {
+        "model": "latent_context",
+        "mse": 10.9562530127,
+        "n": 222,
+        "phase": "selection",
+        "r2": 0.797919146,
+        "task": "bandit"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.6302169357,
+        "n": 210,
+        "phase": "selection",
+        "r2": 0.6278401851,
+        "task": "debugging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 5.7446087421,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.6131665763,
+        "task": "effort"
+      },
+      {
+        "model": "latent_context",
+        "mse": 7.0358733334,
+        "n": 212,
+        "phase": "selection",
+        "r2": 0.6818869292,
+        "task": "foraging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 2.7302108211,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.673536899,
+        "task": "information_sampling"
+      },
+      {
+        "model": "latent_context",
+        "mse": 9.7842516364,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7632709374,
+        "task": "solvability"
+      },
+      {
+        "model": "latent_context",
+        "mse": 3.967238476,
+        "n": 160,
+        "phase": "selection",
+        "r2": 0.7978472303,
+        "task": "waiting"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.6926647082,
+        "n": 1284,
+        "phase": "selection",
+        "r2": 0.7079239862,
+        "task": "task_macro"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.9808257165,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7645320473,
+        "task": "all"
+      },
+      {
+        "model": "latent_context",
+        "mse": 15.2236917312,
+        "n": 204,
+        "phase": "test",
+        "r2": 0.7438884769,
+        "task": "bandit"
+      },
+      {
+        "model": "latent_context",
+        "mse": 5.9270397138,
+        "n": 218,
+        "phase": "test",
+        "r2": 0.670357734,
+        "task": "debugging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 3.5286910678,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.8018875846,
+        "task": "effort"
+      },
+      {
+        "model": "latent_context",
+        "mse": 7.328527213,
+        "n": 228,
+        "phase": "test",
+        "r2": 0.6624430231,
+        "task": "foraging"
+      },
+      {
+        "model": "latent_context",
+        "mse": 2.3216862335,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.7095196435,
+        "task": "information_sampling"
+      },
+      {
+        "model": "latent_context",
+        "mse": 8.9060117684,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.780531125,
+        "task": "solvability"
+      },
+      {
+        "model": "latent_context",
+        "mse": 3.597568424,
+        "n": 160,
+        "phase": "test",
+        "r2": 0.8030738997,
+        "task": "waiting"
+      },
+      {
+        "model": "latent_context",
+        "mse": 6.6904594502,
+        "n": 1290,
+        "phase": "test",
+        "r2": 0.7388144981,
+        "task": "task_macro"
+      }
+    ],
+    "passed": true,
+    "replication_status": "pass",
+    "selected_models": [
+      "latent_context"
+    ],
+    "theory_status": "resolved"
+  },
+  "interface": {
+    "approved_task_count": 7,
+    "labels": [
+      "A",
+      "B"
+    ],
+    "passed": true,
+    "replication_status": "interface_valid",
+    "selected": "a_b",
+    "style": "choice_mapping"
+  },
+  "mechanism": {
+    "controllers": [
+      {
+        "basis_path": "mechanism/candidates/latent_context__L24__rank2.safetensors",
+        "basis_sha256": "5bb4fb6172495f507a320736e538b3c1aa0b821ed6c83e69cf108d0cba3e49fd",
+        "candidate_id": "latent_context__L24__rank2",
+        "controller_path": "mechanism/controllers/latent_context.safetensors",
+        "controller_sha256": "5bb4fb6172495f507a320736e538b3c1aa0b821ed6c83e69cf108d0cba3e49fd",
+        "correlation": 0.048987537202094866,
+        "examples": 18,
+        "fraction_behavioral_effect_recovered": 0.22911255451239776,
+        "global_cfr": 0.27284044406598307,
+        "intercept": 0.5935668983715511,
+        "layer": 24,
+        "mean_cfr": 0.3132713763841006,
+        "median_cfr": 0.3726576673431913,
+        "rank": 2,
+        "relative_depth": 0.5,
+        "rmse": 1.3871998127612182,
+        "sign_accuracy": 1.0,
+        "slope": 0.08457428969291539,
+        "target_variable": "contextual_outcome_history",
+        "theory": "latent_context",
+        "thresholded_cfr_fraction_retained": 1.0,
+        "thresholded_cfr_median": 0.3726576673431913,
+        "thresholded_cfr_q25": 0.27696434359028965,
+        "thresholded_cfr_q75": 0.5614211915916796,
+        "thresholded_cfr_retained": 18,
+        "thresholded_cfr_threshold": 0.1,
+        "training_loss": 2.1023940607014486
+      }
+    ],
+    "endpoint_id": "cognitive_counterfactual_recovery",
+    "generalization": [
+      {
+        "cfr_ci_high": 0.0431467513,
+        "cfr_ci_low": -0.0741259858,
+        "correlation": 0.0263124935,
+        "endpoint_id": "cognitive_counterfactual_recovery",
+        "examples": 96,
+        "fraction_behavioral_effect_recovered": 0.0,
+        "global_cfr": -0.0149813478,
+        "intercept": 0.0077288733,
+        "mean_cfr": -0.3313792548,
+        "median_cfr": 2.77e-08,
+        "metric_id": "global_cfr_v1",
+        "rmse": 0.6492611902,
+        "sign_accuracy": 0.28125,
+        "slope": 0.0049079072,
+        "split": "neural_task_holdout",
+        "task_family": null,
+        "theory": "latent_context",
+        "thresholded_cfr_fraction_retained": 0.9166666667,
+        "thresholded_cfr_median": 2.16e-08,
+        "thresholded_cfr_q25": -0.2146448973,
+        "thresholded_cfr_q75": 0.2078570966,
+        "thresholded_cfr_retained": 88,
+        "thresholded_cfr_threshold": 0.1
+      },
+      {
+        "cfr_ci_high": 0.5891853343,
+        "cfr_ci_low": 0.3013576501,
+        "correlation": 0.1407330667,
+        "endpoint_id": "cognitive_counterfactual_recovery",
+        "examples": 18,
+        "fraction_behavioral_effect_recovered": 0.2643306537,
+        "global_cfr": 0.3900876596,
+        "intercept": 0.4055576492,
+        "mean_cfr": 0.5116428126,
+        "median_cfr": 0.4586388009,
+        "metric_id": "global_cfr_v1",
+        "rmse": 1.4620012123,
+        "sign_accuracy": 1.0,
+        "slope": 0.0395970391,
+        "split": "neural_test",
+        "task_family": null,
+        "theory": "latent_context",
+        "thresholded_cfr_fraction_retained": 1.0,
+        "thresholded_cfr_median": 0.4586388009,
+        "thresholded_cfr_q25": 0.2931688642,
+        "thresholded_cfr_q75": 0.6587462537,
+        "thresholded_cfr_retained": 18,
+        "thresholded_cfr_threshold": 0.1
+      }
+    ],
+    "metric_id": "global_cfr_v1",
+    "ranks": [
+      2,
+      8
+    ],
+    "relative_depths": [
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "model": {
+    "adapter": "gemma",
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7",
+    "tokenizer_id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "tokenizer_revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  },
+  "optional": {
+    "abstraction": "not_run",
+    "ood": "not_run"
+  },
+  "schema_version": "replication-results-v1",
+  "specificity": {
+    "controls_use_endpoint": "cognitive_counterfactual_recovery",
+    "endpoint_id": "cognitive_counterfactual_recovery",
+    "passed": false,
+    "random_control_passed": false,
+    "random_subspaces": 500,
+    "required_controls_complete": true,
+    "status": "fail",
+    "target_shuffles": [
+      {
+        "changed_fraction": 0.9649122807017544,
+        "control": "shuffled_source_base",
+        "status": "informative_control",
+        "theory": "latent_context"
+      },
+      {
+        "changed_rows": 112,
+        "control": "shuffled_target",
+        "maximum_absolute_change": 1.8417200681792307,
+        "rows": 114,
+        "status": "informative_control",
+        "theory": "latent_context"
+      }
+    ]
+  }
+}

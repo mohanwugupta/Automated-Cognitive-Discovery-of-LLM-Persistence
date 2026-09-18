@@ -1,0 +1,8 @@
+{
+  "config_hash": "043bb5688f8e7b792cee243d32150611a48f341b999a0aac08b5fa96e84dc13f",
+  "provenance_path": "provenance.json",
+  "run_id": "scratch-gpfs-jordanat-mg9965-models-google-gemma-4-12b-it-707f0a3b",
+  "schema_version": "replication-protocol-v1",
+  "scientific_invariant": "generalization preserves cognitive_counterfactual_recovery",
+  "state_path": "run_state.json"
+}

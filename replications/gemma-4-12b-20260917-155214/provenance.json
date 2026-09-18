@@ -1,0 +1,55 @@
+{
+  "adapter": {
+    "name": "gemma",
+    "version": "gemma-hf-residual-v1"
+  },
+  "behavioral_design_hash": "f36c61e94900e79373533ad51c8753d3658d7d5f8acc0ad5aae2c4d5195c3798",
+  "behavioral_split_hash": "pending",
+  "config_hash": "043bb5688f8e7b792cee243d32150611a48f341b999a0aac08b5fa96e84dc13f",
+  "counterfactual_pair_manifest_hash": "pending",
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "environment": {
+    "lockfile": "uv.lock",
+    "lockfile_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661"
+  },
+  "frozen_model_hashes": {},
+  "git_commit": "f671c4a05652d0962c98f5103282b4b60584773f",
+  "git_dirty": true,
+  "layer_rank_grid": {
+    "ranks": [
+      2,
+      8
+    ],
+    "relative_depths": [
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  },
+  "neural_split_hash": "pending",
+  "output_path": "/scratch/gpfs/JORDANAT/mg9965/replications/gemma-4-12b-20260917-155214",
+  "schema_version": "replication-provenance-v1",
+  "seeds": {
+    "behavior_design": 12001,
+    "behavior_fit": 12003,
+    "behavior_split": 12002,
+    "bootstrap": 15001,
+    "counterfactual_design": 13001,
+    "interface_calibration": 11001,
+    "interface_validation": 11002,
+    "mechanism_search": 14001,
+    "neural_split": 13002,
+    "random_controls": 14002
+  },
+  "selected_controller_hash": "pending",
+  "tokenizer": {
+    "id": "/scratch/gpfs/JORDANAT/mg9965/models/google--gemma-4-12b-it",
+    "revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "replication_status": "measurement_failure",
+  "run_id": "scratch-gpfs-jordanat-mg9965-models-meta-llama-llama-3-1-8b-instruct-0e9e39f2",
+  "schema_version": "replication-state-v1",
+  "stages": {
+    "abstraction": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "behavior": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "counterfactuals": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "freeze_theory": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "generalization": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "interface": {
+      "artifacts": {},
+      "outcome": "measurement_failure",
+      "status": "complete"
+    },
+    "mechanism": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "model_comparison": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "ood": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "report": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "specificity": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    }
+  }
+}

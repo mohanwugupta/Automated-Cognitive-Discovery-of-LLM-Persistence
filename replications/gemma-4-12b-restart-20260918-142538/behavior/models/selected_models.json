@@ -1,0 +1,9 @@
+{
+  "behavioral_replication": "pass",
+  "behavioral_theory_status": "resolved",
+  "selected_models": [
+    "latent_context"
+  ],
+  "selection_uses_test_for_choice": false,
+  "test_is_used_only_for_preregistered_confirmation": true
+}

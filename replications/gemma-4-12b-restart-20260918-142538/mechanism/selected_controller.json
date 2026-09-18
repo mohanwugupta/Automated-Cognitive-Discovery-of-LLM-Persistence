@@ -1,0 +1,37 @@
+{
+  "controllers": [
+    {
+      "basis_path": "mechanism/candidates/latent_context__L24__rank2.safetensors",
+      "basis_sha256": "5bb4fb6172495f507a320736e538b3c1aa0b821ed6c83e69cf108d0cba3e49fd",
+      "candidate_id": "latent_context__L24__rank2",
+      "controller_path": "mechanism/controllers/latent_context.safetensors",
+      "controller_sha256": "5bb4fb6172495f507a320736e538b3c1aa0b821ed6c83e69cf108d0cba3e49fd",
+      "correlation": 0.048987537202094866,
+      "examples": 18,
+      "fraction_behavioral_effect_recovered": 0.22911255451239776,
+      "global_cfr": 0.27284044406598307,
+      "intercept": 0.5935668983715511,
+      "layer": 24,
+      "mean_cfr": 0.3132713763841006,
+      "median_cfr": 0.3726576673431913,
+      "rank": 2,
+      "relative_depth": 0.5,
+      "rmse": 1.3871998127612182,
+      "sign_accuracy": 1.0,
+      "slope": 0.08457428969291539,
+      "target_variable": "contextual_outcome_history",
+      "theory": "latent_context",
+      "thresholded_cfr_fraction_retained": 1.0,
+      "thresholded_cfr_median": 0.3726576673431913,
+      "thresholded_cfr_q25": 0.27696434359028965,
+      "thresholded_cfr_q75": 0.5614211915916796,
+      "thresholded_cfr_retained": 18,
+      "thresholded_cfr_threshold": 0.1,
+      "training_loss": 2.1023940607014486
+    }
+  ],
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "metric_id": "global_cfr_v1",
+  "schema_version": "selected-controller-v1",
+  "test_splits_touched": false
+}

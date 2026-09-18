@@ -1,0 +1,8 @@
+{
+  "config_hash": "6e48418e1e121f6f47f65da79fa55754ce1171430643d89ed0987c45339dbc33",
+  "provenance_path": "provenance.json",
+  "run_id": "scratch-gpfs-jordanat-mg9965-models-meta-llama-llama-3-1-8b-instruct-0e9e39f2",
+  "schema_version": "replication-protocol-v1",
+  "scientific_invariant": "generalization preserves cognitive_counterfactual_recovery",
+  "state_path": "run_state.json"
+}
