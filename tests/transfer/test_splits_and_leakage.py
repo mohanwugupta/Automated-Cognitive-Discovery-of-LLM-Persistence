@@ -49,3 +49,16 @@ def test_single_task_transfer_evaluates_diagonal_before_off_diagonal():
         "waiting",
     ]
     assert transfer_target_tasks(work, "off_diagonal", source_gate=False) == []
+
+
+def test_positive_diagonal_gate_exposes_only_off_diagonal_targets():
+    work = {
+        "design": "single",
+        "source_tasks": ["bandit"],
+        "target_tasks": ["bandit", "effort", "waiting"],
+    }
+    assert transfer_target_tasks(work, "diagonal", source_gate=None) == ["bandit"]
+    assert transfer_target_tasks(work, "off_diagonal", source_gate=True) == [
+        "effort",
+        "waiting",
+    ]

@@ -307,9 +307,22 @@ def evaluate_controller(
             + "\n",
             encoding="utf-8",
         )
-    selected["target_tests_touched"] = True
-    selected["evaluated_target_tasks"] = sorted(map(str, test.task_family.unique()))
-    (job_root / "evaluation.json").write_text(json.dumps(selected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    evaluation_record = {
+        "schema_version": "task-controller-evaluation-v1",
+        "work_id": work_id,
+        "evaluation_scope": artifact_scope,
+        "controller_sha256": selected["controller_sha256"],
+        "selection_record_remained_immutable": True,
+        "evaluated_target_tasks": sorted(map(str, test.task_family.unique())),
+        "endpoint_id": settings["endpoint_id"],
+        "metric_id": settings["metric_id"],
+        "pairs": len(all_rows),
+        "random_subspaces": count,
+    }
+    (job_root / f"evaluation_{artifact_scope}.json").write_text(
+        json.dumps(evaluation_record, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     return {
         "work_id": work_id,
         "evaluation_scope": evaluation_scope,
