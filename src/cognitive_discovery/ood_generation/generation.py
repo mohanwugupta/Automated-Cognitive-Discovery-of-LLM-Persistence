@@ -108,11 +108,17 @@ def _eos_stats(logits, eos_token_ids: tuple[int, ...]) -> tuple[float, float]:
     import torch
 
     indices = torch.as_tensor(eos_token_ids, device=logits.device, dtype=torch.long)
-    eos_values = logits.float().index_select(0, indices)
+    # Accumulate the diagnostic in float64.  The logits themselves may be
+    # float32/BF16, but single-precision logsumexp can leave a ~1e-6 rounding
+    # residue when only a negligible-probability vocabulary-tail token differs.
+    # This changes neither the logits nor the frozen equivalence thresholds; it
+    # only makes the EOS statistic reproducible across Torch/kernel builds.
+    stable_logits = logits.double()
+    eos_values = stable_logits.index_select(0, indices)
     if not torch.isfinite(eos_values).all():
         raise RuntimeError("EOS was masked or made non-sampleable by the intervention")
     log_probability = torch.logsumexp(eos_values, dim=0) - torch.logsumexp(
-        logits.float(), dim=0
+        stable_logits, dim=0
     )
     probability = float(torch.exp(log_probability).detach().cpu())
     probability = min(max(probability, np.finfo(float).tiny), 1.0 - np.finfo(float).eps)
