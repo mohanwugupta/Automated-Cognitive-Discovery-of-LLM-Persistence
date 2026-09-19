@@ -11,6 +11,7 @@ dist/
 temporary_activations/
 temporary_batches/
 model_cache/
+logs/
 
 # Public Gate-B inputs are reproducibly downloaded and hash-verified. Keep the
 # raw copies out of Git; commit only their immutable manifest and acquisition code.
