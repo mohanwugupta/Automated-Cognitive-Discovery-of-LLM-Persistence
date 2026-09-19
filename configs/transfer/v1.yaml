@@ -1,0 +1,53 @@
+schema_version: task-transfer-v1
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+
+tasks: [bandit, foraging, solvability, information_sampling, waiting, effort, debugging]
+splits:
+  names: [transfer_train, transfer_selection, transfer_test]
+  fractions: [0.60, 0.20, 0.20]
+  grouping: neural_group_id
+
+designs:
+  single_task: true
+  all_pairs: true
+  leave_one_task_out: true
+  training_diversity_counts: [1, 2, 3, 4, 5, 6]
+
+search:
+  relative_depths: [0.25, 0.50, 0.75, 0.90]
+  ranks: [2, 8]
+  epochs: 3
+  learning_rate: 0.03
+  activation_change_penalty: 0.0001
+  selection_metric: global_cfr_v1
+  selection_tiebreak: [lower_rank, earlier_layer]
+
+bootstrap:
+  unit: contrast_id
+  development_samples: 200
+  samples: 2000
+random_controls:
+  subspaces: 100
+  pvalue: finite_sample_plus_one
+
+predictors:
+  frozen_before_matrix: true
+  families: [behavioral, computational, ontology, counterfactual, neural]
+  estimator: ridge
+  alpha: 10.0
+  validation: leave_one_target_task_out
+
+seeds:
+  transfer_split: 26001
+  diversity_order: 26002
+  controller_search: 27001
+  bootstrap: 27002
+  random_controls: 27003
+
+artifact_policy:
+  save_full_activations: false
+  stream_activations: true
+  save_low_rank_bases: true
+  save_scalar_outcomes: true
+  delete_temporary_activations: true

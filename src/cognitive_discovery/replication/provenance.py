@@ -41,6 +41,12 @@ def _base_validate(record: Mapping[str, Any]) -> None:
         "behavioral_design_hash",
         "behavioral_split_hash",
         "frozen_model_hashes",
+        "behavioral_survivor_rule_sha256",
+        "behavioral_survivor_set_sha256",
+        "behavioral_survivor_manifest_sha256",
+        "behavioral_survivor_set",
+        "behavioral_theory_status",
+        "behavioral_survivor_set_frozen_before_neural",
         "counterfactual_pair_manifest_hash",
         "neural_split_hash",
         "layer_rank_grid",
@@ -88,6 +94,27 @@ def _base_validate(record: Mapping[str, Any]) -> None:
     encoded = json.dumps(record, sort_keys=True, default=str).lower()
     if "historical_unknown" in encoded:
         raise ReplicationProvenanceError("new replications cannot contain historical unknowns")
+    if record.get("run_kind") == "pipeline_self_replication":
+        if record.get("analysis_id") != "qwen-prospective":
+            raise ReplicationProvenanceError("prospective analysis identity changed")
+        if record["git_dirty"] is not False:
+            raise ReplicationProvenanceError("prospective Qwen requires git_dirty: false")
+        for name in (
+            "run_spec_sha256",
+            "baseline_preflight_sha256",
+            "protocol_file_sha256",
+        ):
+            _sha(record.get(name), name)
+        if record.get("gates_mutable_after_baseline") is not False:
+            raise ReplicationProvenanceError("prospective gates changed after baseline")
+        freshness = record.get("historical_reuse", {})
+        if not freshness or any(value is not False for value in freshness.values()):
+            raise ReplicationProvenanceError("prospective run reused historical inputs")
+        if set(record.get("excluded_endpoints", [])) != {
+            "natural_effect_recovery",
+            "fresh_context_extension",
+        }:
+            raise ReplicationProvenanceError("prospective endpoint exclusions changed")
 
 
 def validate_replication_provenance(
@@ -118,6 +145,26 @@ def validate_replication_provenance(
         for name, digest in hashes.items():
             _sha(digest, f"frozen_model_hashes.{name}")
         _sha(record["behavioral_split_hash"], "behavioral_split_hash")
+        _sha(
+            record["behavioral_survivor_rule_sha256"],
+            "behavioral_survivor_rule_sha256",
+        )
+        _sha(
+            record["behavioral_survivor_set_sha256"],
+            "behavioral_survivor_set_sha256",
+        )
+        _sha(
+            record["behavioral_survivor_manifest_sha256"],
+            "behavioral_survivor_manifest_sha256",
+        )
+        if not isinstance(record["behavioral_survivor_set"], list) or not record[
+            "behavioral_survivor_set"
+        ]:
+            raise ReplicationProvenanceError("frozen behavioral survivor set is required")
+        if record["behavioral_theory_status"] not in {"resolved", "unresolved"}:
+            raise ReplicationProvenanceError("behavioral theory status must be resolved or unresolved")
+        if record["behavioral_survivor_set_frozen_before_neural"] is not True:
+            raise ReplicationProvenanceError("behavioral survivor set must be frozen before neural work")
     if required_for_stage in neural_stages:
         _sha(
             record["counterfactual_pair_manifest_hash"],

@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import pickle
 import shutil
+import subprocess
 from typing import Any
 
 import numpy as np
@@ -37,6 +38,7 @@ from .provenance import (
 )
 from .splits import assign_behavior_splits, split_manifest_hash
 from .state import ReplicationRunState
+from .survivors import select_behavioral_survivors
 
 
 def _sha256(path: Path) -> str:
@@ -136,6 +138,47 @@ def _load_run(output: Path):
     config = yaml.safe_load((output / "effective_config.yaml").read_text(encoding="utf-8"))
     state = ReplicationRunState.load(output / "run_state.json")
     provenance = json.loads((output / "provenance.json").read_text(encoding="utf-8"))
+    if canonical_hash(config) != provenance["config_hash"]:
+        raise RuntimeError("effective replication gates changed after initialization")
+    if provenance.get("run_kind") == "pipeline_self_replication":
+        run_spec = output / "prospective_run_spec.yaml"
+        preflight = output / "baseline_preflight.json"
+        if not run_spec.is_file() or _sha256(run_spec) != provenance.get("run_spec_sha256"):
+            raise RuntimeError("prospective run spec changed after baseline freeze")
+        if not preflight.is_file() or _sha256(preflight) != provenance.get(
+            "baseline_preflight_sha256"
+        ):
+            raise RuntimeError("prospective baseline preflight changed")
+        repository = Path(__file__).resolve().parents[3]
+        current_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repository, text=True
+        ).strip()
+        if current_commit != provenance.get("git_commit"):
+            raise RuntimeError(
+                "repository commit changed after prospective baseline freeze"
+            )
+        tracked_drift = subprocess.run(
+            [
+                "git",
+                "diff",
+                "--quiet",
+                "HEAD",
+                "--",
+                "src",
+                "scripts",
+                "configs",
+                "slurm",
+                "pyproject.toml",
+                "uv.lock",
+            ],
+            cwd=repository,
+            check=False,
+        )
+        if tracked_drift.returncode != 0:
+            raise RuntimeError(
+                "scientific code, configuration, or environment drifted after "
+                "prospective baseline freeze"
+            )
     return config, state, provenance
 
 
@@ -498,23 +541,25 @@ def execute_model_comparison_stage(root: Path, output: Path) -> dict:
         for name in history_models
         if float(selection.loc[name, "r2"]) >= float(selection.loc[baseline, "r2"]) + threshold
     ]
+    survivor_config = config["behavioral_survivor_set"]
     if not selection_survivors:
         replication = "fail"
         theory_status = "unresolved"
         survivors = []
+        best = None
+        survivor_record = None
     else:
-        best = max(
-            selection_survivors,
-            key=lambda name: (float(selection.loc[name, "r2"]), name),
+        survivor_record = select_behavioral_survivors(
+            selection.mse.to_dict(),
+            metric=survivor_config["metric"],
+            direction=survivor_config["direction"],
+            equivalence_rule=survivor_config["equivalence_rule"],
+            equivalence_margin=float(survivor_config["equivalence_margin"]),
+            eligible_models=selection_survivors,
         )
-        margin = float(config["model_comparison"]["equivalence_margin_mse"])
-        close = [
-            name
-            for name in selection_survivors
-            if float(selection.loc[name, "mse"]) <= float(selection.loc[best, "mse"]) + margin
-        ]
-        survivors = sorted(close)
-        theory_status = "resolved" if len(survivors) == 1 else "unresolved"
+        best = survivor_record["best_model"]
+        survivors = survivor_record["behavioral_survivor_set"]
+        theory_status = survivor_record["behavioral_theory_status"]
         confirmed = [
             name
             for name in survivors
@@ -525,10 +570,30 @@ def execute_model_comparison_stage(root: Path, output: Path) -> dict:
     result = {
         "behavioral_replication": replication,
         "behavioral_theory_status": theory_status,
+        "best_model": best,
+        "behavioral_survivor_set": survivors,
+        "selected_model": best,
         "selected_models": survivors,
         "selection_uses_test_for_choice": False,
         "test_is_used_only_for_preregistered_confirmation": True,
+        "neural_results_used_for_selection": False,
     }
+    if survivor_record is not None:
+        result.update(
+            {
+                "survivor_rule": {
+                    key: survivor_record[key]
+                    for key in (
+                        "metric", "direction", "equivalence_rule",
+                        "equivalence_margin", "evidence_axis",
+                        "neural_results_used", "rule_sha256",
+                    )
+                },
+                "survivor_scores": survivor_record["scores"],
+                "survivor_deltas_from_best": survivor_record["deltas_from_best"],
+                "survivor_membership_sha256": survivor_record["membership_sha256"],
+            }
+        )
     _json(stage_root / "selected_models.json", result)
     state.complete(
         "model_comparison",
@@ -549,7 +614,9 @@ def execute_freeze_theory_stage(root: Path, output: Path) -> dict:
     state.write(output / "run_state.json")
     stage_root = output / "behavior/models"
     selection = json.loads((stage_root / "selected_models.json").read_text())
-    selected = list(selection["selected_models"])
+    selected = list(
+        selection.get("behavioral_survivor_set", selection.get("selected_models", []))
+    )
     if not selected:
         state.fail("freeze_theory", reason="no history-sensitive behavioral model survived")
         state.write(output / "run_state.json")
@@ -560,6 +627,18 @@ def execute_freeze_theory_stage(root: Path, output: Path) -> dict:
     frozen_root = stage_root / "frozen_models"
     frozen_root.mkdir(parents=True, exist_ok=True)
     _json(frozen_root / "frozen_architectures.json", selected)
+    survivor_manifest = {
+        "schema_version": "behavioral-survivor-set-v1",
+        "best_model": selection["best_model"],
+        "behavioral_survivor_set": selected,
+        "behavioral_theory_status": selection["behavioral_theory_status"],
+        **selection["survivor_rule"],
+        "scores": selection["survivor_scores"],
+        "deltas_from_best": selection["survivor_deltas_from_best"],
+        "membership_sha256": selection["survivor_membership_sha256"],
+        "frozen_before_neural_execution": True,
+    }
+    survivor_path = _json(stage_root / "frozen_survivor_set.json", survivor_manifest)
     hashes = {}
     for name in selected:
         source = stage_root / "candidates" / f"{name}.pkl"
@@ -595,14 +674,40 @@ def execute_freeze_theory_stage(root: Path, output: Path) -> dict:
             path = destination / filename
             hashes[f"{name}/{filename}"] = _sha256(path)
     provenance["frozen_model_hashes"] = hashes
+    provenance["behavioral_survivor_rule_sha256"] = survivor_manifest["rule_sha256"]
+    provenance["behavioral_survivor_set_sha256"] = survivor_manifest["membership_sha256"]
+    provenance["behavioral_survivor_manifest_sha256"] = _sha256(survivor_path)
+    provenance["behavioral_survivor_set"] = selected
+    provenance["behavioral_theory_status"] = selection["behavioral_theory_status"]
+    provenance["behavioral_survivor_set_frozen_before_neural"] = True
     write_replication_provenance(output / "provenance.json", provenance)
+    public_root = output / "frozen_theories"
+    public_root.mkdir(parents=True, exist_ok=True)
+    _json(
+        public_root / "manifest.json",
+        {
+            **survivor_manifest,
+            "canonical_artifact": "behavior/models/frozen_survivor_set.json",
+            "frozen_model_root": "behavior/models/frozen_models",
+            "frozen_model_hashes": hashes,
+        },
+    )
     state.complete(
         "freeze_theory",
         outcome=selection["behavioral_theory_status"],
         artifacts=hashes,
     )
     state.write(output / "run_state.json")
-    return {"selected_models": selected, "hashes": hashes}
+    return {
+        "best_model": selection["best_model"],
+        "behavioral_survivor_set": selected,
+        "behavioral_theory_status": selection["behavioral_theory_status"],
+        "selected_model": selection["best_model"],
+        "selected_models": selected,
+        "survivor_rule_sha256": survivor_manifest["rule_sha256"],
+        "survivor_set_sha256": survivor_manifest["membership_sha256"],
+        "hashes": hashes,
+    }
 
 
 STAGE_EXECUTORS = {

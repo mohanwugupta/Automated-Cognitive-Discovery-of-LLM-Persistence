@@ -1,0 +1,33 @@
+schema_version: computational-model-validation-v1
+specification_version: computational-model-spec-v1
+parameter_recovery:
+  parameter_settings: 3
+  sample_size_fractions: [0.3333333333, 0.6666666667, 1.0]
+  noise_sd: 0.05
+  maximum_absolute_bias: 0.40
+  minimum_predictive_r2: 0.98
+model_recovery:
+  sample_size: 1400
+  replicates: 5
+  noise_sd: 0.10
+  key_theories: [dual_history, latent_context, outcome_history]
+  minimum_diagonal_recovery_probability: 0.80
+implementation_gate:
+  blocking: true
+  required_checks:
+    - hand_calculated_fixtures
+    - production_reference_equivalence
+    - fixed_parameter_predictions
+    - counterfactual_equivalence
+    - parameter_recovery
+identifiability_gate:
+  blocking: false
+  well_identified_threshold: 0.80
+  partial_threshold: 0.40
+  known_nested_or_equivalent_pairs:
+    - [outcome_history, dual_history]
+    - [dual_history, outcome_history]
+behavioral_survivor_set:
+  metric: selection_mse
+  equivalence_rule: absolute_score_margin
+  equivalence_margin: 0.02

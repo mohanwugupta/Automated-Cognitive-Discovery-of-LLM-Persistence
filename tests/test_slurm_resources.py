@@ -180,6 +180,13 @@ def test_replication_routes_only_model_forward_stages_to_gpu():
     assert "--untracked-files=no" in resume
     assert "resume_tracked_code_clean" in resume
 
+    prospective = _text("scripts/submit_qwen_prospective.sh")
+    assert "git status --porcelain" in prospective
+    assert "python -m pytest" in prospective
+    assert "uv.lock" in prospective
+    assert "qwen_prospective_run.yaml" in prospective
+    assert "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a" in prospective
+
 
 def test_replication_smoke_routes_only_model_preflight_to_gpu():
     submit = _text("scripts/submit_replication_smoke.sh")
@@ -220,6 +227,19 @@ def test_full_replication_conda_activation_is_safe_in_noninteractive_slurm_shell
         activation = wrapper.index('conda activate "$CONDA_ENV"')
         assert wrapper.rfind("set +u", 0, activation) >= 0
         assert wrapper.find("set -u", activation) > activation
+
+
+def test_transfer_runs_diagonal_gate_before_off_diagonal_and_requires_pilot_budget():
+    submit = _text("scripts/submit_task_transfer.sh")
+    assert "TRANSFER_EVALUATION_SCOPE=diagonal" in submit
+    cpu = _text("slurm/run_task_transfer_cpu.slurm")
+    assert "dispatch_task_transfer_after_diagonal.sh" in cpu
+    assert "TRANSFER_PILOT_REPORT" in submit
+    assert "TRANSFER_APPROVED_GPU_HOURS" in submit
+    assert "TRANSFER_APPROVED_STORAGE_GB" in submit
+    dispatcher = _text("scripts/dispatch_task_transfer_after_diagonal.sh")
+    assert "eligible_array_indices" in dispatcher
+    assert "TRANSFER_EVALUATION_SCOPE=off_diagonal" in dispatcher
 
 
 def _run_replication_dispatch(tmp_path, *, replication_status, interface_outcome):

@@ -59,8 +59,19 @@ model_comparison:
   flexible_baselines: [mlp, gru]
   minimum_history_test_r2: 0.60
   minimum_improvement_over_immediate: 0.01
+  # Deprecated compatibility alias; validation requires it to match the frozen
+  # behavioral_survivor_set.equivalence_margin below.
   equivalence_margin_mse: 0.02
   allow_unresolved_set: true
+
+# Frozen before any counterfactual or neural stage. This rule uses the
+# behavioral-selection split only; neural recovery is never an input.
+behavioral_survivor_set:
+  metric: selection_mse
+  direction: minimize
+  equivalence_rule: absolute_score_margin
+  equivalence_margin: 0.02
+  blocking_on_ambiguity: false
 
 mechanism:
   relative_depths: [0.25, 0.50, 0.75, 0.90]

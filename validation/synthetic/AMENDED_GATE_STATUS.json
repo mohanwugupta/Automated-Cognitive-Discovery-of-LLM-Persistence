@@ -1,0 +1,10 @@
+{
+  "does_not_rewrite_original_report": true,
+  "evidence_eligibility": "development_only",
+  "identifiability_status": "partial",
+  "implementation_validity": "pass",
+  "pipeline_permission": "continue",
+  "schema_version": "nonblocking-identifiability-amendment-v1",
+  "source_interpretation": "DEVELOPMENT_GATE_A_REPORT.md",
+  "superseded_field": "blocked_owner_review"
+}

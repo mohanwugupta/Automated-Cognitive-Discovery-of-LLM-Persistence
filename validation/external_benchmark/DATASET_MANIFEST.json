@@ -1,0 +1,38 @@
+{
+  "article_id": 10042319,
+  "article_title": "Cognitive bias and perseverance",
+  "article_version": 3,
+  "files": [
+    {
+      "analysis_role": "primary_factual_input",
+      "figshare_file_id": 18106115,
+      "md5": "b75a549db4227edda7bfd6d03e997728",
+      "name": "factual.csv",
+      "sha256": "f80fc526606efbb1869af3c021d7caed6894881a8aae03aaff9093d13023b791",
+      "size_bytes": 627971,
+      "url": "https://ndownloader.figshare.com/files/18106115"
+    },
+    {
+      "analysis_role": "acquired_not_analyzed",
+      "figshare_file_id": 18106118,
+      "md5": "40747ad398132b9e5919a613ec1e2ef4",
+      "name": "counterfactual.csv",
+      "sha256": "8a3d07d549313b66d44a8fd1f7d6d058399bca767923099328b528762e200329",
+      "size_bytes": 724714,
+      "url": "https://ndownloader.figshare.com/files/18106118"
+    },
+    {
+      "analysis_role": "source_documentation",
+      "figshare_file_id": 21634635,
+      "md5": "d23d8942da95071bb428a82c0d5ff24a",
+      "name": "Read me.txt",
+      "sha256": "42e87c3291cd80a037a78bdbbc59d2761dd6abb3f18c82fdbe091f4705daf6d8",
+      "size_bytes": 1194,
+      "url": "https://ndownloader.figshare.com/files/21634635"
+    }
+  ],
+  "license": "CC BY 4.0",
+  "public_api": "https://api.figshare.com/v2/articles/10042319",
+  "schema_version": "external-benchmark-dataset-manifest-v1",
+  "version_doi": "10.6084/m9.figshare.10042319.v3"
+}

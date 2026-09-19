@@ -31,6 +31,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--tokenizer-revision")
     parser.add_argument("--adapter", choices=adapter_registry.names())
     parser.add_argument("--config", type=Path, default=Path("configs/replication/default.yaml"))
+    parser.add_argument("--run-spec", type=Path)
+    parser.add_argument("--baseline-preflight", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--resume", type=Path)
     parser.add_argument(
@@ -137,10 +139,13 @@ def main(argv: list[str] | None = None) -> int:
         "output": args.output,
         "tokenizer_id": args.tokenizer,
         "tokenizer_revision": args.tokenizer_revision,
+        "run_spec_path": args.run_spec,
     }
     try:
         if args.execute:
-            result = initialize_replication(**kwargs)
+            result = initialize_replication(
+                **kwargs, baseline_preflight_path=args.baseline_preflight
+            )
             result["mode"] = "initialized"
             if args.stage != "initialize":
                 result["stage"] = args.stage

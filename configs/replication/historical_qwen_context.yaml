@@ -1,0 +1,15 @@
+schema_version: historical-qwen-context-v1
+status: descriptive_context_only
+behavioral_theory_status: unresolved
+surviving_theories: [dual_history, latent_context, outcome_history]
+selected_layer_rank: L28/rank2 primary
+familiar_task_cfr: 0.968265
+whole_task_cfr: 0.872806
+specificity: partial; recovery and random controls pass, variable identity does not
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+sources:
+  behavioral: artifacts/theory_resolution_v1/discrimination/theory_decision.json
+  controller: artifacts/causal_mech_v1/representations/alignments/outcome_history__dual_history__L28__rank2__shared__all_tasks.safetensors
+  metrics: artifacts/causal_specificity_v2/corrected_metrics/bootstrap_intervals.csv
+context_only: true

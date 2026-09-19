@@ -1,0 +1,86 @@
+{
+  "analysis_id": "sugawara_katahira_factual_v1",
+  "benchmark_claim_permission": "stop",
+  "benchmark_claim_status": "unresolved",
+  "bootstrap_computed": false,
+  "converged_map_fits": 858,
+  "evidence_eligibility": "development_only",
+  "execution_status": "owner_review",
+  "failed_exact_hessians": 6,
+  "failure_records": [
+    {
+      "hessian_min_eigenvalue": -0.7962905276505399,
+      "model": "perseverance_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 22,
+      "tau": 0.999998920315494
+    },
+    {
+      "hessian_min_eigenvalue": -12.268872742783898,
+      "model": "perseverance_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 55,
+      "tau": 0.9999989801823125
+    },
+    {
+      "hessian_min_eigenvalue": -13.347735222317244,
+      "model": "hybrid_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 55,
+      "tau": 0.99999899650324
+    },
+    {
+      "hessian_min_eigenvalue": -0.2710514422064878,
+      "model": "perseverance_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 71,
+      "tau": 0.999998999984983
+    },
+    {
+      "hessian_min_eigenvalue": -0.35262058456086326,
+      "model": "hybrid_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 71,
+      "tau": 0.9999989999684763
+    },
+    {
+      "hessian_min_eigenvalue": -2.3752873498180223,
+      "model": "hybrid_gradual",
+      "status": "hessian_not_positive_definite",
+      "subject_id": 105,
+      "tau": 0.9999989951065479
+    }
+  ],
+  "frozen_constraints": {
+    "all_143_participants_required": true,
+    "eigenvalue_floor": null,
+    "participant_exclusion_allowed": false,
+    "positive_definite_hessian_required": true
+  },
+  "gate_b_status": "not_evaluable",
+  "implementation_equivalence": "pass",
+  "independent_reference_max_abs_log_posterior_error": 5.115907697472721e-13,
+  "initial_finite_difference_hessian_failures": 134,
+  "model_fits": 858,
+  "model_ranking_computed": false,
+  "owner_decision_required": "Only if a benchmark claim is pursued: obtain the authors' exact marginal-likelihood implementation, or preregister a separate v2 boundary-aware rule that applies to all boundary solutions before computing any Gate-B contrast or ranking.",
+  "participants": 143,
+  "pipeline_permission": "continue",
+  "positive_definite_exact_hessians": 852,
+  "primary_contrasts_computed": false,
+  "provenance": {
+    "config_sha256": "8a924cdaf1301052a44df350499320c7e0db2d38d38cfcff5c964e05b5be198f",
+    "data_sha256": "f80fc526606efbb1869af3c021d7caed6894881a8aae03aaff9093d13023b791",
+    "generated_at_utc": "2026-09-19T13:05:20.569144+00:00",
+    "git_commit": "bb669f62ace314e3755b1f6d938bb4af82706f27",
+    "git_dirty": true,
+    "nonblocking_amendment_sha256": "afaa594d3a7182a2cc1f4a2eb2d1ea7111b5f1947693be3eeb9416d75b6e0f17",
+    "python_analysis_sha256": "2c42503960032eb9b098c3cccf0165e293da19957288a5b7f29a2e208aa5c81f",
+    "r_fit_script_sha256": "bfb276d5eb0254bdc28e9519ba1e0d6e1be0a006960d8b4331dfadebfa3fdde6",
+    "rsolnp_version": "1.16",
+    "torch_version": "2.8.0"
+  },
+  "reason": "nonregular_active_boundary_laplace_hessians",
+  "results_csv_emitted": false,
+  "schema_version": "external-benchmark-execution-status-v1"
+}

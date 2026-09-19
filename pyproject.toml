@@ -41,6 +41,9 @@ cognitive-discovery-specificity = "cognitive_discovery.cli:causal_specificity_ma
 cognitive-discovery-abstraction = "cognitive_discovery.cli:causal_abstraction_main"
 cognitive-discovery-ood = "cognitive_discovery.cli:ood_generation_main"
 cognitive-discovery-replicate = "cognitive_discovery.replicate_model:main"
+cognitive-discovery-model-validate = "cognitive_discovery.model_validation.cli:main"
+cognitive-discovery-benchmark-fetch = "cognitive_discovery.model_validation.external_benchmark:main"
+cognitive-discovery-transfer = "cognitive_discovery.transfer.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,0 +1,79 @@
+schema_version: external-benchmark-v1
+analysis_id: sugawara_katahira_factual_v1
+status: owner_frozen
+paper:
+  title: Dissociation between asymmetric value updating and perseverance in human reinforcement learning
+  authors: [Michiyo Sugawara, Kentaro Katahira]
+  year: 2021
+  journal: Scientific Reports
+  volume: 11
+  article: 3574
+  doi: 10.1038/s41598-020-80593-7
+dataset:
+  article_id: 10042319
+  version: 3
+  version_doi: 10.6084/m9.figshare.10042319.v3
+  license: CC BY 4.0
+  manifest: validation/external_benchmark/DATASET_MANIFEST.json
+subset:
+  experiment: authors_web_experiment
+  context: factual
+  participants: 143
+  sessions: 2
+  trials_per_session: 96
+  additional_participant_exclusions: false
+  additional_trial_filtering: false
+models:
+  - standard_rl
+  - asymmetry
+  - perseverance_impulsive
+  - perseverance_gradual
+  - hybrid_impulsive
+  - hybrid_gradual
+comparison:
+  metric: participant_laplace_log_marginal_likelihood
+  fit: published_map_specification_and_priors
+implementation:
+  engine: R
+  optimizer: Rsolnp::solnp
+  deterministic_multistarts: 8
+  start_seed: 24001
+  start_distribution: fixed_central_plus_seeded_prior_draws
+  convergence:
+    tolerance: 1.0e-8
+    outer_iterations: 400
+    inner_iterations: 1000
+    delta: 1.0e-8
+  missed_response:
+    rule: retain_row_but_skip_choice_likelihood_and_state_update
+    choice_value: 0
+  false_start:
+    rule: retain_when_choice_is_observed
+  session_reset:
+    q_values: 0.0
+    choice_traces: 0.0
+  laplace:
+    hessian: torch_float64_exact_autodiff_negative_log_posterior
+    require_positive_definite: true
+    eigenvalue_floor: null
+  output_precision_digits: 17
+primary_contrasts:
+  - {left: perseverance_gradual, right: asymmetry}
+  - {left: perseverance_gradual, right: standard_rl}
+bootstrap:
+  pairing: participant
+  samples: 2000
+  interval: percentile_95
+  seed: 23001
+decision:
+  pass:
+    both_mean_contrasts_positive: true
+    both_interval_lower_bounds_positive: true
+    perseverance_gradual_max_rank: 2
+    only_allowed_higher_model: hybrid_gradual
+  partial: both_means_positive_but_uncertainty_or_ranking_fails
+  fail: nonpositive_primary_mean_or_nonhistory_dominance
+secondary_nonblocking:
+  - asymmetry_to_hybrid_gradual_learning_rate_bias_reduction
+  - tau_phi_distributions
+  - independent_reference_agreement

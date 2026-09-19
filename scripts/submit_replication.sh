@@ -11,6 +11,8 @@ OUTPUT="${OUTPUT:?OUTPUT is required}"
 CONFIG="${CONFIG:-configs/replication/default.yaml}"
 TOKENIZER_ID="${TOKENIZER_ID:-$MODEL_ID}"
 TOKENIZER_REVISION="${TOKENIZER_REVISION:-$REVISION}"
+RUN_SPEC="${RUN_SPEC:-}"
+BASELINE_PREFLIGHT="${BASELINE_PREFLIGHT:-}"
 
 if ! command -v sbatch >/dev/null 2>&1; then
   echo "sbatch is unavailable; run this helper on a Della login node" >&2
@@ -27,11 +29,16 @@ fi
 
 cd "$PROJECT_DIR"
 mkdir -p logs
+prospective_args=()
+if [ -n "$RUN_SPEC" ]; then prospective_args+=(--run-spec "$RUN_SPEC"); fi
+if [ -n "$BASELINE_PREFLIGHT" ]; then
+  prospective_args+=(--baseline-preflight "$BASELINE_PREFLIGHT")
+fi
 python -m cognitive_discovery.replicate_model \
   --model "$MODEL_ID" --revision "$REVISION" \
   --tokenizer "$TOKENIZER_ID" --tokenizer-revision "$TOKENIZER_REVISION" \
   --adapter "$ADAPTER" --config "$CONFIG" --output "$OUTPUT" \
-  --stage initialize --execute
+  --stage initialize --execute "${prospective_args[@]}"
 
 interface=$(sbatch --parsable --export="ALL,STAGE=interface,OUTPUT=$OUTPUT" "$GPU_SCRIPT")
 interface="${interface%%;*}"

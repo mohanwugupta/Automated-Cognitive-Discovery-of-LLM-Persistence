@@ -1,0 +1,48 @@
+# Run identity for Phase 3. This is not passed directly to the replication CLI;
+# the executable protocol remains configs/replication/default.yaml.
+schema_version: prospective-replication-run-v1
+analysis_id: qwen-prospective
+base_protocol: configs/replication/default.yaml
+interpretation: pipeline_self_replication
+model:
+  id: Qwen/Qwen3.5-4B
+  # Existing reproducible follow-up identity from qwen_confirmation_v2.
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  tokenizer_id: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  adapter: qwen
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+excluded_endpoints:
+  - natural_effect_recovery
+  - fresh_context_extension
+freshness:
+  reuse_historical_behavioral_models: false
+  reuse_historical_das_bases: false
+  reuse_historical_layer_rank: false
+  reuse_historical_counterfactual_pairs: false
+  reuse_historical_neural_splits: false
+  reuse_historical_theory_winner: false
+baseline:
+  require_git_dirty_false: true
+  require_full_cpu_tests: true
+  require_uv_lock_hash: true
+gates:
+  source: configs/replication/default.yaml
+  mutable_after_baseline: false
+historical_comparison:
+  source: configs/replication/historical_qwen_context.yaml
+  context_only: true
+required_output_directories:
+  - interface
+  - behavior
+  - frozen_theories
+  - counterfactuals
+  - mechanism
+  - specificity
+transfer:
+  matrix_scope: single_task_7x7
+  diagonal_required_before_off_diagonal: true
+  pilot_source_controllers: 1
+  parameterized_model_allowed_before_matrix_freeze: false
+status: ready_for_prospective_run

@@ -1,0 +1,7 @@
+schema_version: external-benchmark-nonblocking-amendment-v1
+status: owner_frozen
+implementation_equivalence: pass
+benchmark_claim_status: unresolved
+benchmark_claim_permission: stop
+pipeline_permission: continue
+v2_boundary_method_status: not_selected

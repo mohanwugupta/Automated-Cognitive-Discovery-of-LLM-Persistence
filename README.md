@@ -45,6 +45,10 @@ See [CANONICAL_PIPELINE.md](docs/CANONICAL_PIPELINE.md) for the full dependency 
 
 Exact values, limitations, and artifact identities are indexed by C01–C13 in [CLAIMS.md](docs/CLAIMS.md).
 
+The prospective computational-model validation and task-transfer extension is
+documented in [TASK_TRANSFER.md](docs/TASK_TRANSFER.md). It adds no scientific
+claim until its staged validation, Qwen, and transfer gates have been run.
+
 ## 5. Reproduce manuscript numbers
 
 Install the locked CPU environment, then replay all claims from committed compact artifacts:

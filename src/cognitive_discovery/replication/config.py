@@ -50,6 +50,7 @@ def validate_replication_config(config: Mapping[str, Any]) -> None:
         "interface",
         "behavior",
         "model_comparison",
+        "behavioral_survivor_set",
         "mechanism",
         "specificity",
         "optional",
@@ -107,6 +108,23 @@ def validate_replication_config(config: Mapping[str, Any]) -> None:
         raise ReplicationConfigError("behavior split names are not canonical")
     if abs(sum(map(float, splits.values())) - 1.0) > 1e-12:
         raise ReplicationConfigError("behavior split fractions must sum to one")
+    survivor = config["behavioral_survivor_set"]
+    if survivor.get("metric") != "selection_mse":
+        raise ReplicationConfigError("behavioral survivor metric must be selection_mse")
+    if survivor.get("direction") != "minimize":
+        raise ReplicationConfigError("selection_mse behavioral survivor direction must be minimize")
+    if survivor.get("equivalence_rule") != "absolute_score_margin":
+        raise ReplicationConfigError("unsupported behavioral survivor equivalence rule")
+    if float(survivor.get("equivalence_margin", -1)) < 0:
+        raise ReplicationConfigError("behavioral survivor equivalence margin must be non-negative")
+    legacy_margin = float(config["model_comparison"].get("equivalence_margin_mse", -1))
+    if abs(legacy_margin - float(survivor["equivalence_margin"])) > 1e-12:
+        raise ReplicationConfigError(
+            "model_comparison.equivalence_margin_mse compatibility alias must match "
+            "behavioral_survivor_set.equivalence_margin"
+        )
+    if survivor.get("blocking_on_ambiguity") is not False:
+        raise ReplicationConfigError("behavioral theory ambiguity must be non-blocking")
     mechanism = config["mechanism"]
     depths = list(map(float, mechanism.get("relative_depths", [])))
     ranks = list(map(int, mechanism.get("ranks", [])))

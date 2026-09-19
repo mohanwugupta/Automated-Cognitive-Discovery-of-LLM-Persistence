@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from pathlib import Path
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -47,6 +48,7 @@ from .controls import audit_informative_target_shuffle, require_cognitive_endpoi
 from .provenance import validate_replication_provenance, write_replication_provenance
 from .splits import assign_neural_splits, split_manifest_hash
 from .state import ReplicationRunState
+from .survivors import validate_frozen_survivor_set
 from .workflow import _interface_messages, _json, _load_run, _ontology_config, _sha256
 
 
@@ -55,6 +57,12 @@ THEORY_TARGET = {
     "dual_history": "outcome_history",
     "latent_context": "contextual_outcome_history",
 }
+
+
+def mechanism_candidate_id(theory: str, layer: int, rank: int) -> str:
+    """Theory-qualified ID prevents survivor searches from overwriting each other."""
+
+    return f"{theory}__L{int(layer)}__rank{int(rank)}"
 
 
 def _increasing_outcome_pattern(left, right):
@@ -178,6 +186,7 @@ def execute_counterfactual_stage(root: Path, output: Path) -> dict:
     config, state, provenance = _load_run(output)
     require_cognitive_endpoint(config["endpoint_id"])
     validate_replication_provenance(provenance, required_for_stage="counterfactuals")
+    survivor_manifest = validate_frozen_survivor_set(output, provenance)
     state.start("counterfactuals")
     state.write(output / "run_state.json")
     records = _records_for_counterfactuals(root, output, config)
@@ -190,6 +199,8 @@ def execute_counterfactual_stage(root: Path, output: Path) -> dict:
     )
     frozen_root = output / "behavior/models/frozen_models"
     bank = FrozenTheoryBank(frozen_root)
+    if sorted(bank.architectures) != sorted(survivor_manifest["behavioral_survivor_set"]):
+        raise RuntimeError("frozen theory bank differs from the behavioral survivor set")
     pairs, predictions = build_counterfactual_pairs(records, bank)
     compatible = {
         theory: THEORY_TARGET[theory]
@@ -239,6 +250,18 @@ def execute_counterfactual_stage(root: Path, output: Path) -> dict:
         "frozen_before_das": True,
     }
     _json(mechanism_root / "neural_split_manifest.json", split_record)
+    _json(
+        output / "counterfactuals/manifest.json",
+        {
+            "schema_version": "prospective-counterfactual-index-v1",
+            "condition_manifest": "mechanism/condition_manifest.jsonl",
+            "pair_manifest": "mechanism/pair_manifest.parquet",
+            "predictions": "mechanism/counterfactual_predictions.parquet",
+            "pair_manifest_sha256": pair_hash,
+            "neural_split_sha256": neural_hash,
+            "historical_pairs_reused": False,
+        },
+    )
     provenance["counterfactual_pair_manifest_hash"] = pair_hash
     provenance["neural_split_hash"] = neural_hash
     provenance["counterfactual_prediction_hash"] = _sha256(Path(prediction_path))
@@ -352,6 +375,7 @@ def execute_mechanism_stage(
     config, state, provenance = _load_run(output)
     require_cognitive_endpoint(config["endpoint_id"])
     validate_replication_provenance(provenance, required_for_stage="mechanism")
+    survivor_manifest = validate_frozen_survivor_set(output, provenance)
     state.start("mechanism")
     state.write(output / "run_state.json")
     runner = _runner(config, output, online=online)
@@ -381,9 +405,7 @@ def execute_mechanism_stage(
     selection_rows = []
     train_rows = []
     controller_candidates = {}
-    selected_theories = json.loads(
-        (output / "behavior/models/selected_models.json").read_text()
-    )["selected_models"]
+    selected_theories = survivor_manifest["behavioral_survivor_set"]
     for theory in selected_theories:
         target_variable = THEORY_TARGET[theory]
         train = pairs[
@@ -448,7 +470,7 @@ def execute_mechanism_stage(
                         optimizer.step()
                         losses.append(float(loss.detach().cpu()))
                 basis = alignment.numpy_basis()
-                candidate_id = f"{theory}__L{layer}__rank{rank}"
+                candidate_id = mechanism_candidate_id(theory, layer, rank)
                 basis_path = output / "mechanism/candidates" / f"{candidate_id}.safetensors"
                 save_alignment(
                     basis_path,
@@ -584,6 +606,7 @@ def execute_generalization_stage(
     config, state, provenance = _load_run(output)
     require_cognitive_endpoint(config["endpoint_id"])
     validate_replication_provenance(provenance, required_for_stage="generalization")
+    validate_frozen_survivor_set(output, provenance)
     state.start("generalization")
     state.write(output / "run_state.json")
     runner = _runner(config, output, online=online)
@@ -728,6 +751,7 @@ def execute_specificity_stage(
     config, state, provenance = _load_run(output)
     require_cognitive_endpoint(config["specificity"]["endpoint_id"])
     validate_replication_provenance(provenance, required_for_stage="specificity")
+    validate_frozen_survivor_set(output, provenance)
     state.start("specificity")
     state.write(output / "run_state.json")
     runner = _runner(config, output, online=online)
@@ -1044,6 +1068,33 @@ def execute_specificity_stage(
         "target_shuffles": shuffle_audits,
     }
     _json(output / "mechanism/specificity_gates.json", gates)
+    public_root = output / "specificity"
+    public_root.mkdir(parents=True, exist_ok=True)
+    for name in (
+        "specificity_controls.csv",
+        "random_subspace_null.csv",
+        "target_shuffle_audit.json",
+        "specificity_gates.json",
+    ):
+        shutil.copy2(output / "mechanism" / name, public_root / name)
+    _json(
+        public_root / "manifest.json",
+        {
+            "schema_version": "prospective-specificity-index-v1",
+            "endpoint_id": config["endpoint_id"],
+            "metric_id": config["metric_id"],
+            "canonical_root": "mechanism",
+            "controls": [
+                "matched_random_subspace",
+                "shuffled_source_base",
+                "output_readout_direction",
+                "predictive_ridge_direction",
+                "pca_variance_subspace",
+                "response_mapping_invariance",
+            ],
+            "informative_control_status": gates["status"],
+        },
+    )
     state.complete(
         "specificity",
         outcome=gates["status"],
