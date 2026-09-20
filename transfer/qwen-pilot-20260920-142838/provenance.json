@@ -1,0 +1,62 @@
+{
+  "adapter": {
+    "name": "qwen",
+    "version": "qwen-hf-residual-v2"
+  },
+  "behavioral_survivor_rule_sha256": "ea9c201c5570d70e2f423f578e6c2c7ddf4d925271627d953f8ae00a39eafcc8",
+  "behavioral_survivor_set": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "behavioral_survivor_set_sha256": "d50375916ff18570386a11232d268c81e589f71fe5d31d98571b322547180562",
+  "behavioral_theory_status": "unresolved",
+  "config_sha256": "46fddfbc5a34e3bb3a93e5e94d0abaa592aba142645e54ed297b5e4fc93ff25e",
+  "counterfactual_pair_sha256": "23ae80776eda6aacef105254babe873383156d3ab837e5184f6ecf1cb9a2308b",
+  "counterfactual_prediction_sha256": "ac9f4a62143290947ebe63ad4aa5a8c5366c221e2178f6449ab4d867753f42d6",
+  "diff_sha256": null,
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "environment_lock_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661",
+  "evidence_mode": "final",
+  "git_commit": "ac3472bcc689c4e1189f253f8cabf08a63dd3cd4",
+  "git_dirty": false,
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "output_root": "/scratch/gpfs/JORDANAT/mg9965/transfer/qwen-pilot-20260920-142838",
+  "pair_manifest_sha256": "1d8ee8d8f2b4fd94964a3a6285eba330860a1dbacc77223944bb73664841638b",
+  "replication_neural_split_sha256": "918440f243bbf4c9f3d2103ff01eb87a832f0728b0e88746c3641d8f31e7fe50",
+  "schema_version": "task-transfer-provenance-v1",
+  "seeds": {
+    "bootstrap": 27002,
+    "controller_search": 27001,
+    "diversity_order": 26002,
+    "random_controls": 27003,
+    "transfer_split": 26001
+  },
+  "source_validity_rule_sha256": "bab43369f2704838197789b277b0bf21116b954edeae8b631a813f93524cf68e",
+  "specification_hashes": {
+    "choice_perseveration": "b8a6f97ba63a91970c71311690fb7806dec96d6655559d5346bf6dbe0702d6b7",
+    "dual_history": "a83dac359ef58e63adda9b1075b04cacbe6cb87ba47f1e322321aa5a1bfe8dbc",
+    "dynamic_reevaluation": "abfd2a556536a0d6b633cedec2b01e689728e7109da51225af5742078d55072a",
+    "generic_sequential_choice": "ecda22c0043ea01479d0e2c3fa22956f0c2508e5772838b0a0a16daaf13af915",
+    "immediate_state": "e8384fc3ef140c1147922694651f5f355024cab29489bc7d1d50172ef29bc1b1",
+    "intercept": "2e0edb220bc537118fead19ddfcb447a5e9d6ce777c640f80d2d350c4c8884e5",
+    "latent_context": "97a90fd8c001a3d728b7df01019dedd115d2a5e4ccd906a447381611c7cc8253",
+    "latent_motivation": "80e9dad9a0d38c4807895ae8698d24716c6243132b13227ebb51a2dddf9c1aab",
+    "meta_control": "345fe5143ffe4e8f9382e033a060ad87112d4186a13b7d7bc969b2a139e805b0",
+    "option_termination": "7be0dc328e536fd63166d4b8adca7faf4aacb696422d3cce66c48435d2f35c55",
+    "outcome_history": "e2ec3537b63b8719713f0ed3971cf6936b5705620ec0aa5619c5e0c305e9bd16",
+    "task_set_reinstatement": "8b8c2bc005deeb1c9f34d6fa4d0892ffdf2a7dd2b2f6c864e762c36322741704"
+  },
+  "tokenizer": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "transfer_predictor_semantic_sha256": "56021e662b76183335adc537bfda211f0ac08e370d9573e30c9baf3f4f6a818d",
+  "transfer_predictor_spec_sha256": "c3571ed10d86f9460197fa7c670e70c9fdf3d60d0f3f5e0f27ee00f91877ea4f",
+  "transfer_split_sha256": "7065120938d0994e65bb1805c89edb119210495caa9f3c389f3eee9db9db3849",
+  "work_manifest_hash": "97d69ca4c98731191b6cbc7b0c9080e136d3df79cb77d44d5889eb1b1d3510bb"
+}

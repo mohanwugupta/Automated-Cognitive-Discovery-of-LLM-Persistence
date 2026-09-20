@@ -1,0 +1,12 @@
+{
+  "elapsed_seconds": 18,
+  "evaluation_scope": "diagonal",
+  "gpu_count": 1,
+  "mode": "evaluate",
+  "output_bytes": 62464,
+  "random_count": 2,
+  "schema_version": "task-transfer-resource-v1",
+  "slurm_job_id": "14198406",
+  "smoke": true,
+  "work_id": "dual_history__single__bandit"
+}

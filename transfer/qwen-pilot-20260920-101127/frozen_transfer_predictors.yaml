@@ -1,0 +1,62 @@
+schema_version: transfer-predictors-v1
+frozen_before_off_diagonal: true
+outcome_columns_prohibited: [global_cfr, bootstrap_low, bootstrap_high, transfer_status, source_valid]
+
+families:
+  behavioral_computational:
+    direction: greater similarity predicts greater transfer
+    variables:
+      coefficient_cosine: {source: frozen_behavioral_fits, coding: cosine_similarity}
+      coefficient_euclidean_distance: {source: frozen_behavioral_fits, coding: negative_l2_distance}
+      same_surviving_theory: {source: frozen_behavioral_survivor_set, coding: binary_equal}
+      outcome_history_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      action_history_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      continuation_value_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      disengagement_value_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      progress_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      success_evidence_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+      continuation_cost_difference: {source: frozen_behavioral_fits, coding: negative_absolute_difference}
+  task_structure:
+    direction: greater structural similarity predicts greater transfer
+    variables:
+      binary_descriptor_similarity: {source: frozen_task_ontology, coding: mean_exact_match}
+      temporal_horizon_similarity: {source: frozen_task_ontology, coding: one_minus_absolute_ordinal_difference_div_2}
+      choice_structure_match: {source: frozen_task_ontology, coding: binary_equal}
+  counterfactual_geometry:
+    direction: greater counterfactual similarity predicts greater transfer
+    variables:
+      delta_cf_distribution_similarity: {source: frozen_counterfactual_pairs, coding: one_minus_wasserstein_scaled}
+      effect_size_variance_similarity: {source: frozen_counterfactual_pairs, coding: negative_absolute_difference}
+      target_sign_balance_similarity: {source: frozen_counterfactual_pairs, coding: negative_absolute_difference}
+      source_base_feature_distance_similarity: {source: frozen_counterfactual_pairs, coding: negative_absolute_difference}
+      target_magnitude_similarity: {source: frozen_counterfactual_pairs, coding: negative_absolute_difference}
+  neural_similarity:
+    direction: greater neural/controller similarity predicts greater transfer
+    variables:
+      relative_depth_similarity: {source: frozen_diagonal_controllers, coding: negative_absolute_difference}
+      rank_match: {source: frozen_diagonal_controllers, coding: binary_equal}
+      principal_angle_overlap: {source: frozen_diagonal_controllers, coding: mean_squared_cosine_principal_angles}
+      subspace_similarity: {source: frozen_diagonal_controllers, coding: projection_frobenius_overlap}
+      pre_das_representational_similarity: {source: frozen_source_selection_activations, coding: linear_cka_streamed}
+
+task_structure:
+  binary_descriptors:
+    - terminal_disengagement
+    - continuation_produces_new_information
+    - explicit_continuation_cost
+    - stochastic_outcomes
+    - controllability
+    - environmental_stability
+    - prior_investment_relevance
+    - progress_observability
+    - success_failure_feedback
+  temporal_horizon_levels: {short: 0, medium: 1, long: 2}
+  choice_structure_levels: [stay_leave, retry_give_up, wait_stop, continue_stop]
+  tasks:
+    bandit: {terminal_disengagement: false, continuation_produces_new_information: true, explicit_continuation_cost: false, stochastic_outcomes: true, controllability: medium, environmental_stability: stable, prior_investment_relevance: true, progress_observability: false, success_failure_feedback: true, temporal_horizon: medium, choice_structure: stay_leave}
+    foraging: {terminal_disengagement: true, continuation_produces_new_information: true, explicit_continuation_cost: true, stochastic_outcomes: true, controllability: medium, environmental_stability: changing, prior_investment_relevance: true, progress_observability: true, success_failure_feedback: true, temporal_horizon: medium, choice_structure: stay_leave}
+    solvability: {terminal_disengagement: true, continuation_produces_new_information: true, explicit_continuation_cost: true, stochastic_outcomes: false, controllability: high, environmental_stability: stable, prior_investment_relevance: true, progress_observability: true, success_failure_feedback: true, temporal_horizon: medium, choice_structure: retry_give_up}
+    information_sampling: {terminal_disengagement: false, continuation_produces_new_information: true, explicit_continuation_cost: true, stochastic_outcomes: true, controllability: high, environmental_stability: stable, prior_investment_relevance: false, progress_observability: true, success_failure_feedback: false, temporal_horizon: short, choice_structure: continue_stop}
+    waiting: {terminal_disengagement: true, continuation_produces_new_information: true, explicit_continuation_cost: true, stochastic_outcomes: true, controllability: low, environmental_stability: stable, prior_investment_relevance: true, progress_observability: true, success_failure_feedback: true, temporal_horizon: long, choice_structure: wait_stop}
+    effort: {terminal_disengagement: true, continuation_produces_new_information: false, explicit_continuation_cost: true, stochastic_outcomes: false, controllability: high, environmental_stability: stable, prior_investment_relevance: true, progress_observability: true, success_failure_feedback: true, temporal_horizon: medium, choice_structure: continue_stop}
+    debugging: {terminal_disengagement: true, continuation_produces_new_information: true, explicit_continuation_cost: true, stochastic_outcomes: false, controllability: high, environmental_stability: changing, prior_investment_relevance: true, progress_observability: true, success_failure_feedback: true, temporal_horizon: long, choice_structure: retry_give_up}

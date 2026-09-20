@@ -1,0 +1,28 @@
+{
+  "criteria": {
+    "beats_matched_random_subspace_null": false,
+    "bootstrap_lower_bound_positive": true,
+    "heldout_global_cfr_positive": true,
+    "intervention_target_correlation_positive": false,
+    "response_mapping_robustness_passes": false
+  },
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "mapping_averaged_cfr": 0.43762397679168846,
+  "mapping_complete": true,
+  "mapping_each_positive": false,
+  "mapping_gap": 0.8752479535833769,
+  "mapping_sign_consistent": false,
+  "mapping_values": {
+    "continue_x": 0.0,
+    "continue_y": 0.8752479535833769
+  },
+  "metric_id": "global_cfr_v1",
+  "response_mapping_robustness_passes": false,
+  "rule_version": "task_source_validity_v1",
+  "schema_version": "task-transfer-diagonal-gate-v1",
+  "source_available": false,
+  "source_status": "invalid_source_controller",
+  "source_task": "bandit",
+  "source_valid": false,
+  "work_id": "dual_history__single__bandit"
+}

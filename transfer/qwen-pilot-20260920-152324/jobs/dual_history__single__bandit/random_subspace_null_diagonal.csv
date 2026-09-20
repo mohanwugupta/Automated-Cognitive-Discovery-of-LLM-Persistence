@@ -1,0 +1,7 @@
+work_id,target_task,response_mapping,random_index,global_cfr
+dual_history__single__bandit,bandit,pooled,0,-0.15266643570903526
+dual_history__single__bandit,bandit,continue_x,0,0.0
+dual_history__single__bandit,bandit,continue_y,0,-0.30533287141807075
+dual_history__single__bandit,bandit,pooled,1,0.17672022656417874
+dual_history__single__bandit,bandit,continue_x,1,0.0
+dual_history__single__bandit,bandit,continue_y,1,0.3534404531283578

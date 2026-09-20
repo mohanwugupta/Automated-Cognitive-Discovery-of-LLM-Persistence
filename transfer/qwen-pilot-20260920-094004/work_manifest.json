@@ -1,0 +1,431 @@
+{
+  "adapter": {
+    "name": "qwen",
+    "version": "qwen-hf-residual-v2"
+  },
+  "behavioral_survivor_rule_sha256": "ea9c201c5570d70e2f423f578e6c2c7ddf4d925271627d953f8ae00a39eafcc8",
+  "behavioral_survivor_set": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "behavioral_survivor_set_sha256": "d50375916ff18570386a11232d268c81e589f71fe5d31d98571b322547180562",
+  "behavioral_theory_status": "unresolved",
+  "best_model": "dual_history",
+  "config_sha256": "46fddfbc5a34e3bb3a93e5e94d0abaa592aba142645e54ed297b5e4fc93ff25e",
+  "diagonal_required_before_off_diagonal": true,
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "matrix_scope": "single_task_matrix",
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "pair_manifest_sha256": "1d8ee8d8f2b4fd94964a3a6285eba330860a1dbacc77223944bb73664841638b",
+  "prediction_manifest_sha256": "ac9f4a62143290947ebe63ad4aa5a8c5366c221e2178f6449ab4d867753f42d6",
+  "replication_root": "/scratch/gpfs/JORDANAT/mg9965/Automated-Cognitive-Discovery-of-LLM-Persistence/replications_09_19_26/qwen-prospective",
+  "response_mappings": [
+    "continue_x",
+    "continue_y"
+  ],
+  "schema_version": "task-transfer-work-v1",
+  "source_pair_manifest_sha256": "23ae80776eda6aacef105254babe873383156d3ab837e5184f6ecf1cb9a2308b",
+  "source_validity_rule_sha256": "bab43369f2704838197789b277b0bf21116b954edeae8b631a813f93524cf68e",
+  "tasks": [
+    "bandit",
+    "foraging",
+    "solvability",
+    "information_sampling",
+    "waiting",
+    "effort",
+    "debugging"
+  ],
+  "tokenizer": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "transfer_predictor_semantic_sha256": "56021e662b76183335adc537bfda211f0ac08e370d9573e30c9baf3f4f6a818d",
+  "transfer_predictor_spec_sha256": "c3571ed10d86f9460197fa7c670e70c9fdf3d60d0f3f5e0f27ee00f91877ea4f",
+  "transfer_split_sha256": "7065120938d0994e65bb1805c89edb119210495caa9f3c389f3eee9db9db3849",
+  "work_manifest_hash": "97d69ca4c98731191b6cbc7b0c9080e136d3df79cb77d44d5889eb1b1d3510bb",
+  "work_units": [
+    {
+      "design": "single",
+      "source_id": "bandit",
+      "source_tasks": [
+        "bandit"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__bandit"
+    },
+    {
+      "design": "single",
+      "source_id": "foraging",
+      "source_tasks": [
+        "foraging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__foraging"
+    },
+    {
+      "design": "single",
+      "source_id": "solvability",
+      "source_tasks": [
+        "solvability"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__solvability"
+    },
+    {
+      "design": "single",
+      "source_id": "information_sampling",
+      "source_tasks": [
+        "information_sampling"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__information_sampling"
+    },
+    {
+      "design": "single",
+      "source_id": "waiting",
+      "source_tasks": [
+        "waiting"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__waiting"
+    },
+    {
+      "design": "single",
+      "source_id": "effort",
+      "source_tasks": [
+        "effort"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__effort"
+    },
+    {
+      "design": "single",
+      "source_id": "debugging",
+      "source_tasks": [
+        "debugging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "dual_history",
+      "work_id": "dual_history__single__debugging"
+    },
+    {
+      "design": "single",
+      "source_id": "bandit",
+      "source_tasks": [
+        "bandit"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__bandit"
+    },
+    {
+      "design": "single",
+      "source_id": "foraging",
+      "source_tasks": [
+        "foraging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__foraging"
+    },
+    {
+      "design": "single",
+      "source_id": "solvability",
+      "source_tasks": [
+        "solvability"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__solvability"
+    },
+    {
+      "design": "single",
+      "source_id": "information_sampling",
+      "source_tasks": [
+        "information_sampling"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__information_sampling"
+    },
+    {
+      "design": "single",
+      "source_id": "waiting",
+      "source_tasks": [
+        "waiting"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__waiting"
+    },
+    {
+      "design": "single",
+      "source_id": "effort",
+      "source_tasks": [
+        "effort"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__effort"
+    },
+    {
+      "design": "single",
+      "source_id": "debugging",
+      "source_tasks": [
+        "debugging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "latent_context",
+      "work_id": "latent_context__single__debugging"
+    },
+    {
+      "design": "single",
+      "source_id": "bandit",
+      "source_tasks": [
+        "bandit"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__bandit"
+    },
+    {
+      "design": "single",
+      "source_id": "foraging",
+      "source_tasks": [
+        "foraging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__foraging"
+    },
+    {
+      "design": "single",
+      "source_id": "solvability",
+      "source_tasks": [
+        "solvability"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__solvability"
+    },
+    {
+      "design": "single",
+      "source_id": "information_sampling",
+      "source_tasks": [
+        "information_sampling"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__information_sampling"
+    },
+    {
+      "design": "single",
+      "source_id": "waiting",
+      "source_tasks": [
+        "waiting"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__waiting"
+    },
+    {
+      "design": "single",
+      "source_id": "effort",
+      "source_tasks": [
+        "effort"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__effort"
+    },
+    {
+      "design": "single",
+      "source_id": "debugging",
+      "source_tasks": [
+        "debugging"
+      ],
+      "target_tasks": [
+        "bandit",
+        "foraging",
+        "solvability",
+        "information_sampling",
+        "waiting",
+        "effort",
+        "debugging"
+      ],
+      "theory": "outcome_history",
+      "work_id": "outcome_history__single__debugging"
+    }
+  ]
+}

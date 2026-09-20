@@ -1,0 +1,75 @@
+schema_version: task-transfer-v1
+endpoint_id: cognitive_counterfactual_recovery
+metric_id: global_cfr_v1
+response_mappings: [continue_x, continue_y]
+
+tasks: [bandit, foraging, solvability, information_sampling, waiting, effort, debugging]
+splits:
+  names: [transfer_train, transfer_selection, transfer_test]
+  fractions: [0.60, 0.20, 0.20]
+  grouping: neural_group_id
+
+designs:
+  single_task: true
+  all_pairs: true
+  leave_one_task_out: true
+  training_diversity_counts: [1, 2, 3, 4, 5, 6]
+
+search:
+  relative_depths: [0.25, 0.50, 0.75, 0.90]
+  ranks: [2, 8]
+  epochs: 3
+  learning_rate: 0.03
+  activation_change_penalty: 0.0001
+  selection_metric: global_cfr_v1
+  selection_tiebreak: [lower_rank, earlier_layer]
+
+bootstrap:
+  unit: contrast_id
+  development_samples: 200
+  samples: 2000
+random_controls:
+  subspaces: 100
+  pvalue: finite_sample_plus_one
+
+source_validity:
+  rule_version: task_source_validity_v1
+  random_p_max: 0.05
+  response_mapping:
+    values: [continue_x, continue_y]
+    maximum_global_cfr_gap: 0.25
+    require_positive_each_mapping: true
+    require_sign_consistency: true
+
+predictors:
+  frozen_before_matrix: true
+  spec_path: configs/transfer/transfer_predictors_v1.yaml
+  families: [behavioral_computational, task_structure, counterfactual_geometry, neural_similarity]
+  estimator: ridge
+  alpha: 10.0
+  validation: leave_one_target_task_out
+
+resource_projection:
+  multiplier_basis: parameter_count_ratio_planning_only
+  model_gpu_time_multipliers:
+    qwen: 1.0
+    llama: 2.0
+    gemma: 3.0
+  model_storage_multipliers:
+    qwen: 1.0
+    llama: 1.0
+    gemma: 1.0
+
+seeds:
+  transfer_split: 26001
+  diversity_order: 26002
+  controller_search: 27001
+  bootstrap: 27002
+  random_controls: 27003
+
+artifact_policy:
+  save_full_activations: false
+  stream_activations: true
+  save_low_rank_bases: true
+  save_scalar_outcomes: true
+  delete_temporary_activations: true

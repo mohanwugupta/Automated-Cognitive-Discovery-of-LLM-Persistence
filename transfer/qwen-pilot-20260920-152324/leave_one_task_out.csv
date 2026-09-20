@@ -1,0 +1,1 @@
+model,theory,source_task,target_task,response_mapping,layer,rank,n_train,n_selection,n_test,global_cfr,correlation,slope,bootstrap_low,bootstrap_high,random_mean,random_max,random_p,mapping_gap,controller_hash,split_hash,endpoint_id,metric_id,mapping_averaged_cfr,mapping_sign_consistent,status

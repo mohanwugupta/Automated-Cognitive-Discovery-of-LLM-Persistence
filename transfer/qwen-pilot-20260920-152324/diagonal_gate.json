@@ -1,0 +1,16 @@
+{
+  "active_array_indices": [
+    0
+  ],
+  "eligible_array_indices": [],
+  "eligible_work_ids": [],
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "metric_id": "global_cfr_v1",
+  "schema_version": "task-transfer-diagonal-dispatch-v1",
+  "unavailable_array_indices": [
+    0
+  ],
+  "unavailable_work_ids": [
+    "dual_history__single__bandit"
+  ]
+}
