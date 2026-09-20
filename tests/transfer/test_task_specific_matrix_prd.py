@@ -59,6 +59,13 @@ def test_source_validity_is_five_part_and_mapping_robust():
     assert failed_mapping["criteria"]["response_mapping_robustness_passes"] is False
 
 
+def test_della_gpu_wrapper_lets_gres_select_public_gpu_partition():
+    wrapper = (ROOT / "slurm/run_task_transfer_gpu.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --gres=gpu:1" in wrapper
+    assert "#SBATCH --constraint=\"nomig&gpu40\"" in wrapper
+    assert "#SBATCH --partition=gpu" not in wrapper
+
+
 def test_config_freezes_mapping_gate_and_predictor_spec():
     config = load_transfer_config(ROOT / "configs/transfer/v1.yaml")
     assert tuple(config["response_mappings"]) == RESPONSE_MAPPINGS
