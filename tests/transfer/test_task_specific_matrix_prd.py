@@ -13,6 +13,7 @@ from cognitive_discovery.transfer.matrix import (
     unavailable_transfer_rows,
     write_matrix_artifacts,
 )
+from cognitive_discovery.transfer.neural import _load_replication_for_transfer
 from cognitive_discovery.transfer.predictors import (
     build_task_structure_predictors,
     load_predictor_spec,
@@ -64,6 +65,22 @@ def test_della_gpu_wrapper_lets_gres_select_public_gpu_partition():
     assert "#SBATCH --gres=gpu:1" in wrapper
     assert "#SBATCH --constraint=\"nomig&gpu40\"" in wrapper
     assert "#SBATCH --partition=gpu" not in wrapper
+
+
+def test_transfer_validates_frozen_replication_without_requiring_old_checkout():
+    replication = ROOT / "replications_09_19_26/qwen-prospective"
+    provenance = json.loads((replication / "provenance.json").read_text(encoding="utf-8"))
+    manifest = {
+        "model": provenance["model"],
+        "tokenizer": provenance["tokenizer"],
+        "adapter": provenance["adapter"],
+        "endpoint_id": provenance["endpoint_id"],
+        "metric_id": provenance["metric_id"],
+        "source_pair_manifest_sha256": provenance["counterfactual_pair_manifest_hash"],
+        "prediction_manifest_sha256": provenance["counterfactual_prediction_hash"],
+    }
+    config = _load_replication_for_transfer(replication, manifest)
+    assert config["model"]["revision"] == provenance["model"]["revision"]
 
 
 def test_config_freezes_mapping_gate_and_predictor_spec():

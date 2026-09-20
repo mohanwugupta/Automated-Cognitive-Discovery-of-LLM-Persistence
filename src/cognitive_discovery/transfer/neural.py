@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from cognitive_discovery.causal_mechanistic import pipeline as causal_pipeline
 from cognitive_discovery.causal_mechanistic.das import DASAlignment, load_alignment, save_alignment
@@ -16,7 +17,12 @@ from cognitive_discovery.replication.adapters import resolve_relative_layers
 from cognitive_discovery.replication.neural import (
     THEORY_TARGET, _baseline_frame, _prediction_series, _record_map, _runner,
 )
-from cognitive_discovery.replication.workflow import _load_run, _sha256
+from cognitive_discovery.replication.provenance import (
+    canonical_hash,
+    validate_replication_provenance,
+)
+from cognitive_discovery.replication.state import ReplicationRunState
+from cognitive_discovery.replication.workflow import _sha256
 from cognitive_discovery.reproducibility.metrics import global_cfr_v1
 
 from .config import load_transfer_config
@@ -61,12 +67,69 @@ def _merge_metric_components(job_root: Path) -> Path:
     return path
 
 
+def _load_replication_for_transfer(replication_root: Path, manifest: dict) -> dict:
+    """Validate an immutable completed replication without requiring its old checkout.
+
+    Replication stages must run at their baseline commit. A downstream transfer
+    extension necessarily runs at a later commit, so it verifies the frozen
+    replication itself rather than equating the current repository HEAD with
+    the historical replication HEAD.
+    """
+
+    config_path = replication_root / "effective_config.yaml"
+    provenance_path = replication_root / "provenance.json"
+    state_path = replication_root / "run_state.json"
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    state = ReplicationRunState.load(state_path)
+    if canonical_hash(config) != provenance["config_hash"]:
+        raise RuntimeError("frozen replication configuration hash changed")
+    validate_replication_provenance(provenance, required_for_stage="mechanism")
+    if state.replication_status != "complete":
+        raise RuntimeError("task transfer requires a completed source replication")
+    for stage in ("interface", "behavior", "model_comparison", "freeze_theory", "counterfactuals", "mechanism"):
+        if state.stages[stage]["status"] != "complete":
+            raise RuntimeError(f"source replication stage is incomplete: {stage}")
+    if provenance.get("run_kind") == "pipeline_self_replication":
+        run_spec = replication_root / "prospective_run_spec.yaml"
+        preflight = replication_root / "baseline_preflight.json"
+        if not run_spec.is_file() or _sha256(run_spec) != provenance.get("run_spec_sha256"):
+            raise RuntimeError("prospective replication run specification changed")
+        if not preflight.is_file() or _sha256(preflight) != provenance.get("baseline_preflight_sha256"):
+            raise RuntimeError("prospective replication baseline preflight changed")
+    pair_path = replication_root / "mechanism/pair_manifest.parquet"
+    prediction_path = replication_root / "mechanism/counterfactual_predictions.parquet"
+    if _sha256(pair_path) != provenance["counterfactual_pair_manifest_hash"]:
+        raise RuntimeError("source replication counterfactual pairs changed")
+    if _sha256(prediction_path) != provenance.get("counterfactual_prediction_hash"):
+        raise RuntimeError("source replication cognitive predictions changed")
+    if manifest["source_pair_manifest_sha256"] != provenance["counterfactual_pair_manifest_hash"]:
+        raise RuntimeError("transfer manifest points to different counterfactual pairs")
+    if manifest["prediction_manifest_sha256"] != provenance["counterfactual_prediction_hash"]:
+        raise RuntimeError("transfer manifest points to different cognitive predictions")
+    for identity in ("model", "tokenizer", "adapter"):
+        if manifest[identity] != provenance[identity]:
+            raise RuntimeError(f"transfer and replication {identity} identities differ")
+    model = config["model"]
+    if (model["id"], model["revision"]) != (
+        provenance["model"]["id"], provenance["model"]["revision"]
+    ):
+        raise RuntimeError("effective replication model identity changed")
+    if (model["tokenizer_id"], model["tokenizer_revision"]) != (
+        provenance["tokenizer"]["id"], provenance["tokenizer"]["revision"]
+    ):
+        raise RuntimeError("effective replication tokenizer identity changed")
+    if provenance["endpoint_id"] != manifest["endpoint_id"] or provenance["metric_id"] != manifest["metric_id"]:
+        raise RuntimeError("transfer endpoint or metric differs from source replication")
+    return config
+
+
 def _context(replication_root: Path, transfer_root: Path, work_id: str):
     manifest = json.loads((transfer_root / "work_manifest.json").read_text(encoding="utf-8"))
     matches = [unit for unit in manifest["work_units"] if unit["work_id"] == work_id]
     if len(matches) != 1:
         raise ValueError(f"unknown or duplicate transfer work id: {work_id}")
-    config, _, _ = _load_run(replication_root)
+    config = _load_replication_for_transfer(replication_root, manifest)
     return manifest, matches[0], config
 
 
