@@ -1,0 +1,11 @@
+{
+  "approved_task_count": 7,
+  "labels": [
+    "A",
+    "B"
+  ],
+  "passed": true,
+  "replication_status": "interface_valid",
+  "selected": "a_b",
+  "style": "choice_mapping"
+}

@@ -1,0 +1,9 @@
+{
+  "completed_at_utc": "2026-09-19T18:17:11.345080+00:00",
+  "cpu_test_command": "PYTHONPATH=src:. python -m pytest -q -p no:cacheprovider",
+  "cpu_test_status": "pass",
+  "git_commit": "b5d76994dc13753420995da79693a006466351cd",
+  "git_dirty": false,
+  "schema_version": "prospective-baseline-preflight-v1",
+  "uv_lock_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661"
+}

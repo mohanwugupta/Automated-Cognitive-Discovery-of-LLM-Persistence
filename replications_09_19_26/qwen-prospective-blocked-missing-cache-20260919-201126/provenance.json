@@ -1,0 +1,79 @@
+{
+  "adapter": {
+    "name": "qwen",
+    "version": "qwen-hf-residual-v2"
+  },
+  "analysis_id": "qwen-prospective",
+  "baseline_preflight_sha256": "4f0c5ce41d924e86ed879e4257d122a05c40108ccffffe874f4ada49939ee315",
+  "behavioral_design_hash": "f36c61e94900e79373533ad51c8753d3658d7d5f8acc0ad5aae2c4d5195c3798",
+  "behavioral_split_hash": "pending",
+  "behavioral_survivor_manifest_sha256": "pending",
+  "behavioral_survivor_rule_sha256": "pending",
+  "behavioral_survivor_set": [],
+  "behavioral_survivor_set_frozen_before_neural": false,
+  "behavioral_survivor_set_sha256": "pending",
+  "behavioral_theory_status": "pending",
+  "config_hash": "2bd48661fc0b88aab0cc1d0d39db09eedc3774bd5ace7f954db987de98be0cd3",
+  "counterfactual_pair_manifest_hash": "pending",
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "environment": {
+    "lockfile": "uv.lock",
+    "lockfile_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661"
+  },
+  "excluded_endpoints": [
+    "natural_effect_recovery",
+    "fresh_context_extension"
+  ],
+  "frozen_model_hashes": {},
+  "gates_mutable_after_baseline": false,
+  "git_commit": "b5d76994dc13753420995da79693a006466351cd",
+  "git_dirty": false,
+  "historical_reuse": {
+    "reuse_historical_behavioral_models": false,
+    "reuse_historical_counterfactual_pairs": false,
+    "reuse_historical_das_bases": false,
+    "reuse_historical_layer_rank": false,
+    "reuse_historical_neural_splits": false,
+    "reuse_historical_theory_winner": false
+  },
+  "layer_rank_grid": {
+    "ranks": [
+      2,
+      8
+    ],
+    "relative_depths": [
+      0.25,
+      0.5,
+      0.75,
+      0.9
+    ]
+  },
+  "metric_id": "global_cfr_v1",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "neural_split_hash": "pending",
+  "output_path": "/scratch/gpfs/JORDANAT/mg9965/replications/qwen-prospective",
+  "protocol_file_sha256": "a49af9d6bc634b67c107bfd6de86265c78ec21e41029845d8abd46d893d684ad",
+  "run_kind": "pipeline_self_replication",
+  "run_spec_sha256": "2768e5f0f2810f7b74a75b662dae624aff28be6e30a209279e51ad7ea22f2310",
+  "schema_version": "replication-provenance-v1",
+  "seeds": {
+    "behavior_design": 12001,
+    "behavior_fit": 12003,
+    "behavior_split": 12002,
+    "bootstrap": 15001,
+    "counterfactual_design": 13001,
+    "interface_calibration": 11001,
+    "interface_validation": 11002,
+    "mechanism_search": 14001,
+    "neural_split": 13002,
+    "random_controls": 14002
+  },
+  "selected_controller_hash": "pending",
+  "tokenizer": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  }
+}

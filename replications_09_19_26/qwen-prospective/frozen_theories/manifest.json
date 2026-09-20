@@ -1,0 +1,45 @@
+{
+  "behavioral_survivor_set": [
+    "dual_history",
+    "latent_context",
+    "outcome_history"
+  ],
+  "behavioral_theory_status": "unresolved",
+  "best_model": "dual_history",
+  "canonical_artifact": "behavior/models/frozen_survivor_set.json",
+  "deltas_from_best": {
+    "dual_history": 0.0,
+    "latent_context": 0.014942858467672848,
+    "outcome_history": 0.015150915180183855
+  },
+  "direction": "minimize",
+  "equivalence_margin": 0.02,
+  "equivalence_rule": "absolute_score_margin",
+  "evidence_axis": "behavioral_only",
+  "frozen_before_neural_execution": true,
+  "frozen_model_hashes": {
+    "dual_history/model.pkl": "7fb36b06c48ec9bf48b0bf8557fe32ff976a5bde3179c975401f8203da7fb3f0",
+    "dual_history/model_spec.json": "c1c9ebd3a7f197a9e9b73e96dc6a6a5310f9e385917e69b3be491bae7acb3f9f",
+    "dual_history/parameters.csv": "836977ceb68a3cd2df9fd2633af678626078aef2ecf278e39cb5d9fc8a4c0dd4",
+    "dual_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+    "latent_context/model.pkl": "15792364dac9335f924e91c5dce7b0dcbd243a23c578ca4bba53a7d48c6d5803",
+    "latent_context/model_spec.json": "05b3cc3fb5ff2b9445ebccdb6c4329bdededa1b25b1ff0369abb8cd3d7e4f7ef",
+    "latent_context/parameters.csv": "fa99d54b882a69f8bb252ee41c881368290b25633520ecf9b2ade614da39c057",
+    "latent_context/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8",
+    "outcome_history/model.pkl": "c9fb0970bb5d813e73594acddb2e10ff5b69449f60a43399109663e885bb6adc",
+    "outcome_history/model_spec.json": "955d41d07519ad1d1bb22d8b9056d3e1c417f091540d72cf0dfc3b3c83a5de10",
+    "outcome_history/parameters.csv": "0beeadfb3a3409333a73753368ee01baf023d3e119ae3aa427663ea1226ad8c8",
+    "outcome_history/training_condition_hashes.json": "5342937a562d515ac09372c4871a5753203506ef341cba9c79b4d051ed2f7fc8"
+  },
+  "frozen_model_root": "behavior/models/frozen_models",
+  "membership_sha256": "d50375916ff18570386a11232d268c81e589f71fe5d31d98571b322547180562",
+  "metric": "selection_mse",
+  "neural_results_used": false,
+  "rule_sha256": "ea9c201c5570d70e2f423f578e6c2c7ddf4d925271627d953f8ae00a39eafcc8",
+  "schema_version": "behavioral-survivor-set-v1",
+  "scores": {
+    "dual_history": 0.38453645165048134,
+    "latent_context": 0.3994793101181542,
+    "outcome_history": 0.3996873668306652
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "canonical_root": "mechanism",
+  "controls": [
+    "matched_random_subspace",
+    "shuffled_source_base",
+    "output_readout_direction",
+    "predictive_ridge_direction",
+    "pca_variance_subspace",
+    "response_mapping_invariance"
+  ],
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "informative_control_status": "incomplete_controls",
+  "metric_id": "global_cfr_v1",
+  "schema_version": "prospective-specificity-index-v1"
+}

@@ -1,0 +1,8 @@
+{
+  "config_hash": "2bd48661fc0b88aab0cc1d0d39db09eedc3774bd5ace7f954db987de98be0cd3",
+  "provenance_path": "provenance.json",
+  "run_id": "qwen-qwen3-5-4b-851bf6e8",
+  "schema_version": "replication-protocol-v1",
+  "scientific_invariant": "generalization preserves cognitive_counterfactual_recovery",
+  "state_path": "run_state.json"
+}

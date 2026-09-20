@@ -1,0 +1,9 @@
+{
+  "condition_manifest": "mechanism/condition_manifest.jsonl",
+  "historical_pairs_reused": false,
+  "neural_split_sha256": "918440f243bbf4c9f3d2103ff01eb87a832f0728b0e88746c3641d8f31e7fe50",
+  "pair_manifest": "mechanism/pair_manifest.parquet",
+  "pair_manifest_sha256": "23ae80776eda6aacef105254babe873383156d3ab837e5184f6ecf1cb9a2308b",
+  "predictions": "mechanism/counterfactual_predictions.parquet",
+  "schema_version": "prospective-counterfactual-index-v1"
+}

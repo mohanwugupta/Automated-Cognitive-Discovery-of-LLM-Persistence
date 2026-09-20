@@ -1,0 +1,72 @@
+{
+  "controls_use_endpoint": "cognitive_counterfactual_recovery",
+  "endpoint_id": "cognitive_counterfactual_recovery",
+  "passed": false,
+  "random_subspaces": 500,
+  "required_controls_complete": false,
+  "status": "incomplete_controls",
+  "target_shuffles": [
+    {
+      "control": "shuffled_source_base",
+      "reason": "shuffled-source stratum cannot be deranged",
+      "theory": "dual_history"
+    },
+    {
+      "control": "shuffled_target",
+      "reason": "task foraging has too few semantic targets to shuffle",
+      "theory": "dual_history"
+    },
+    {
+      "changed_fraction": 0.0,
+      "control": "shuffled_source_base",
+      "status": "uninformative_control",
+      "theory": "dual_history"
+    },
+    {
+      "changed_rows": 0,
+      "control": "shuffled_target",
+      "maximum_absolute_change": 0.0,
+      "rows": 1,
+      "status": "uninformative_control",
+      "theory": "dual_history"
+    },
+    {
+      "changed_fraction": 0.8596491228070176,
+      "control": "shuffled_source_base",
+      "status": "informative_control",
+      "theory": "latent_context"
+    },
+    {
+      "changed_rows": 112,
+      "control": "shuffled_target",
+      "maximum_absolute_change": 0.4218573103811174,
+      "rows": 114,
+      "status": "informative_control",
+      "theory": "latent_context"
+    },
+    {
+      "control": "shuffled_source_base",
+      "reason": "shuffled-source stratum cannot be deranged",
+      "theory": "outcome_history"
+    },
+    {
+      "control": "shuffled_target",
+      "reason": "task foraging has too few semantic targets to shuffle",
+      "theory": "outcome_history"
+    },
+    {
+      "changed_fraction": 0.0,
+      "control": "shuffled_source_base",
+      "status": "uninformative_control",
+      "theory": "outcome_history"
+    },
+    {
+      "changed_rows": 0,
+      "control": "shuffled_target",
+      "maximum_absolute_change": 0.0,
+      "rows": 1,
+      "status": "uninformative_control",
+      "theory": "outcome_history"
+    }
+  ]
+}

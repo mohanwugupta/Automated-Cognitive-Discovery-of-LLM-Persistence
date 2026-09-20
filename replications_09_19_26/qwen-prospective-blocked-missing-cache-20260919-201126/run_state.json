@@ -1,0 +1,62 @@
+{
+  "replication_status": "blocked",
+  "run_id": "qwen-qwen3-5-4b-851bf6e8",
+  "schema_version": "replication-state-v1",
+  "stages": {
+    "abstraction": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "behavior": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "counterfactuals": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "freeze_theory": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "generalization": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "interface": {
+      "artifacts": {},
+      "outcome": "OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+      "status": "blocked"
+    },
+    "mechanism": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "model_comparison": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "ood": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "report": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    },
+    "specificity": {
+      "artifacts": {},
+      "outcome": null,
+      "status": "pending"
+    }
+  }
+}
