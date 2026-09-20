@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -124,6 +126,52 @@ def _load_replication_for_transfer(replication_root: Path, manifest: dict) -> di
     return config
 
 
+def _materialize_local_model(config: dict) -> tuple[dict, dict]:
+    """Keep pinned model identity while loading an offline local materialization."""
+
+    raw = os.environ.get("TRANSFER_MODEL_PATH", "").strip()
+    if not raw:
+        raise RuntimeError("TRANSFER_MODEL_PATH is required for offline transfer jobs")
+    path = Path(raw).expanduser().resolve()
+    if not path.is_dir():
+        raise RuntimeError(f"TRANSFER_MODEL_PATH is not a directory: {path}")
+    required = (path / "config.json", path / "tokenizer_config.json")
+    missing = [item.name for item in required if not item.is_file()]
+    weights = sorted(path.glob("*.safetensors"))
+    if missing or not weights:
+        raise RuntimeError(
+            f"local model materialization is incomplete: missing={missing}, "
+            f"safetensors={len(weights)}"
+        )
+    metadata_files = list(required)
+    metadata_files.extend(sorted(path.glob("*.safetensors.index.json")))
+    metadata_files.extend(sorted(path.glob("generation_config.json")))
+    metadata_files.extend(sorted(path.glob("tokenizer.json")))
+    fingerprint_payload = {
+        "metadata_sha256": {
+            item.name: _sha256(item) for item in sorted(set(metadata_files))
+        },
+        "weight_files": [
+            {"name": item.name, "bytes": item.stat().st_size} for item in weights
+        ],
+    }
+    model = config["model"]
+    materialization = {
+        "schema_version": "local-model-materialization-v1",
+        "path": str(path),
+        "model_id": model["id"],
+        "model_revision": model["revision"],
+        "tokenizer_id": model["tokenizer_id"],
+        "tokenizer_revision": model["tokenizer_revision"],
+        "metadata_fingerprint_sha256": canonical_hash(fingerprint_payload),
+        **fingerprint_payload,
+    }
+    runtime = deepcopy(config)
+    runtime["model"]["id"] = str(path)
+    runtime["model"]["tokenizer_id"] = str(path)
+    return runtime, materialization
+
+
 def _context(replication_root: Path, transfer_root: Path, work_id: str):
     manifest = json.loads((transfer_root / "work_manifest.json").read_text(encoding="utf-8"))
     matches = [unit for unit in manifest["work_units"] if unit["work_id"] == work_id]
@@ -151,6 +199,7 @@ def train_controller(replication_root, transfer_root, work_id, transfer_config, 
 
     replication_root, transfer_root = Path(replication_root), Path(transfer_root)
     manifest, work, replication_config = _context(replication_root, transfer_root, work_id)
+    replication_config, model_materialization = _materialize_local_model(replication_config)
     settings = load_transfer_config(transfer_config)
     _validate_frozen_contract(manifest, transfer_root, transfer_config)
     runner = _runner(replication_config, replication_root, online=online)
@@ -256,6 +305,7 @@ def train_controller(replication_root, transfer_root, work_id, transfer_config, 
         "train_pair_ids": sorted(train.pair_id.astype(str)),
         "selection_pair_ids": sorted(selection.pair_id.astype(str)),
         "seeds": settings["seeds"], "leakage_audit": audit,
+        "model_materialization": model_materialization,
         "target_tests_touched": False,
     }
     (job_root / "selected_controller.json").write_text(json.dumps(selected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -275,10 +325,13 @@ def evaluate_controller(
 ):
     replication_root, transfer_root = Path(replication_root), Path(transfer_root)
     manifest, work, replication_config = _context(replication_root, transfer_root, work_id)
+    replication_config, model_materialization = _materialize_local_model(replication_config)
     settings = load_transfer_config(transfer_config)
     _validate_frozen_contract(manifest, transfer_root, transfer_config)
     job_root = transfer_root / "jobs" / work_id
     selected = json.loads((job_root / "selected_controller.json").read_text(encoding="utf-8"))
+    if selected.get("model_materialization") != model_materialization:
+        raise RuntimeError("local model materialization changed after controller training")
     if selected.get("target_tests_touched") is not False:
         raise RuntimeError("controller selection did not preserve untouched target tests")
     runner = _runner(replication_config, replication_root, online=online)
@@ -447,6 +500,7 @@ def evaluate_controller(
         "random_subspaces": count,
         "pilot_gate_override": pilot_gate_override,
         "evidence_eligible": not smoke,
+        "model_materialization": model_materialization,
     }
     (job_root / f"evaluation_{artifact_scope}.json").write_text(
         json.dumps(evaluation_record, indent=2, sort_keys=True) + "\n",

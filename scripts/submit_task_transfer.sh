@@ -7,6 +7,15 @@ REPO=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 REPLICATION=${REPLICATION:?export REPLICATION to a completed prospective run}
 TRANSFER_OUTPUT=${TRANSFER_OUTPUT:?export TRANSFER_OUTPUT to a new scratch directory}
 TRANSFER_CONFIG=${TRANSFER_CONFIG:-$REPO/configs/transfer/v1.yaml}
+if [[ -z "${TRANSFER_MODEL_PATH:-}" ]]; then
+  model_id=$(python -c 'import json,os; print(json.load(open(os.path.join(os.environ["REPLICATION"], "provenance.json")))["model"]["id"])')
+  TRANSFER_MODEL_PATH="/scratch/gpfs/JORDANAT/${USER}/models/${model_id//\//--}"
+fi
+if [[ ! -f "$TRANSFER_MODEL_PATH/config.json" ]]; then
+  echo "TRANSFER_MODEL_PATH does not contain config.json: $TRANSFER_MODEL_PATH" >&2
+  exit 2
+fi
+export TRANSFER_MODEL_PATH
 export REPO REPLICATION TRANSFER_OUTPUT TRANSFER_CONFIG
 
 cd "$REPO"

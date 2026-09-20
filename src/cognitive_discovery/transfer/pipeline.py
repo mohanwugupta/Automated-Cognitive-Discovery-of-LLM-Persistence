@@ -361,6 +361,7 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
         model_gpu_time_multipliers=config["resource_projection"]["model_gpu_time_multipliers"],
         model_storage_multipliers=config["resource_projection"]["model_storage_multipliers"],
     )
+    selected = json.loads((job_root / "selected_controller.json").read_text(encoding="utf-8"))
     projection.update(
         {
             "pilot_work_id": job_root.name,
@@ -369,6 +370,7 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
             "config_sha256": manifest["config_sha256"],
             "work_manifest_hash": manifest["work_manifest_hash"],
             "cross_model_projection_basis": config["resource_projection"]["multiplier_basis"],
+            "model_materialization": selected.get("model_materialization"),
         }
     )
     diagonal_metrics = job_root / "diagonal_metrics.csv"
@@ -382,7 +384,6 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
         )
         mapping_values = set(pilot_metrics.response_mapping.astype(str))
         evaluated_targets = set(pilot_metrics.target_task.astype(str))
-    selected = json.loads((job_root / "selected_controller.json").read_text(encoding="utf-8"))
     checks = {
         "leakage_audit_passed": bool(selected.get("leakage_audit", {}).get("passed")),
         "all_seven_targets_evaluated": evaluated_targets == set(config["tasks"]),
@@ -455,6 +456,9 @@ def aggregate_transfer(output: str | Path, *, require_complete: bool = True) -> 
                     "controller_hash": selected["controller_sha256"],
                     "split_hash": selected["transfer_split_sha256"],
                     "target_definition": selected["target_definition"],
+                    "model_materialization_sha256": selected.get(
+                        "model_materialization", {}
+                    ).get("metadata_fingerprint_sha256"),
                 })
         gate_path = job_root / "diagonal_gate.json"
         if gate_path.is_file():

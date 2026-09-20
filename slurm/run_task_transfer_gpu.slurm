@@ -16,6 +16,7 @@ CONDA_ENV=${CONDA_ENV:-llm-cognitive-discovery}
 REPLICATION=${REPLICATION:?export REPLICATION}
 TRANSFER_OUTPUT=${TRANSFER_OUTPUT:?export TRANSFER_OUTPUT}
 TRANSFER_CONFIG=${TRANSFER_CONFIG:-$REPO/configs/transfer/v1.yaml}
+TRANSFER_MODEL_PATH=${TRANSFER_MODEL_PATH:?export TRANSFER_MODEL_PATH to the immutable local model checkout}
 TRANSFER_MODE=${TRANSFER_MODE:?TRANSFER_MODE must be train or evaluate}
 TRANSFER_EVALUATION_SCOPE=${TRANSFER_EVALUATION_SCOPE:-all}
 cd "$REPO"
@@ -28,6 +29,8 @@ conda activate "$CONDA_ENV"
 set -u
 export PYTHONPATH="$REPO/src${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 python -c 'import torch; assert torch.cuda.is_available(), "CUDA is unavailable"; print("CUDA preflight:", torch.cuda.get_device_name(0))'
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader

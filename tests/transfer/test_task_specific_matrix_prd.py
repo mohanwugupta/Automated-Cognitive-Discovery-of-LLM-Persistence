@@ -13,7 +13,10 @@ from cognitive_discovery.transfer.matrix import (
     unavailable_transfer_rows,
     write_matrix_artifacts,
 )
-from cognitive_discovery.transfer.neural import _load_replication_for_transfer
+from cognitive_discovery.transfer.neural import (
+    _load_replication_for_transfer,
+    _materialize_local_model,
+)
 from cognitive_discovery.transfer.predictors import (
     build_task_structure_predictors,
     load_predictor_spec,
@@ -81,6 +84,28 @@ def test_transfer_validates_frozen_replication_without_requiring_old_checkout():
     }
     config = _load_replication_for_transfer(replication, manifest)
     assert config["model"]["revision"] == provenance["model"]["revision"]
+
+
+def test_local_materialization_preserves_pinned_identity(tmp_path, monkeypatch):
+    model_root = tmp_path / "Qwen--Qwen3.5-4B"
+    model_root.mkdir()
+    (model_root / "config.json").write_text("{}", encoding="utf-8")
+    (model_root / "tokenizer_config.json").write_text("{}", encoding="utf-8")
+    (model_root / "model-00001-of-00001.safetensors").write_bytes(b"weights")
+    monkeypatch.setenv("TRANSFER_MODEL_PATH", str(model_root))
+    original = {
+        "model": {
+            "id": "Qwen/Qwen3.5-4B", "revision": "a" * 40,
+            "tokenizer_id": "Qwen/Qwen3.5-4B", "tokenizer_revision": "a" * 40,
+        }
+    }
+    runtime, identity = _materialize_local_model(original)
+    assert original["model"]["id"] == "Qwen/Qwen3.5-4B"
+    assert runtime["model"]["id"] == str(model_root.resolve())
+    assert runtime["model"]["tokenizer_id"] == str(model_root.resolve())
+    assert identity["model_id"] == "Qwen/Qwen3.5-4B"
+    assert identity["model_revision"] == "a" * 40
+    assert len(identity["metadata_fingerprint_sha256"]) == 64
 
 
 def test_config_freezes_mapping_gate_and_predictor_spec():
