@@ -92,11 +92,20 @@ export CONDA_ENV=llm-cognitive-discovery
 bash scripts/submit_task_transfer.sh
 ```
 
-That pilot uses one layer, one rank, one epoch, and two random controls. It is a
-runtime/integration check and cannot be promoted to evidence. Its report scales
+The pilot requires a clean committed worktree. It uses one layer, one rank, one
+epoch, and two random controls. It is a runtime/integration check and cannot be
+promoted to evidence. Because two controls cannot attain the frozen null-test
+threshold, the pilot alone may override the diagonal dispatch gate solely to
+exercise all seven targets; aggregation still marks its scientific outgoing
+cells unavailable. Its report scales
 the measured times by the frozen full layer/rank grid, epoch count, random-control
 count, and number of source controllers; it does not treat smoke timing as if it
 were a full controller.
+
+Gemma and Llama figures in the Qwen pilot report are planning estimates based
+on the frozen 12B:8B:4B parameter-count ratios (3:2:1), not measurements. Each
+model's own pilot measurement supersedes that estimate before its budget is
+approved.
 
 After the pilot completes, inspect:
 
@@ -124,4 +133,23 @@ failed within-task controller makes its off-diagonal cells `unavailable`, never
 zero. Eligible controllers then fill the remaining cells of the 7×7 matrix for
 each frozen survivor. Full activations are streamed and never persisted. No
 parameterized transfer-explanation model is submitted by this workflow; matrix
-and predictor definitions must be frozen in a later owner-approved step.
+predictors are already frozen in
+`configs/transfer/transfer_predictors_v1.yaml`, but no parameterized model is
+submitted by this workflow.
+
+The source gate is `task_source_validity_v1`: pooled held-out CFR, its lower
+bootstrap bound, and target correlation must be positive; the finite-sample
+matched-random p-value must be at most .05; and both `continue_x` and
+`continue_y` must have positive, sign-consistent CFR with a maximum gap of .25.
+Failures are `invalid_source_controller`; their outgoing cells are
+`unavailable`, never zero.
+
+Aggregation writes the preregistered contract under `diagonal/` and `matrix/`:
+controller manifests, pooled and mapping-specific diagonal results, source
+validity, mapping-indexed long results, mapping matrices, and a pooled summary.
+The exact endpoint remains `cognitive_counterfactual_recovery` / `global_cfr_v1`.
+
+Run the evidence matrices in order by changing only the completed prospective
+replication root and a fresh output directory: Qwen, then Gemma, then Llama.
+Each model retains its own frozen behavioral survivor set. Do not reuse a
+controller, pair manifest, split, layer, or rank across models.

@@ -17,9 +17,12 @@ from cognitive_discovery.replication.neural import (
     THEORY_TARGET, _baseline_frame, _prediction_series, _record_map, _runner,
 )
 from cognitive_discovery.replication.workflow import _load_run, _sha256
+from cognitive_discovery.reproducibility.metrics import global_cfr_v1
 
 from .config import load_transfer_config
+from .matrix import RESPONSE_MAPPINGS, evaluate_source_validity, mapping_diagnostics
 from .metrics import summarize_transfer
+from .predictors import load_predictor_spec
 from .splits import audit_transfer_leakage
 
 
@@ -51,7 +54,7 @@ def _merge_metric_components(job_root: Path) -> Path:
         raise RuntimeError("no transfer metric components are available")
     result = pd.concat(frames, ignore_index=True)
     result = result.drop_duplicates(
-        ["model", "theory", "source_task", "target_task"], keep="last"
+        ["model", "theory", "source_task", "target_task", "response_mapping"], keep="last"
     )
     path = job_root / "metrics.csv"
     result.to_csv(path, index=False)
@@ -67,6 +70,17 @@ def _context(replication_root: Path, transfer_root: Path, work_id: str):
     return manifest, matches[0], config
 
 
+def _validate_frozen_contract(manifest: dict, transfer_root: Path, transfer_config) -> None:
+    if _sha256(Path(transfer_config)) != manifest["config_sha256"]:
+        raise RuntimeError("transfer configuration changed after preparation")
+    frozen = transfer_root / "frozen_transfer_predictors.yaml"
+    if not frozen.is_file():
+        raise RuntimeError("frozen transfer-predictor specification is absent")
+    load_predictor_spec(frozen)
+    if _sha256(frozen) != manifest["transfer_predictor_spec_sha256"]:
+        raise RuntimeError("transfer-predictor specification changed after preparation")
+
+
 def train_controller(replication_root, transfer_root, work_id, transfer_config, *, online=False, smoke=False):
     """Fit/select only on source-task train/selection pairs; never target test."""
 
@@ -75,6 +89,7 @@ def train_controller(replication_root, transfer_root, work_id, transfer_config, 
     replication_root, transfer_root = Path(replication_root), Path(transfer_root)
     manifest, work, replication_config = _context(replication_root, transfer_root, work_id)
     settings = load_transfer_config(transfer_config)
+    _validate_frozen_contract(manifest, transfer_root, transfer_config)
     runner = _runner(replication_config, replication_root, online=online)
     layers = resolve_relative_layers(runner.layer_count, settings["search"]["relative_depths"])
     ranks = list(map(int, settings["search"]["ranks"]))
@@ -198,6 +213,7 @@ def evaluate_controller(
     replication_root, transfer_root = Path(replication_root), Path(transfer_root)
     manifest, work, replication_config = _context(replication_root, transfer_root, work_id)
     settings = load_transfer_config(transfer_config)
+    _validate_frozen_contract(manifest, transfer_root, transfer_config)
     job_root = transfer_root / "jobs" / work_id
     selected = json.loads((job_root / "selected_controller.json").read_text(encoding="utf-8"))
     if selected.get("target_tests_touched") is not False:
@@ -211,10 +227,19 @@ def evaluate_controller(
     diagonal_gate_path = job_root / "diagonal_gate.json"
     source_gate = None
     if diagonal_gate_path.is_file():
-        source_gate = bool(
-            json.loads(diagonal_gate_path.read_text(encoding="utf-8"))["source_available"]
-        )
-    target_tasks = transfer_target_tasks(work, evaluation_scope, source_gate)
+        gate = json.loads(diagonal_gate_path.read_text(encoding="utf-8"))
+        source_gate = bool(gate.get("source_valid", gate.get("source_available", False)))
+    # A smoke pilot must exercise all seven targets even though two random
+    # controls cannot attain the preregistered p <= .05 source gate. Its rows
+    # remain development-only and aggregation still marks an invalid source's
+    # scientific transfer cells unavailable.
+    effective_source_gate = source_gate
+    pilot_gate_override = bool(
+        smoke and evaluation_scope == "off_diagonal" and source_gate is False
+    )
+    if pilot_gate_override:
+        effective_source_gate = True
+    target_tasks = transfer_target_tasks(work, evaluation_scope, effective_source_gate)
     if not target_tasks:
         return {
             "work_id": work_id,
@@ -244,16 +269,61 @@ def evaluate_controller(
     random_bases = orthonormal_random_subspaces(basis.shape[0], rank, count, seed=int(settings["seeds"]["random_controls"]))
     for target_task, part in test.groupby("task_family"):
         rows = causal_pipeline._evaluate_alignment(runner, basis, part, records_by_id, states, _baseline_frame(part, cache), target, layer=layer, split_label="transfer_test", intervention_type=work_id)
-        frame = pd.DataFrame(rows).merge(part[["pair_id", "contrast_id"]], on="pair_id", validate="one_to_one")
+        frame = pd.DataFrame(rows).merge(
+            part[["pair_id", "contrast_id"]],
+            on="pair_id", validate="one_to_one",
+        )
         all_rows.extend(frame.to_dict("records"))
-        random_cfrs = []
+        random_by_mapping = {"pooled": []}
+        random_by_mapping.update({mapping: [] for mapping in RESPONSE_MAPPINGS})
         for index, random_basis in enumerate(random_bases):
             random_frame = pd.DataFrame(causal_pipeline._evaluate_alignment(runner, random_basis, part, records_by_id, states, _baseline_frame(part, cache), target, layer=layer, split_label="transfer_test", intervention_type=f"random_{index}"))
-            value = summarize_transfer(random_frame.assign(contrast_id=random_frame.pair_id.map(part.set_index("pair_id").contrast_id)), model=manifest["model"]["id"], theory=theory, source_task=work["source_id"], target_task=str(target_task), layer=layer, rank=rank, bootstrap_samples=max(100, int(settings["bootstrap"]["development_samples"])), seed=int(settings["seeds"]["bootstrap"]) + index)["global_cfr"]
-            random_cfrs.append(value)
-            null_rows.append({"work_id": work_id, "target_task": target_task, "random_index": index, "global_cfr": value})
-        frame.attrs["n_train"] = selected["n_train"]
-        metrics.append(summarize_transfer(frame, model=manifest["model"]["id"], theory=theory, source_task=work["source_id"], target_task=str(target_task), layer=layer, rank=rank, bootstrap_samples=int(settings["bootstrap"]["samples"]), seed=int(settings["seeds"]["bootstrap"]), random_cfrs=random_cfrs))
+            for mapping, random_part in [("pooled", random_frame)] + [
+                (mapping, random_frame[random_frame.response_mapping == mapping])
+                for mapping in RESPONSE_MAPPINGS
+            ]:
+                if random_part.empty:
+                    continue
+                value = global_cfr_v1(
+                    random_part.predicted_counterfactual_effect.to_numpy(float),
+                    random_part.neural_counterfactual_effect.to_numpy(float),
+                )
+                random_by_mapping[mapping].append(value)
+                null_rows.append({
+                    "work_id": work_id, "target_task": target_task,
+                    "response_mapping": mapping, "random_index": index,
+                    "global_cfr": value,
+                })
+        metric_rows = []
+        for mapping, metric_frame in [("pooled", frame)] + [
+            (mapping, frame[frame.response_mapping == mapping])
+            for mapping in RESPONSE_MAPPINGS
+        ]:
+            if metric_frame.empty:
+                raise RuntimeError(
+                    f"{work_id}/{target_task} lacks frozen response mapping {mapping}"
+                )
+            metric_rows.append(summarize_transfer(
+                metric_frame, model=manifest["model"]["id"], theory=theory,
+                source_task=work["source_id"], target_task=str(target_task),
+                response_mapping=mapping, layer=layer, rank=rank,
+                bootstrap_samples=int(settings["bootstrap"]["samples"]),
+                seed=int(settings["seeds"]["bootstrap"]),
+                random_cfrs=random_by_mapping[mapping],
+                n_train=selected["n_train"], n_selection=selected["n_selection"],
+                controller_hash=selected["controller_sha256"],
+                split_hash=selected["transfer_split_sha256"],
+            ))
+        diagnostics = mapping_diagnostics(
+            [row for row in metric_rows if row["response_mapping"] != "pooled"]
+        )
+        for row in metric_rows:
+            row.update({
+                "mapping_gap": diagnostics["mapping_gap"],
+                "mapping_averaged_cfr": diagnostics["mapping_averaged_cfr"],
+                "mapping_sign_consistent": diagnostics["mapping_sign_consistent"],
+            })
+        metrics.extend(metric_rows)
     artifact_scope = (
         evaluation_scope if evaluation_scope in {"diagonal", "off_diagonal"} else "all"
     )
@@ -277,14 +347,13 @@ def evaluate_controller(
     metrics_frame.to_csv(component, index=False)
     _merge_metric_components(job_root)
     if evaluation_scope == "diagonal":
-        if len(metrics_frame) != 1:
-            raise RuntimeError("diagonal evaluation must emit exactly one source-task row")
-        row = metrics_frame.iloc[0]
-        source_available = bool(
-            np.isfinite(row.global_cfr)
-            and row.global_cfr > 0
-            and row.bootstrap_low > 0
-            and row.correlation > 0
+        pooled = metrics_frame[metrics_frame.response_mapping == "pooled"]
+        mappings = metrics_frame[metrics_frame.response_mapping.isin(RESPONSE_MAPPINGS)]
+        if len(pooled) != 1 or len(mappings) != len(RESPONSE_MAPPINGS):
+            raise RuntimeError("diagonal evaluation must emit pooled and both mapping rows")
+        gate = evaluate_source_validity(
+            pooled.iloc[0].to_dict(), mappings.to_dict("records"),
+            settings["source_validity"],
         )
         (job_root / "diagonal_gate.json").write_text(
             json.dumps(
@@ -292,12 +361,7 @@ def evaluate_controller(
                     "schema_version": "task-transfer-diagonal-gate-v1",
                     "work_id": work_id,
                     "source_task": work["source_id"],
-                    "source_available": source_available,
-                    "criteria": {
-                        "global_cfr_positive": bool(row.global_cfr > 0),
-                        "bootstrap_lower_bound_positive": bool(row.bootstrap_low > 0),
-                        "correlation_positive": bool(row.correlation > 0),
-                    },
+                    **gate,
                     "endpoint_id": settings["endpoint_id"],
                     "metric_id": settings["metric_id"],
                 },
@@ -318,6 +382,8 @@ def evaluate_controller(
         "metric_id": settings["metric_id"],
         "pairs": len(all_rows),
         "random_subspaces": count,
+        "pilot_gate_override": pilot_gate_override,
+        "evidence_eligible": not smoke,
     }
     (job_root / f"evaluation_{artifact_scope}.json").write_text(
         json.dumps(evaluation_record, indent=2, sort_keys=True) + "\n",

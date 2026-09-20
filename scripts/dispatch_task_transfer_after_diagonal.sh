@@ -14,7 +14,8 @@ python scripts/task_transfer.py gate-diagonal --output "$TRANSFER_OUTPUT" \
 eligible=$(python -c '
 import json, os
 value = json.load(open(os.path.join(os.environ["TRANSFER_OUTPUT"], "diagonal_gate.json")))
-print(",".join(map(str, value["eligible_array_indices"])))
+indices = value["active_array_indices"] if os.environ.get("TRANSFER_SMOKE") == "1" else value["eligible_array_indices"]
+print(",".join(map(str, indices)))
 ')
 
 if [ -n "$eligible" ]; then

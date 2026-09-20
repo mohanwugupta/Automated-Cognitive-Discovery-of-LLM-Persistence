@@ -10,7 +10,7 @@ TRANSFER_CONFIG=${TRANSFER_CONFIG:-$REPO/configs/transfer/v1.yaml}
 export REPO REPLICATION TRANSFER_OUTPUT TRANSFER_CONFIG
 
 cd "$REPO"
-PREPARE_EXTRA=()
+PREPARE_EXTRA=(--final)
 if [[ "${TRANSFER_FULL_MATRIX_APPROVED:-0}" == 1 ]]; then
   TRANSFER_PILOT_REPORT=${TRANSFER_PILOT_REPORT:?full matrix requires resource_projection.json from the one-source pilot}
   TRANSFER_APPROVED_GPU_HOURS=${TRANSFER_APPROVED_GPU_HOURS:?approve a numeric GPU-hour ceiling}
@@ -33,7 +33,6 @@ if report["projected_full_storage_gb"] > storage:
     raise SystemExit("pilot projection exceeds approved storage ceiling")
 ' "$TRANSFER_PILOT_REPORT" "$REPLICATION" "$TRANSFER_CONFIG" \
   "$TRANSFER_APPROVED_GPU_HOURS" "$TRANSFER_APPROVED_STORAGE_GB"
-  PREPARE_EXTRA+=(--final)
 fi
 python scripts/task_transfer.py prepare --replication "$REPLICATION" \
   --output "$TRANSFER_OUTPUT" --config "$TRANSFER_CONFIG" \

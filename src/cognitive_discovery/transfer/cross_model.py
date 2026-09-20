@@ -15,6 +15,8 @@ def compare_transfer_topology(tables: dict[str, pd.DataFrame], *, samples=2000, 
         for right_name in models[left_index + 1:]:
             right = tables[right_name]
             keys = ["theory", "source_task", "target_task"]
+            if "response_mapping" in left and "response_mapping" in right:
+                keys.append("response_mapping")
             merged = left.merge(right, on=keys, suffixes=("_left", "_right"), validate="one_to_one")
             merged = merged[(merged.source_task != merged.target_task) & merged.global_cfr_left.notna() & merged.global_cfr_right.notna()]
             if len(merged) < 3:

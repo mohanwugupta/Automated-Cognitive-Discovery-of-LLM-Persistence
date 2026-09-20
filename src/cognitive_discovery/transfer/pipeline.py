@@ -19,15 +19,18 @@ from cognitive_discovery.model_validation.specifications import validate_specifi
 
 from .config import load_transfer_config
 from .geometry import controller_geometry
-from .predictors import fit_heldout_target_predictor
+from .matrix import RESPONSE_MAPPINGS, unavailable_transfer_rows, write_matrix_artifacts
+from .predictors import fit_heldout_target_predictor, load_predictor_spec, predictor_spec_hash
 from .provenance import file_hash, git_identity, write_provenance
 from .splits import assign_transfer_splits, planned_source_sets, transfer_split_hash
 
 
 OUTPUT_COLUMNS = (
-    "model", "theory", "source_task", "target_task", "layer", "rank", "n_train",
-    "n_test", "global_cfr", "correlation", "slope", "bootstrap_low",
-    "bootstrap_high", "random_p", "endpoint_id", "metric_id", "status",
+    "model", "theory", "source_task", "target_task", "response_mapping",
+    "layer", "rank", "n_train", "n_selection", "n_test", "global_cfr",
+    "correlation", "slope", "bootstrap_low", "bootstrap_high", "random_mean",
+    "random_max", "random_p", "mapping_gap", "controller_hash", "split_hash",
+    "endpoint_id", "metric_id", "status",
 )
 
 
@@ -44,7 +47,15 @@ def prepare_transfer(
     scope: str = "single_task_matrix",
 ) -> dict:
     replication_root, output = Path(replication_root), Path(output)
+    repository = Path(__file__).resolve().parents[3]
     config = load_transfer_config(config_path)
+    predictor_path = Path(config["predictors"]["spec_path"])
+    if not predictor_path.is_absolute():
+        predictor_path = repository / predictor_path
+    predictor_spec = load_predictor_spec(predictor_path)
+    predictor_hash = _sha(predictor_path)
+    predictor_semantic_hash = predictor_spec_hash(predictor_spec)
+    source_rule_hash = canonical_hash(config["source_validity"])
     provenance = json.loads((replication_root / "provenance.json").read_text(encoding="utf-8"))
     survivor_manifest = validate_frozen_survivor_set(replication_root, provenance)
     if final and provenance.get("git_dirty") is not False:
@@ -57,6 +68,13 @@ def prepare_transfer(
         if not path.is_file():
             raise FileNotFoundError(f"transfer input is absent: {path}")
     pairs = read_records(pairs_path)
+    if "response_mapping" not in pairs:
+        raise ValueError("counterfactual pairs must preserve response_mapping")
+    observed_mappings = set(pairs.response_mapping.astype(str))
+    if observed_mappings != set(RESPONSE_MAPPINGS):
+        raise ValueError(
+            f"pair response mappings differ from the frozen design: {sorted(observed_mappings)}"
+        )
     if "neural_group_id" not in pairs:
         pairs["neural_group_id"] = pairs.target_variable.astype(str) + ":" + pairs.contrast_id.astype(str)
     pairs = assign_transfer_splits(
@@ -68,6 +86,8 @@ def prepare_transfer(
     output.mkdir(parents=True, exist_ok=False)
     effective_config = output / "effective_config.yaml"
     shutil.copyfile(config_path, effective_config)
+    frozen_predictors = output / "frozen_transfer_predictors.yaml"
+    shutil.copyfile(predictor_path, frozen_predictors)
     pair_output = Path(write_records(pairs.to_dict("records"), output / "pair_manifest.parquet"))
     theories = sorted(read_records(predictions_path).theory.astype(str).unique())
     expected_theories = sorted(survivor_manifest["behavioral_survivor_set"])
@@ -92,8 +112,11 @@ def prepare_transfer(
         "replication_root": str(replication_root.resolve()),
         "model": provenance["model"],
         "tokenizer": provenance["tokenizer"],
+        "adapter": provenance.get("adapter", {"name": "unknown", "version": "unknown"}),
         "endpoint_id": config["endpoint_id"],
         "metric_id": config["metric_id"],
+        "tasks": list(config["tasks"]),
+        "response_mappings": list(config["response_mappings"]),
         "behavioral_theory_status": survivor_manifest["behavioral_theory_status"],
         "best_model": survivor_manifest["best_model"],
         "behavioral_survivor_set": expected_theories,
@@ -104,23 +127,36 @@ def prepare_transfer(
         "prediction_manifest_sha256": _sha(predictions_path),
         "transfer_split_sha256": split_hash,
         "config_sha256": _sha(effective_config),
+        "source_validity_rule_sha256": source_rule_hash,
+        "transfer_predictor_spec_sha256": predictor_hash,
+        "transfer_predictor_semantic_sha256": predictor_semantic_hash,
         "work_units": work,
         "work_manifest_hash": canonical_hash(work),
         "matrix_scope": scope,
         "diagonal_required_before_off_diagonal": True,
     }
     (output / "work_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    repository = Path(__file__).resolve().parents[3]
     lockfile = repository / "uv.lock"
     transfer_provenance = {
         "schema_version": "task-transfer-provenance-v1",
         **git_identity(repository),
         "model": provenance["model"],
         "tokenizer": provenance["tokenizer"],
+        "adapter": manifest["adapter"],
         "environment_lock_sha256": file_hash(lockfile),
         "specification_hashes": validate_specifications(repository),
         "pair_manifest_sha256": manifest["pair_manifest_sha256"],
+        "counterfactual_pair_sha256": provenance.get(
+            "counterfactual_pair_manifest_hash", manifest["source_pair_manifest_sha256"]
+        ),
+        "counterfactual_prediction_sha256": provenance.get(
+            "counterfactual_prediction_hash", manifest["prediction_manifest_sha256"]
+        ),
+        "replication_neural_split_sha256": provenance.get("neural_split_hash"),
         "transfer_split_sha256": split_hash,
+        "source_validity_rule_sha256": source_rule_hash,
+        "transfer_predictor_spec_sha256": predictor_hash,
+        "transfer_predictor_semantic_sha256": predictor_semantic_hash,
         "endpoint_id": config["endpoint_id"],
         "metric_id": config["metric_id"],
         "seeds": config["seeds"],
@@ -147,7 +183,7 @@ def _merge_job_metric_components(job_root: Path) -> Path:
     if not frames:
         raise RuntimeError(f"no transfer metric components for {job_root.name}")
     frame = pd.concat(frames, ignore_index=True).drop_duplicates(
-        ["model", "theory", "source_task", "target_task"], keep="last"
+        ["model", "theory", "source_task", "target_task", "response_mapping"], keep="last"
     )
     path = job_root / "metrics.csv"
     frame.to_csv(path, index=False)
@@ -178,39 +214,26 @@ def gate_diagonal_transfer(
             missing.append(work["work_id"])
             continue
         gate = json.loads(gate_path.read_text(encoding="utf-8"))
-        if gate.get("source_available") is True:
+        if gate.get("source_valid", gate.get("source_available")) is True:
             eligible.append(index)
             continue
         unavailable.append(index)
         selected = json.loads(
             (job_root / "selected_controller.json").read_text(encoding="utf-8")
         )
-        rows = []
-        for target in work["target_tasks"]:
-            if target in set(work["source_tasks"]):
-                continue
-            rows.append(
-                {
-                    "model": manifest["model"]["id"],
-                    "theory": work["theory"],
-                    "source_task": work["source_id"],
-                    "target_task": target,
-                    "layer": selected["layer"],
-                    "rank": selected["rank"],
-                    "n_train": selected["n_train"],
-                    "n_test": 0,
-                    "global_cfr": np.nan,
-                    "correlation": np.nan,
-                    "slope": np.nan,
-                    "bootstrap_low": np.nan,
-                    "bootstrap_high": np.nan,
-                    "random_p": np.nan,
-                    "endpoint_id": manifest["endpoint_id"],
-                    "metric_id": manifest["metric_id"],
-                    "status": "unavailable",
-                }
-            )
-        pd.DataFrame(rows, columns=OUTPUT_COLUMNS).to_csv(
+        targets = [
+            target for target in work["target_tasks"]
+            if target not in set(work["source_tasks"])
+        ]
+        rows = unavailable_transfer_rows(
+            model=manifest["model"]["id"], theory=work["theory"],
+            source_task=work["source_id"], target_tasks=targets,
+            layer=selected["layer"], rank=selected["rank"],
+            n_train=selected["n_train"], n_selection=selected["n_selection"],
+            controller_hash=selected["controller_sha256"],
+            split_hash=selected["transfer_split_sha256"],
+        )
+        rows.to_csv(
             job_root / "off_diagonal_metrics.csv", index=False
         )
         _merge_job_metric_components(job_root)
@@ -246,6 +269,8 @@ def project_pilot_resources(
     train_scale: float = 1.0,
     evaluation_scale: float = 1.0,
     storage_scale: float = 1.0,
+    model_gpu_time_multipliers: dict | None = None,
+    model_storage_multipliers: dict | None = None,
 ) -> dict:
     measured_seconds = (
         float(train_seconds)
@@ -260,6 +285,15 @@ def project_pilot_resources(
     pilot_hours = measured_seconds / 3600.0
     projected_hours_per_controller = projected_seconds_per_controller / 3600.0
     pilot_storage_gb = float(pilot_storage_bytes) / 1_000_000_000
+    gpu_multipliers = model_gpu_time_multipliers or {"qwen": 1.0, "llama": 2.0, "gemma": 3.0}
+    storage_multipliers = model_storage_multipliers or {"qwen": 1.0, "llama": 1.0, "gemma": 1.0}
+    full_hours = projected_hours_per_controller * int(source_controllers)
+    full_storage = pilot_storage_gb * float(storage_scale) * int(source_controllers)
+    targets = 7
+    evaluation_per_target = (
+        (float(diagonal_seconds) + float(off_diagonal_seconds))
+        * float(evaluation_scale) / targets / 3600.0
+    )
     return {
         "schema_version": "task-transfer-pilot-projection-v1",
         "pilot_gpu_hours": pilot_hours,
@@ -269,12 +303,17 @@ def project_pilot_resources(
         "evaluation_scale": float(evaluation_scale),
         "storage_scale": float(storage_scale),
         "projected_gpu_hours_per_source_controller": projected_hours_per_controller,
-        "projected_full_gpu_hours": (
-            projected_hours_per_controller * int(source_controllers)
-        ),
-        "projected_full_storage_gb": (
-            pilot_storage_gb * float(storage_scale) * int(source_controllers)
-        ),
+        "projected_evaluation_gpu_hours_per_target": evaluation_per_target,
+        "projected_full_gpu_hours": full_hours,
+        "projected_full_storage_gb": full_storage,
+        "projected_model_gpu_hours": {
+            model: full_hours * float(multiplier)
+            for model, multiplier in gpu_multipliers.items()
+        },
+        "projected_model_storage_gb": {
+            model: full_storage * float(storage_multipliers.get(model, 1.0))
+            for model in gpu_multipliers
+        },
         "projection_rule": (
             "measured_one_source_smoke_pilot_scaled_by_frozen_search_grid_"
             "epochs_random_controls_and_source_controllers"
@@ -319,6 +358,8 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
         train_scale=train_scale,
         evaluation_scale=evaluation_scale,
         storage_scale=storage_scale,
+        model_gpu_time_multipliers=config["resource_projection"]["model_gpu_time_multipliers"],
+        model_storage_multipliers=config["resource_projection"]["model_storage_multipliers"],
     )
     projection.update(
         {
@@ -327,8 +368,36 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
             "behavioral_survivor_set": manifest["behavioral_survivor_set"],
             "config_sha256": manifest["config_sha256"],
             "work_manifest_hash": manifest["work_manifest_hash"],
+            "cross_model_projection_basis": config["resource_projection"]["multiplier_basis"],
         }
     )
+    diagonal_metrics = job_root / "diagonal_metrics.csv"
+    off_diagonal_metrics = job_root / "off_diagonal_metrics.csv"
+    mapping_values = set()
+    evaluated_targets = set()
+    if diagonal_metrics.is_file() and off_diagonal_metrics.is_file():
+        pilot_metrics = pd.concat(
+            [pd.read_csv(diagonal_metrics), pd.read_csv(off_diagonal_metrics)],
+            ignore_index=True,
+        )
+        mapping_values = set(pilot_metrics.response_mapping.astype(str))
+        evaluated_targets = set(pilot_metrics.target_task.astype(str))
+    selected = json.loads((job_root / "selected_controller.json").read_text(encoding="utf-8"))
+    checks = {
+        "leakage_audit_passed": bool(selected.get("leakage_audit", {}).get("passed")),
+        "all_seven_targets_evaluated": evaluated_targets == set(config["tasks"]),
+        "both_response_mappings_emitted": set(RESPONSE_MAPPINGS) <= mapping_values,
+        "pooled_summary_emitted": "pooled" in mapping_values,
+        "scoped_artifacts_prevent_overwrite": all(
+            (job_root / name).is_file() for name in (
+                "interventions_diagonal.parquet", "interventions_off_diagonal.parquet",
+                "random_subspace_null_diagonal.csv", "random_subspace_null_off_diagonal.csv",
+            )
+        ),
+    }
+    projection["pilot_checks"] = checks
+    projection["pilot_clean"] = bool(all(checks.values()))
+    projection["evidence_eligible"] = False
     (output / "resource_projection.json").write_text(
         json.dumps(projection, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -339,8 +408,19 @@ def _write_pilot_projection(output: Path, manifest: dict) -> dict | None:
         f"Measured output storage: {projection['pilot_storage_gb']:.4f} GB  \n"
         f"Training scale (grid × epochs): {projection['train_scale']:.2f}×  \n"
         f"Evaluation scale (random controls): {projection['evaluation_scale']:.2f}×  \n"
+        f"Projected evaluation GPU-hours per target: {projection['projected_evaluation_gpu_hours_per_target']:.4f}  \n"
+        f"Projected Qwen GPU-hours: {projection['projected_model_gpu_hours']['qwen']:.4f}  \n"
+        f"Projected Gemma GPU-hours: {projection['projected_model_gpu_hours']['gemma']:.4f}  \n"
+        f"Projected Llama GPU-hours: {projection['projected_model_gpu_hours']['llama']:.4f}  \n"
+        f"Cross-model projection basis: `{projection['cross_model_projection_basis']}`  \n"
         f"Projected full GPU-hours: {projection['projected_full_gpu_hours']:.4f}  \n"
         f"Projected full storage: {projection['projected_full_storage_gb']:.4f} GB\n\n"
+        f"Leakage audit passed: `{checks['leakage_audit_passed']}`  \n"
+        f"All seven targets evaluated: `{checks['all_seven_targets_evaluated']}`  \n"
+        f"Both mappings emitted: `{checks['both_response_mappings_emitted']}`  \n"
+        f"Scoped artifacts/no overwrite: `{checks['scoped_artifacts_prevent_overwrite']}`  \n\n"
+        "This smoke pilot is not scientific evidence; its source-gate override exists only "
+        "to measure all-target integration cost.\n\n"
         "The full matrix remains blocked until both projected budgets are explicitly approved.\n",
         encoding="utf-8",
     )
@@ -351,9 +431,10 @@ def aggregate_transfer(output: str | Path, *, require_complete: bool = True) -> 
     output = Path(output)
     manifest = json.loads((output / "work_manifest.json").read_text(encoding="utf-8"))
     expected = {unit["work_id"] for unit in manifest["work_units"]}
-    frames, missing = [], []
+    frames, missing, controller_rows, gate_rows = [], [], [], []
     for work_id in sorted(expected):
-        path = output / "jobs" / work_id / "metrics.csv"
+        job_root = output / "jobs" / work_id
+        path = job_root / "metrics.csv"
         if path.is_file():
             frame = pd.read_csv(path)
             if set(OUTPUT_COLUMNS) - set(frame.columns):
@@ -361,10 +442,45 @@ def aggregate_transfer(output: str | Path, *, require_complete: bool = True) -> 
             frames.append(frame)
         else:
             missing.append(work_id)
+        selected_path = job_root / "selected_controller.json"
+        if selected_path.is_file():
+            selected = json.loads(selected_path.read_text(encoding="utf-8"))
+            work = selected["work"]
+            if work.get("design") == "single":
+                controller_rows.append({
+                    "model": manifest["model"]["id"], "theory": work["theory"],
+                    "task": work["source_id"], "layer": selected["layer"],
+                    "rank": selected["rank"], "n_train": selected["n_train"],
+                    "n_selection": selected["n_selection"],
+                    "controller_hash": selected["controller_sha256"],
+                    "split_hash": selected["transfer_split_sha256"],
+                    "target_definition": selected["target_definition"],
+                })
+        gate_path = job_root / "diagonal_gate.json"
+        if gate_path.is_file():
+            gate = json.loads(gate_path.read_text(encoding="utf-8"))
+            gate_rows.append({
+                "model": manifest["model"]["id"],
+                "theory": next(unit["theory"] for unit in manifest["work_units"] if unit["work_id"] == work_id),
+                "source_task": gate["source_task"],
+                "source_valid": gate.get("source_valid", gate.get("source_available", False)),
+                "source_status": gate.get("source_status", "invalid_source_controller"),
+                "mapping_gap": gate.get("mapping_gap", np.nan),
+                "mapping_sign_consistent": gate.get("mapping_sign_consistent", False),
+                "response_mapping_robustness_passes": gate.get("response_mapping_robustness_passes", False),
+                **{f"criterion_{key}": value for key, value in gate.get("criteria", {}).items()},
+            })
     if require_complete and missing:
         raise RuntimeError(f"transfer jobs are incomplete: {missing[:5]} ({len(missing)} total)")
     all_metrics = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=OUTPUT_COLUMNS)
     all_metrics.to_csv(output / "all_transfer_metrics.csv", index=False)
+    controllers = pd.DataFrame(controller_rows)
+    gates = pd.DataFrame(gate_rows)
+    if not all_metrics.empty and not gates.empty:
+        write_matrix_artifacts(
+            output, all_metrics, controllers, gates,
+            task_order=manifest.get("tasks", yaml.safe_load((output / "effective_config.yaml").read_text(encoding="utf-8"))["tasks"]),
+        )
     singles = all_metrics[all_metrics.source_task.astype(str).str.fullmatch("[a-z_]+")]
     if not singles.empty:
         singles = gate_source_controllers(singles)
@@ -374,7 +490,14 @@ def aggregate_transfer(output: str | Path, *, require_complete: bool = True) -> 
     all_metrics[all_metrics.source_task.astype(str).str.startswith("to-")].to_csv(output / "training_diversity.csv", index=False)
     geometry_rows = []
     single_units = [unit for unit in manifest["work_units"] if unit["design"] == "single"]
+    valid_keys = {
+        (str(row.theory), str(row.source_task))
+        for row in pd.DataFrame(gate_rows).itertuples()
+        if bool(row.source_valid)
+    }
     for left_index, left in enumerate(single_units):
+        if (str(left["theory"]), str(left["source_id"])) not in valid_keys:
+            continue
         left_meta = output / "jobs" / left["work_id"] / "selected_controller.json"
         if not left_meta.is_file():
             continue
@@ -382,6 +505,8 @@ def aggregate_transfer(output: str | Path, *, require_complete: bool = True) -> 
         left_basis = load_alignment(left_meta.parent / left_record["controller_path"])
         for right in single_units[left_index + 1:]:
             if right["theory"] != left["theory"]:
+                continue
+            if (str(right["theory"]), str(right["source_id"])) not in valid_keys:
                 continue
             right_meta = output / "jobs" / right["work_id"] / "selected_controller.json"
             if not right_meta.is_file():
@@ -422,13 +547,31 @@ def gate_source_controllers(metrics: pd.DataFrame) -> pd.DataFrame:
     """Gate D: unavailable source controllers are never encoded as zero transfer."""
 
     diagonal = metrics[metrics.source_task == metrics.target_task].copy()
-    diagonal["source_available"] = (
-        np.isfinite(diagonal.global_cfr)
-        & (diagonal.global_cfr > 0)
-        & (diagonal.bootstrap_low > 0)
-        & (diagonal.correlation > 0)
-    )
-    availability = diagonal[["model", "theory", "source_task", "source_available"]]
+    keys = ["model", "theory", "source_task"]
+    availability_rows = []
+    for values, part in diagonal.groupby(keys):
+        pooled = part
+        mapping_ok = True
+        if "response_mapping" in part:
+            pooled = part[part.response_mapping == "pooled"]
+            mapping = part[part.response_mapping.isin(RESPONSE_MAPPINGS)]
+            mapping_values = mapping.global_cfr.dropna().to_numpy(float)
+            mapping_ok = bool(
+                len(mapping_values) == len(RESPONSE_MAPPINGS)
+                and np.all(mapping_values > 0)
+                and float(np.max(mapping_values) - np.min(mapping_values)) <= .25
+            )
+        available = False
+        if len(pooled) == 1:
+            row = pooled.iloc[0]
+            available = bool(
+                np.isfinite(row.global_cfr) and row.global_cfr > 0
+                and row.bootstrap_low > 0 and row.correlation > 0
+                and np.isfinite(row.random_p) and row.random_p <= .05
+                and mapping_ok
+            )
+        availability_rows.append(dict(zip(keys, values)) | {"source_available": available})
+    availability = pd.DataFrame(availability_rows, columns=keys + ["source_available"])
     result = metrics.merge(availability, on=["model", "theory", "source_task"], how="left", validate="many_to_one")
     invalid = ~result.source_available.fillna(False)
     off_diagonal = result.source_task != result.target_task

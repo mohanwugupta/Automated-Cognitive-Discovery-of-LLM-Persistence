@@ -44,9 +44,12 @@ def git_identity(root: str | Path) -> dict:
 def validate_transfer_provenance(record: dict, *, final: bool = False) -> None:
     required = {
         "schema_version", "git_commit", "git_dirty", "diff_sha256", "model",
-        "tokenizer", "environment_lock_sha256", "specification_hashes",
-        "pair_manifest_sha256", "transfer_split_sha256", "endpoint_id",
-        "metric_id", "seeds", "output_root",
+        "tokenizer", "adapter", "environment_lock_sha256", "specification_hashes",
+        "pair_manifest_sha256", "counterfactual_pair_sha256",
+        "counterfactual_prediction_sha256", "replication_neural_split_sha256",
+        "transfer_split_sha256", "source_validity_rule_sha256",
+        "transfer_predictor_spec_sha256", "endpoint_id", "metric_id", "seeds",
+        "output_root",
     }
     missing = required - set(record)
     if missing:
@@ -59,7 +62,18 @@ def validate_transfer_provenance(record: dict, *, final: bool = False) -> None:
         raise ValueError("final transfer evidence requires a clean worktree")
     if record["git_dirty"] and not SHA256.fullmatch(str(record["diff_sha256"])):
         raise ValueError("dirty development runs require an exact diff hash")
-    for key in ("environment_lock_sha256", "pair_manifest_sha256", "transfer_split_sha256"):
+    for identity in ("model", "tokenizer"):
+        value = record[identity]
+        if not value.get("id") or not COMMIT.fullmatch(str(value.get("revision", ""))):
+            raise ValueError(f"{identity} requires an exact id and immutable 40-hex revision")
+    if not record["adapter"].get("name") or not record["adapter"].get("version"):
+        raise ValueError("adapter name and version are required")
+    for key in (
+        "environment_lock_sha256", "pair_manifest_sha256",
+        "counterfactual_pair_sha256", "counterfactual_prediction_sha256",
+        "replication_neural_split_sha256", "transfer_split_sha256",
+        "source_validity_rule_sha256", "transfer_predictor_spec_sha256",
+    ):
         if not SHA256.fullmatch(str(record[key])):
             raise ValueError(f"{key} must be SHA-256")
     if record["endpoint_id"] != "cognitive_counterfactual_recovery" or record["metric_id"] != "global_cfr_v1":

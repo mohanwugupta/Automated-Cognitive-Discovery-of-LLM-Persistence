@@ -1,6 +1,7 @@
 schema_version: task-transfer-v1
 endpoint_id: cognitive_counterfactual_recovery
 metric_id: global_cfr_v1
+response_mappings: [continue_x, continue_y]
 
 tasks: [bandit, foraging, solvability, information_sampling, waiting, effort, debugging]
 splits:
@@ -31,12 +32,33 @@ random_controls:
   subspaces: 100
   pvalue: finite_sample_plus_one
 
+source_validity:
+  rule_version: task_source_validity_v1
+  random_p_max: 0.05
+  response_mapping:
+    values: [continue_x, continue_y]
+    maximum_global_cfr_gap: 0.25
+    require_positive_each_mapping: true
+    require_sign_consistency: true
+
 predictors:
   frozen_before_matrix: true
-  families: [behavioral, computational, ontology, counterfactual, neural]
+  spec_path: configs/transfer/transfer_predictors_v1.yaml
+  families: [behavioral_computational, task_structure, counterfactual_geometry, neural_similarity]
   estimator: ridge
   alpha: 10.0
   validation: leave_one_target_task_out
+
+resource_projection:
+  multiplier_basis: parameter_count_ratio_planning_only
+  model_gpu_time_multipliers:
+    qwen: 1.0
+    llama: 2.0
+    gemma: 3.0
+  model_storage_multipliers:
+    qwen: 1.0
+    llama: 1.0
+    gemma: 1.0
 
 seeds:
   transfer_split: 26001
