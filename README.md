@@ -1,5 +1,9 @@
 # Cognitive models as guides to causal discovery
 
+The prospective three-architecture, variable-indexed pipeline is documented in
+[`CROSS_TASK_DISCOVERY.md`](CROSS_TASK_DISCOVERY.md). It supersedes the earlier
+controller-first 7×7 transfer plan without deleting that historical implementation.
+
 ## 1. Scientific question
 
 When a language model persists rather than disengages, can behavioral cognitive models identify the computation and guide a causal search for a low-dimensional neural controller? This repository separates four questions that are easy to conflate: behavioral predictability, recovery of a frozen cognitive counterfactual, recovery of the model's natural effect, and identification of a unique computational abstraction.

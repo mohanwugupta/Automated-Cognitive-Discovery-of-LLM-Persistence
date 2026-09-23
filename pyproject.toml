@@ -44,6 +44,7 @@ cognitive-discovery-replicate = "cognitive_discovery.replicate_model:main"
 cognitive-discovery-model-validate = "cognitive_discovery.model_validation.cli:main"
 cognitive-discovery-benchmark-fetch = "cognitive_discovery.model_validation.external_benchmark:main"
 cognitive-discovery-transfer = "cognitive_discovery.transfer.cli:main"
+cognitive-discovery-cross-task = "cognitive_discovery.cross_task.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

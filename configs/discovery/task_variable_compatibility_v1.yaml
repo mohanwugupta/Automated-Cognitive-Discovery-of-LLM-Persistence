@@ -1,0 +1,84 @@
+schema_version: task-variable-compatibility-v1
+
+# Definitions are expanded with every task below into one frozen record for every
+# task × variable cell. An omitted variable is explicitly non-manipulable; it is
+# never imputed merely to make an analysis rectangular.
+variables:
+  continuation_value:
+    levels: [low, medium, high]
+    semantic_definition: Expected benefit of continuing the current pursuit.
+    nuisance_variables_to_hold_fixed: [disengagement_value, continuation_cost]
+  disengagement_value:
+    levels: [low, medium, high]
+    semantic_definition: Expected benefit of stopping or switching away.
+    nuisance_variables_to_hold_fixed: [continuation_value, continuation_cost]
+  continuation_cost:
+    levels: [low, medium, high]
+    semantic_definition: Prospective cost required for another continuation step.
+    nuisance_variables_to_hold_fixed: [continuation_value, disengagement_value]
+  progress:
+    levels: [negative, neutral, positive]
+    semantic_definition: Evidence that the pursuit is moving toward its goal.
+    nuisance_variables_to_hold_fixed: [continuation_value, success_evidence]
+  success_evidence:
+    levels: [low, medium, high]
+    semantic_definition: Current evidence that continued pursuit will succeed.
+    nuisance_variables_to_hold_fixed: [progress, continuation_value]
+  uncertainty:
+    levels: [low, high]
+    semantic_definition: Uncertainty about the relevant continuation outcome.
+    nuisance_variables_to_hold_fixed: [continuation_value, success_evidence]
+  prior_investment:
+    levels: [low, high]
+    semantic_definition: Resources already spent before the current decision.
+    nuisance_variables_to_hold_fixed: [continuation_cost, progress]
+  controllability:
+    levels: [low, high]
+    semantic_definition: Degree to which continued action can affect success.
+    nuisance_variables_to_hold_fixed: [success_evidence, uncertainty]
+  environmental_stability:
+    levels: [changing, stable]
+    semantic_definition: Expected persistence of the current environment or payoff regime.
+    nuisance_variables_to_hold_fixed: [uncertainty, goal_continuity]
+  goal_continuity:
+    levels: [new, same]
+    semantic_definition: Whether the current decision continues the same goal or policy.
+    nuisance_variables_to_hold_fixed: [environmental_stability, prior_investment]
+  action_history:
+    levels: [disengage, mixed, continue]
+    semantic_definition: Direction of prior continuation-versus-disengagement choices.
+    nuisance_variables_to_hold_fixed: [outcome_history, current_state]
+    history_requirements: Matched nonempty action sequences with outcome history fixed.
+  outcome_history:
+    levels: [negative, mixed, positive]
+    semantic_definition: Valence of outcomes observed before the current decision.
+    nuisance_variables_to_hold_fixed: [action_history, current_state]
+    history_requirements: Matched nonempty outcome sequences with action history fixed.
+  contextual_history:
+    levels: [return_A, return_B, novel_C]
+    semantic_definition: Which previously experienced latent context is reinstated at decision time.
+    nuisance_variables_to_hold_fixed: [current_state, action_history, outcome_history]
+    history_requirements: A1-B-A2 episode with validated context cue and matched current state.
+
+tasks:
+  bandit:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, success_evidence, uncertainty, prior_investment, environmental_stability, goal_continuity, action_history, outcome_history, contextual_history]
+    notes: Existing canonical bandit and contextual-history renderers implement these manipulations.
+  foraging:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, progress, success_evidence, uncertainty, prior_investment, controllability, environmental_stability, goal_continuity, action_history, outcome_history, contextual_history]
+    notes: Existing canonical foraging and contextual-history renderers implement these manipulations.
+  solvability:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, progress, success_evidence, uncertainty, prior_investment, controllability, environmental_stability, goal_continuity, action_history, outcome_history]
+    notes: Contextual reinstatement is not implemented for solvability and remains unavailable.
+  information_sampling:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, progress, success_evidence, uncertainty, prior_investment, environmental_stability, goal_continuity, action_history, outcome_history]
+    notes: Controllability and contextual reinstatement are not independent canonical manipulations here.
+  waiting:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, success_evidence, uncertainty, prior_investment, environmental_stability, goal_continuity, action_history, outcome_history]
+    notes: Progress, controllability, and contextual reinstatement are not independent canonical manipulations here.
+  effort:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, progress, success_evidence, uncertainty, prior_investment, controllability, environmental_stability, goal_continuity, action_history, outcome_history]
+    notes: Contextual reinstatement is not implemented for effort and remains unavailable.
+  debugging:
+    manipulable: [continuation_value, disengagement_value, continuation_cost, progress, success_evidence, uncertainty, prior_investment, controllability, environmental_stability, goal_continuity, action_history, outcome_history, contextual_history]
+    notes: Existing canonical debugging and contextual-history renderers implement these manipulations.

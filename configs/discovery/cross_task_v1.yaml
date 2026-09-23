@@ -1,0 +1,157 @@
+schema_version: cross-task-discovery-v1
+analysis_id: cross_task_discovery_three_llms_v1
+
+models:
+  - key: qwen
+    id: Qwen/Qwen3.5-4B
+    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+    tokenizer_id: Qwen/Qwen3.5-4B
+    tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+    adapter: qwen
+    local_path_template: /scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B
+  - key: gemma
+    id: google/gemma-4-12b-it
+    revision: 707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7
+    tokenizer_id: google/gemma-4-12b-it
+    tokenizer_revision: 707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7
+    adapter: gemma
+    local_path_template: /scratch/gpfs/JORDANAT/{user}/models/google--gemma-4-12b-it
+  - key: llama
+    id: meta-llama/Llama-3.1-8B-Instruct
+    revision: 0e9e39f249a16976918f6564b8830bc894c89659
+    tokenizer_id: meta-llama/Llama-3.1-8B-Instruct
+    tokenizer_revision: 0e9e39f249a16976918f6564b8830bc894c89659
+    adapter: llama
+    local_path_template: /scratch/gpfs/JORDANAT/{user}/models/meta-llama--Llama-3.1-8B-Instruct
+
+tasks: [bandit, foraging, solvability, information_sampling, waiting, effort, debugging]
+compatibility_matrix:
+  path: configs/discovery/task_variable_compatibility_v1.yaml
+  freeze_before_design: true
+
+interfaces:
+  candidates:
+    - {id: yes_no, labels: ["Yes", "No"], style: yes_no_question}
+    - {id: continue_stop, labels: [Continue, Stop], style: choice_mapping}
+    - {id: a_b, labels: [A, B], style: choice_mapping}
+    - {id: x_y, labels: [X, Y], style: choice_mapping}
+  require_semantic_reversal: true
+  require_mapping_reversal: true
+  require_task_level_validity: true
+  calibration_conditions_per_task: 30
+  validation_conditions_per_task: 70
+  maximum_mapping_gap: 0.25
+  maximum_order_effect: 0.25
+
+design:
+  backend: native_sweetpea_equivalent
+  broad_semantic_conditions: 2800
+  contextual_semantic_conditions: 420
+  active_budget: 1400
+  untouched_validation_conditions: 980
+  shared_semantic_manifest: true
+  response_mappings: [continue_x, continue_y]
+  deliberate_decorrelation: true
+  preregistered_interactions:
+    - [continuation_value, continuation_cost]
+    - [success_evidence, uncertainty]
+    - [prior_investment, controllability]
+    - [progress, continuation_cost]
+
+splits:
+  names: [train, selection, test]
+  fractions: [0.60, 0.20, 0.20]
+  group_response_mappings: true
+  group_repeated_renderings: true
+  group_semantic_contrasts: true
+  stratify_by: [task_family, target_variable]
+
+computational:
+  model_bank:
+    - immediate_state
+    - dynamic_reevaluation
+    - choice_perseveration
+    - outcome_history
+    - dual_history
+    - latent_context
+    - latent_motivation
+    - option_termination
+    - task_set_reinstatement
+    - meta_control
+  flexible_baselines: [linear_interactions, mlp, gru]
+  flexible_settings:
+    hidden_size: 64
+    learning_rate: 0.001
+    max_epochs: 200
+    patience: 20
+  sharing_structures: [fully_shared, task_specific, hierarchical, ontology_conditioned]
+  survivor_metric: selection_mse
+  survivor_direction: minimize
+  practical_equivalence_margin: 0.02
+  neural_results_used_for_survivors: false
+
+active_discovery:
+  acquisition: weighted_coverage_uncertainty_disagreement_v1
+  weights: {coverage: 0.40, uncertainty: 0.30, disagreement: 0.30}
+  uses_neural_data: false
+  untouched_validation: true
+  rounds: 4
+
+representation:
+  targets_selected_before_neural: true
+  activation_position: final_prompt_token
+  layer_grid: relative_depth_all_feasible
+  methods: [ridge, low_rank_supervised, contrast_svd]
+  sharing_models: [one_shared, shared_plus_private, aligned_task_specific, fully_task_specific]
+  target_refit_allowed: false
+  mapping_pair_grouped: true
+  random_nulls: 100
+
+causal:
+  methods: [das_interchange, subspace_patching, frozen_basis_replacement]
+  requires_frozen_hypotheses: true
+  requires_representational_or_registered_negative_control_rationale: true
+  target_task_refit_allowed: false
+  controls:
+    - matched_random_subspace
+    - output_readout_direction
+    - pca_variance_subspace
+    - predictive_probe_direction
+    - target_changing_shuffled_source_base
+    - response_mapping_invariance
+
+endpoints:
+  behavior: semantic_persistence_logit_v1
+  representation: frozen_source_decoding_v1
+  causal: cognitive_counterfactual_recovery
+  causal_metric: global_cfr_v1
+
+evidence_levels:
+  behavior: 1
+  computational: 2
+  representation: 3
+  causal: 4
+  cross_task_causal: 5
+
+seeds:
+  interface_calibration: 21001
+  interface_validation: 21002
+  design: 22001
+  behavior_split: 22002
+  behavior_bootstrap: 22003
+  computational_fit: 23001
+  active_candidates: 24001
+  active_acquisition: 24002
+  representation_split: 25001
+  representation_fit: 25002
+  representation_null: 25003
+  causal_search: 26001
+  causal_bootstrap: 26002
+  causal_controls: 26003
+
+artifact_policy:
+  save_full_activations: false
+  stream_activations: true
+  save_compact_sufficient_statistics: true
+  delete_temporary_activations: true
+  maximum_tracked_file_mb: 10
