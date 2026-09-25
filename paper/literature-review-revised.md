@@ -43,22 +43,24 @@ These are applications to our code and results, rather than claims made by the c
 | Binz & Schulz 2023 | Preprint introduction, vignette controls, bandit and two-step analyses, causal-task setup | Strategy-sensitive evaluation; version read is the 2022 preprint, citation is the 2023 publication. |
 | McGuire & Kable 2015 | Publisher abstract and figure descriptions; full article access unresolved in this pass | Dynamic revaluation motivates persistence tasks; do not claim full-paper reading. |
 | Constantino & Daw 2015 | Introduction, task design, MVT derivation, threshold/model-comparison and learning-method passages | Competing sequential learning accounts; not equivalent to our fixed history regressors. |
-| Klein-Flügge et al. 2016 | Abstract, significance statement, introduction | Independent reward/effort manipulations motivate component versus integrated-value distinctions. |
+| Klein-Flügge et al. 2016 | Abstract, introduction, value-comparison results and discussion; imaging-method details not fully reviewed | Independent reward/effort manipulations motivate component versus integrated-value distinctions. |
 | Pisauro et al. 2017 | Introduction and model-based EEG/EEG-informed fMRI result passages | Models predict neural temporal profiles; our final-prompt measurements are a different level of evidence. |
 | Sukhov et al. 2025 | Introduction, task definition, optimal-policy and human-result overview | Irreversible abandonment and finite horizons matter; ordinary bandits are not the same quitting problem. |
 | Hagendorff et al., Machine Psychology | Initial framing and selected methodological passages, August 2024 preprint | Behavioral experiments and computational analysis; human paradigms require adaptation. |
-| Aher et al. 2023 | Abstract and introduction | Simulated population behavior and systematic distortions; not evidence of shared human internal processes. |
+| Aher et al. 2023 | Abstract/introduction, wisdom-of-crowds experiment, risks and conclusion | Simulated population behavior and systematic distortions; not evidence of shared human internal processes. |
 | Shanahan et al. 2023 | Abstract and introduction, May 2023 preprint | Role-play is an interpretive caution, not evidence that all computational accounts are empty. |
 | Hayes et al. 2024 | Introduction, full cognitive-model subsection, hidden-state analysis, conclusions | Relative versus absolute reward encoding, learning and response functions; close cognitive-modeling precedent. |
 | Schmied et al. 2025 | Abstract, introduction and study overview | Exploration, frequency bias and knowing-doing gap; distinguish fine-tuning changes from our inference-time interventions. |
-| Chen et al. 2025, When Greedy Wins | Abstract and introduction | Lower average regret can hide premature abandonment of exploration. |
-| Zhang et al. | Abstract and introduction, arXiv v3, May 2026 | Random/directed exploration and thinking conditions; version title ends “Experiments,” not original “Tasks.” |
+| Chen et al. 2025, When Greedy Wins | Abstract/introduction, exploration diagnostics and conclusion | Lower average regret can hide premature abandonment of exploration. |
+| Zhang et al. | Abstract/introduction, choice equations, estimation, parameter-recovery design, key observations and conclusion; v3 May 2026 | Random/directed exploration and thinking conditions; version title ends “Experiments,” not original “Tasks.” |
 | Everitt et al. 2025 | Introduction and limitations | Capability-relative pursuit of a prompted goal differs from raw success and our conditional persistence logits. |
-| Arghal et al. 2026 | Abstract, introduction and overview, v2 | Goal-preserving transformations and representational probing; latest PDF confirms ICML 2026. |
+| Arghal et al. 2026 | Abstract/introduction and concluding representation/patching limitation, v2 | Goal-preserving transformations and representational probing; latest PDF confirms ICML 2026. |
 | Xu et al. 2026 | Introduction and value-neuron intervention/transfer subsections, v2 | Includes causal ablations and downstream reward-prediction diagnostics; do not dismiss as probing only. |
 | Arditi et al. 2024 | Introduction, extraction, interventions, evaluation, refusal results, weight-edit section | Causal refusal evidence; our conceptual distinction is explanatory target, not direction rank. |
-| Chen et al. 2025, Persona Vectors | Abstract, introduction and extraction overview | Automated trait directions, monitoring, training-data prediction and intervention applications. |
+| Chen et al. 2025, Persona Vectors | Abstract/introduction, extraction overview, steering experiment, limitations and conclusion | Automated trait directions, monitoring, training-data prediction and intervention applications. |
 | Gupta et al. 2026, Sisyphus | Original draft/intro/reference audit and stored-results audit from this project | Original motivation retained; original inference/training was not rerun by the arithmetic audit. |
+
+Additional methods/results passages were checked on 9 September, including the limits of behavioral simulation and unsuccessful simple activation patching in Arghal et al. The new computational-discrimination audit is our analysis, not a claim from these sources.
 
 Remaining comprehensive reading includes the unexamined main sections and appendices in the rows above, and a full accessible copy of McGuire and Kable. The rewritten review only makes source claims supported by the passages examined. It should not be described as “all papers read in full.”
 
