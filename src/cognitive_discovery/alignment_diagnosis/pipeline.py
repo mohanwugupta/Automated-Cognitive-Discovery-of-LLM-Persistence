@@ -98,6 +98,7 @@ def prepare(config, output, *, pilot=False, synthetic=None):
                     ROOT / "src/cognitive_discovery/participants/qwen.py",
                     ROOT / "src/cognitive_discovery/participants/token_mapping.py",
                     ROOT / "src/cognitive_discovery/models/features.py",
+                    ROOT / "src/cognitive_discovery/data/storage.py",
                 ]
             )
         },

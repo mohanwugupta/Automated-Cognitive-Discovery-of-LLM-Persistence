@@ -311,6 +311,28 @@ def fast_config(config):
     return result
 
 
+def test_pandas3_nullable_design_collects_and_reports_strict_json(config, tmp_path):
+    config = fast_config(config)
+    output = tmp_path / "pandas3-run"
+    with pd.option_context("future.infer_string", True):
+        prepare(config, output, pilot=True, synthetic="integrated")
+        collect(output, "main", execute=True)
+        collect(output, "calibration", execute=True)
+        freeze_predictions(output)
+        collect(output, "intervention", execute=True)
+        result = analyze(output)
+    assert result["data_kind"] == "synthetic"
+
+    def reject_constant(value):
+        raise ValueError(f"non-JSON numeric constant: {value}")
+
+    for path in output.glob("*.jsonl"):
+        for line in path.read_text().splitlines():
+            json.loads(line, parse_constant=reject_constant)
+    baseline = records(output / "main_observations.jsonl")[0]
+    assert baseline["expected_action"] is None
+
+
 def test_staged_workflow_freezes_before_intervention_and_resumes(config, tmp_path):
     config = fast_config(config)
     output = tmp_path / "run"

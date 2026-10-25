@@ -30,8 +30,14 @@ def write_records(records, path: str | Path) -> Path:
         temporary.replace(path)
     else:
         temporary = path.with_name(path.name + ".tmp")
+        # Pandas 3 string columns and nullable numeric columns can replace None
+        # with NaN. Cast before masking so missing values remain Python None.
+        json_frame = frame.astype(object).where(frame.notna(), None)
         temporary.write_text(
-            "".join(json.dumps(row, sort_keys=True, default=str) + "\n" for row in frame.to_dict("records")),
+            "".join(
+                json.dumps(row, sort_keys=True, default=str, allow_nan=False) + "\n"
+                for row in json_frame.to_dict("records")
+            ),
             encoding="utf-8",
         )
         temporary.replace(path)

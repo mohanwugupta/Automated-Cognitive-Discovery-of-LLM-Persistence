@@ -78,3 +78,20 @@ separately from the canonical model ID. The complete CPU regression suite passed
 **334 tests, with 2 skipped** and the same two environment compatibility warnings.
 Canonical validation passed with **43 verified hashes**. Local model loading was
 tested with a fake loader; real GPU inference remains a cluster check.
+
+## Pandas 3 nullable JSON regression
+
+Reproduced the cluster's exact `Out of range float values are not JSON compliant`
+failure with Pandas 3-style string inference (`future.infer_string=True`). The
+DataFrame conversion changed an uncorrected trial's `expected_action=None` to
+NaN before saving its design, which then reached the strict observation writer.
+This was metadata missingness, not evidence of nonfinite Qwen logits.
+
+Three test-first cases failed before the fix: JSON null preservation with string
+inference disabled and enabled, and the complete diagnosis workflow with the
+future string behavior enabled. The shared writer now casts to object, replaces
+missing cells with Python None, and enforces strict JSON. Probability precision
+and nested histories remain intact. All three cases passed after the fix; the
+full suite passed **337 tests, with 2 skipped** and the same two environment
+compatibility warnings. Canonical validation passed all **43 hashes**. The
+storage implementation is also included in new diagnosis source provenance.
