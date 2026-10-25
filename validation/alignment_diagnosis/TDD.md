@@ -48,3 +48,20 @@ Shell syntax, whitespace, and tracked artifact size checks passed.
 
 The CPU tests exercise Qwen inference through a fake model and run the complete
 synthetic workflow. Real Qwen inference and GPU execution were not run locally.
+
+## Immediate cluster submission regression
+
+After a reported silent submission, added `tests/test_alignment_submission.py`
+before changing the submission wrapper. A fake Python executable deliberately
+fails if invoked on the login node; fake `sbatch` records the dependency chain.
+Both tests initially failed: the wrapper called Python before submitting, and
+did not reject an existing output directory before that call.
+
+Moved preparation into a queued CPU job, added an early existing-output check,
+and printed progress and job IDs for each submission. The same two tests then
+passed. Preparation, freeze, and analysis request CPUs; initial and intervention
+collection request GPUs, with `afterok` dependencies between all five jobs.
+
+The focused regression run passed **50 tests** across submission, diagnosis,
+Slurm resource contracts, and documentation. Shell syntax and whitespace checks
+also passed. Actual Slurm submission was simulated locally, not executed remotely.

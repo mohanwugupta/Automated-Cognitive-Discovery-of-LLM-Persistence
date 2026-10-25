@@ -111,8 +111,9 @@ intervention collection or analysis. A new fit requires a new run directory.
 You may run `analyze` immediately after `freeze` to inspect the preregistered
 report and plot; validation is marked pending until intervention collection ends.
 
-On Della, activate the project conda environment first, ensure the pinned model
-is cached, then:
+On Della, ensure the pinned model is cached, then submit from the login node.
+The wrapper calls `sbatch` directly; it runs no Python preparation on the login
+node. Jobs activate the project conda environment themselves:
 
 ```bash
 export DIAGNOSIS_OUTPUT=/scratch/gpfs/JORDANAT/$USER/alignment_diagnosis_pilot_v1
@@ -120,8 +121,9 @@ export DIAGNOSIS_PILOT=1
 bash scripts/submit_alignment_diagnosis.sh
 ```
 
-The dependency chain is GPU initial collection → CPU fit/recovery/freeze → GPU
-intervention collection → CPU analysis. Only collection jobs request a GPU.
+The dependency chain is CPU preparation → GPU initial collection → CPU
+fit/recovery/freeze → GPU intervention collection → CPU analysis. Each job ID is
+printed as soon as its submission returns. Only collection jobs request a GPU.
 `DIAGNOSIS_CONFIG`, `REPO`, and `CONDA_ENV` can override the corresponding defaults.
 After inspecting the pilot, submit the main experiment to a new output directory
 with `DIAGNOSIS_PILOT=0`. No cluster jobs are launched by ordinary tests or smoke runs.

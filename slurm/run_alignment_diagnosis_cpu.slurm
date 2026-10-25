@@ -24,6 +24,13 @@ export PYTHONNOUSERSITE=1
 export PYTHONPATH="$REPO/src${PYTHONPATH:+:$PYTHONPATH}"
 export MPLCONFIGDIR="${TMPDIR:-/tmp}/cognitive-diagnosis-mpl-$SLURM_JOB_ID"
 case "$DIAGNOSIS_PHASE" in
+  prepare)
+    pilot_args=()
+    if [[ "${DIAGNOSIS_PILOT:-0}" == 1 ]]; then pilot_args+=(--pilot); fi
+    python scripts/alignment_diagnosis.py prepare \
+      --config "${DIAGNOSIS_CONFIG:-$REPO/configs/alignment_diagnosis/v1.yaml}" \
+      --output "$DIAGNOSIS_OUTPUT" "${pilot_args[@]}"
+    ;;
   freeze|analyze)
     python scripts/alignment_diagnosis.py "$DIAGNOSIS_PHASE" --output "$DIAGNOSIS_OUTPUT"
     ;;

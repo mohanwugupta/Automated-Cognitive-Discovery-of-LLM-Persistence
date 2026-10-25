@@ -1,26 +1,42 @@
 #!/bin/bash
-# Run from the activated project environment on Della; pinned weights must be cached.
+# Submit from Della without importing Python or preparing data on the login node.
 set -euo pipefail
 REPO=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 DIAGNOSIS_OUTPUT=${DIAGNOSIS_OUTPUT:?export DIAGNOSIS_OUTPUT to a new scratch directory}
 DIAGNOSIS_CONFIG=${DIAGNOSIS_CONFIG:-$REPO/configs/alignment_diagnosis/v1.yaml}
-export REPO DIAGNOSIS_OUTPUT
+DIAGNOSIS_PILOT=${DIAGNOSIS_PILOT:-0}
+export REPO DIAGNOSIS_OUTPUT DIAGNOSIS_CONFIG DIAGNOSIS_PILOT
+printf 'Submitting alignment diagnosis jobs from %s\n' "$REPO"
+trap 'printf "Submission failed at line %s; check the error above.\n" "$LINENO" >&2' ERR
 command -v sbatch >/dev/null || { echo "sbatch is unavailable; run on Della" >&2; exit 1; }
 cd "$REPO"
-export PYTHONPATH="$REPO/src${PYTHONPATH:+:$PYTHONPATH}"
-pilot_args=()
-if [[ "${DIAGNOSIS_PILOT:-0}" == 1 ]]; then pilot_args+=(--pilot); fi
-python scripts/alignment_diagnosis.py prepare --config "$DIAGNOSIS_CONFIG" \
-  --output "$DIAGNOSIS_OUTPUT" "${pilot_args[@]}"
+if [[ -e "$DIAGNOSIS_OUTPUT" ]]; then
+  echo "DIAGNOSIS_OUTPUT already exists: $DIAGNOSIS_OUTPUT. Choose a new output directory; existing data were left untouched." >&2
+  exit 2
+fi
+[[ -f "$DIAGNOSIS_CONFIG" ]] || { echo "missing config: $DIAGNOSIS_CONFIG" >&2; exit 2; }
 mkdir -p logs
-initial=$(sbatch --parsable --export=ALL,DIAGNOSIS_PHASE=initial slurm/run_alignment_diagnosis_gpu.slurm)
+printf 'Submitting prepare (CPU)...\n'
+prepare=$(sbatch --parsable --export=ALL,DIAGNOSIS_PHASE=prepare slurm/run_alignment_diagnosis_cpu.slurm)
+prepare=${prepare%%;*}
+printf 'prepare=%s\n' "$prepare"
+printf 'Submitting initial collection (GPU)...\n'
+initial=$(sbatch --parsable --dependency="afterok:$prepare" \
+  --export=ALL,DIAGNOSIS_PHASE=initial slurm/run_alignment_diagnosis_gpu.slurm)
 initial=${initial%%;*}
+printf 'initial=%s\n' "$initial"
+printf 'Submitting prediction freeze (CPU)...\n'
 freeze=$(sbatch --parsable --dependency="afterok:$initial" \
   --export=ALL,DIAGNOSIS_PHASE=freeze slurm/run_alignment_diagnosis_cpu.slurm)
 freeze=${freeze%%;*}
+printf 'freeze=%s\n' "$freeze"
+printf 'Submitting intervention collection (GPU)...\n'
 intervention=$(sbatch --parsable --dependency="afterok:$freeze" \
   --export=ALL,DIAGNOSIS_PHASE=intervention slurm/run_alignment_diagnosis_gpu.slurm)
 intervention=${intervention%%;*}
+printf 'intervention=%s\n' "$intervention"
+printf 'Submitting analysis (CPU)...\n'
 analysis=$(sbatch --parsable --dependency="afterok:$intervention" \
   --export=ALL,DIAGNOSIS_PHASE=analyze slurm/run_alignment_diagnosis_cpu.slurm)
-printf 'initial=%s\nfreeze=%s\nintervention=%s\nanalysis=%s\n' "$initial" "$freeze" "$intervention" "$analysis"
+analysis=${analysis%%;*}
+printf 'analyze=%s\n' "$analysis"
