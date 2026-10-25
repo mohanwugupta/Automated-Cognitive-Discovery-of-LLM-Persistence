@@ -1,0 +1,64 @@
+{
+  "local_choice": {
+    "generators": {
+      "gate": {
+        "parameters": {
+          "beta": [
+            16.364803396845684,
+            20.0,
+            -1.0899371629107713
+          ],
+          "correction_parameter": 1.0
+        },
+        "passed": true,
+        "recovery_rate": 1.0
+      },
+      "integrated": {
+        "parameters": {
+          "beta": [
+            16.364803396845684,
+            20.0,
+            -1.0899371629107713
+          ],
+          "correction_parameter": 40.0
+        },
+        "passed": true,
+        "recovery_rate": 1.0
+      }
+    },
+    "passed": true,
+    "replicates": 30,
+    "sampling": "one Bernoulli action per prompt; four held-out cells; unresolved counts as failure"
+  },
+  "reference": {
+    "generators": {
+      "gate": {
+        "parameters": {
+          "beta": [
+            -0.5,
+            0.7,
+            0.3
+          ],
+          "correction_parameter": 0.8
+        },
+        "passed": false,
+        "recovery_rate": 0.7666666666666667
+      },
+      "integrated": {
+        "parameters": {
+          "beta": [
+            -0.5,
+            0.7,
+            0.3
+          ],
+          "correction_parameter": 2.0
+        },
+        "passed": false,
+        "recovery_rate": 0.36666666666666664
+      }
+    },
+    "passed": false,
+    "replicates": 30,
+    "sampling": "one Bernoulli action per prompt; four held-out cells; unresolved counts as failure"
+  }
+}

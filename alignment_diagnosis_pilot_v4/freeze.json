@@ -1,0 +1,27 @@
+{
+  "attractiveness_gate_passed": true,
+  "calibration_minimum_by_history": {
+    "16.0": 0.9560233179413042,
+    "8.0": 0.9555304915660373
+  },
+  "created_utc": "2026-10-25T13:29:10.362572+00:00",
+  "data_kind": "qwen",
+  "hashes": {
+    "calibration_design.jsonl": "67808c75a932bcff1c05ce0841f169ce827511d5f040e3758b3a573146f83748",
+    "calibration_observations.jsonl": "9866fc86c79f2f88842d51cd9a1c0e14c8339bf22a77aa46e769f73c9f4529e0",
+    "config.json": "2095627f03d7cbaa98aa1d20d1fd7c3d3033cad8c7a196fc0f4226b67c5ae96a",
+    "cv_choice_continue.csv": "b4273b07cc1073548d371985a725cf38e5f991b67db13bfbadb8aa7aa44621c7",
+    "cv_p_continue.csv": "a2e75d1bc2ce913e7f0f125f9c2bf763af672a129931cdfca930b3abd2db2ae4",
+    "intervention_design.jsonl": "818de28c6dec7c43cae2970e3ff07bcc00320bc92afd12df119811ea7b93b8fb",
+    "main_design.jsonl": "bd24319bb9a0b25929cdad3c22f00e5c04cdec76afb6e43cc80085a70de8f9a2",
+    "main_observations.jsonl": "6834dd8f2bd3f4de4dc8177cf76601a6f0b322c638543ac65c5478a2d9bbf47c",
+    "model_comparison.json": "7b12ca9cb9bba00aed1acd5438201b9704bf988445355032c883260d7183c5b2",
+    "model_source.json": "e61c164ca07f219474557138f047cf07e2a1bbb6cdd935d8c349e248223245fc",
+    "preregistered_predictions.jsonl": "67815491275cb05f8f80d14c0f9e666ab32ef29e75618bcba05b6ec7469d6508",
+    "provenance.json": "e353788f5635ba491b32e9e09ad16272fb2a4d80edbc8bcab583e1d89c090ec4",
+    "recovery.json": "f691b3b64da9cb8a4874074fc706c1ee987eec063ff6f1cdd69c373af233a8ec"
+  },
+  "schema_version": "bandit-diagnosis-prediction-freeze-v1",
+  "selected_incentive": 8.0,
+  "selection_rule": "smallest candidate with mean uncorrected p_continue >= target in both histories"
+}

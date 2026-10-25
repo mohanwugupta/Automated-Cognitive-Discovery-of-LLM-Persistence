@@ -1,0 +1,11 @@
+effect,endpoint,mean_difference,lower_95,upper_95,variants
+correction_reduction,choice_continue,1.0,1.0,1.0,8
+correction_reduction,p_continue,0.9383668565103309,0.9305438405061078,0.9465966679484051,8
+incentive_effect_c0,choice_continue,0.0,0.0,0.0,8
+incentive_effect_c0,p_continue,0.001726090192639508,-0.0007031120361143696,0.004018558470675875,8
+history_effect_c0,choice_continue,0.0,0.0,0.0,8
+history_effect_c0,p_continue,0.025138762616092707,0.012111019424359295,0.03627269205480085,8
+incentive_effect_c1,choice_continue,0.0,0.0,0.0,8
+incentive_effect_c1,p_continue,0.02568042851840088,0.021364749296169917,0.029611944830032655,8
+history_effect_c1,choice_continue,0.0,0.0,0.0,8
+history_effect_c1,p_continue,0.005003833189920891,-0.004489884940368626,0.01461514974724012,8

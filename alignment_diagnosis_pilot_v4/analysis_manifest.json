@@ -1,0 +1,14 @@
+{
+  "dataset_sha256": "8eb2f4fb498f5727781199bdea0444efeaccff15ce260954b53cc10336f709aa",
+  "freeze_sha256": "160a04c6c787af7bf1f77787b4be3e4825d26c57a55628c6cd2e2da0bc9a7dc8",
+  "intervention_observations_sha256": "2b1a6f440b63b3584811b966632e62dea931c4af7f967daa77281bcbb906bfb5",
+  "outputs": {
+    "condition_summary.csv": "8cfaa6ec93883f23689d0c175bf6e87a088da426f3f3ed3f7f6ce6dcf3b9541a",
+    "counterfactual_results.csv": "3e54ca52705735469781dba4014481cbc524c1fb58dc60984b1de0a74fad0f29",
+    "diagnosis.json": "1199d2511655e1d2f400c8dc55132f2547f13ac78e074fc0f842598cfd24515c",
+    "diagnosis.md": "f66642129694dffe1d44e817872a71ac7d2ff6e4cbb15a958a4250c2e8c06226",
+    "diagnostic_figure.png": "99fe47f93f49e8cfc798fd159aa23681d7ef85711da1c773f3eba1ecb13f9211",
+    "failure_diagnoses.jsonl": "a900049eb6cef1ca3d4d5fe9ea17eca198f189b79e5aeb057ac9fedb67b9c274",
+    "paired_effects.csv": "09a7689084c9eb7819cd33a85bffd4472783b997b226f5de1b96b21567fcb652"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-10-25T13:23:13.587508+00:00",
+  "data_kind": "qwen",
+  "endpoints": {
+    "behavior": "sampled A/B after correction among parseable A/B/C",
+    "policy": "(P(A)+P(B))/(P(A)+P(B)+P(C))"
+  },
+  "environment_lock_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661",
+  "git_commit": "ac51aa289505d6762c6d8e68405250a6f09d79d9",
+  "git_dirty": true,
+  "inputs": {
+    "calibration_design.jsonl": "67808c75a932bcff1c05ce0841f169ce827511d5f040e3758b3a573146f83748",
+    "config.json": "2095627f03d7cbaa98aa1d20d1fd7c3d3033cad8c7a196fc0f4226b67c5ae96a",
+    "main_design.jsonl": "bd24319bb9a0b25929cdad3c22f00e5c04cdec76afb6e43cc80085a70de8f9a2"
+  },
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "pilot": true,
+  "runtime": {
+    "packages": {
+      "huggingface-hub": "1.29.0",
+      "matplotlib": "3.11.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "scipy": "1.17.1",
+      "torch": "2.13.0",
+      "transformers": "5.16.1"
+    },
+    "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]"
+  },
+  "sampling": {
+    "constrained_decoding": false,
+    "max_new_tokens": 8,
+    "seed_unit": "trial_id",
+    "temperature": 1.0,
+    "top_k": 0,
+    "top_p": 1.0
+  },
+  "schema_version": "bandit-alignment-diagnosis-provenance-v1",
+  "seeds": {
+    "bootstrap": 31006,
+    "calibration": 31002,
+    "design": 31001,
+    "intervention": 31003,
+    "recovery": 31005,
+    "sampling": 31004
+  },
+  "source_hashes": {
+    "src/cognitive_discovery/alignment_diagnosis/__init__.py": "92ff7cec1964cb4d63fb45779667f626bb0fc670c049552af020fd9b86d2eb2d",
+    "src/cognitive_discovery/alignment_diagnosis/cli.py": "611e07dfb7c9e59c7bd3396fc374ce3410bdff0fbb47533acce2a0bea3f5d8f9",
+    "src/cognitive_discovery/alignment_diagnosis/design.py": "4a40cc18be016b8a33dc0724c7fb8e7e82c51aa796ed0b8cae793dcf14c1c368",
+    "src/cognitive_discovery/alignment_diagnosis/models.py": "de8cedc770febcf53bb920d57a88353c6b11c3a16b84bb4188101802d073d02d",
+    "src/cognitive_discovery/alignment_diagnosis/participant.py": "6b680a84a7c94979560985bbdf3c32c5bd3d3905d295c70a57549ceff889320c",
+    "src/cognitive_discovery/alignment_diagnosis/pipeline.py": "45837831064b12f4934493c7c5954e69d01a6cf099da6be71648326df1ad7dff",
+    "src/cognitive_discovery/alignment_diagnosis/reporting.py": "9d9d6ae48908b015ba7f88bb295064005d4d4a6e0971792c273220b75520341a",
+    "src/cognitive_discovery/data/storage.py": "a5774f76d42b4b7707fa789e6a4874f45494551ea715f8b748bc6e8e1d47d935",
+    "src/cognitive_discovery/models/features.py": "4973fed74ef9b0297edd0106de05633d7e3f4b4b64ac7134b6d1bf1ea21911f9",
+    "src/cognitive_discovery/participants/qwen.py": "90984bb91cd2d0a03c13d9d3ce965760fa77c6f05da9ff864d1196715351e02c",
+    "src/cognitive_discovery/participants/token_mapping.py": "d2e37199d6285f581ea4f6801becc3958c8f7c9d96c3b017ce98f4d2648d7fad"
+  },
+  "synthetic_generator": null
+}
