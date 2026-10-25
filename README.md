@@ -53,6 +53,11 @@ The prospective computational-model validation and task-transfer extension is
 documented in [TASK_TRANSFER.md](docs/TASK_TRANSFER.md). It adds no scientific
 claim until its staged validation, Qwen, and transfer gates have been run.
 
+The behavior-only bandit correction experiment is documented in
+[ALIGNMENT_DIAGNOSIS.md](docs/ALIGNMENT_DIAGNOSIS.md). It tests competing computational
+explanations of authorized STOP failures, freezes predictions before an independent
+incentive intervention, and produces a bounded alignment diagnosis report.
+
 ## 5. Reproduce manuscript numbers
 
 Install the locked CPU environment, then replay all claims from committed compact artifacts:

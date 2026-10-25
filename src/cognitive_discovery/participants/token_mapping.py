@@ -23,6 +23,16 @@ def verify_choice_tokens(tokenizer, labels: Iterable[str]) -> dict[str, int]:
 
 def verify_chat_choice_tokens(tokenizer, messages, labels: Iterable[str]) -> dict[str, int]:
     labels = tuple(labels)
+    if len(labels) != 2:
+        raise ValueError("binary choice requires two distinct labels")
+    return verify_chat_action_tokens(tokenizer, messages, labels)
+
+
+def verify_chat_action_tokens(tokenizer, messages, labels: Iterable[str]) -> dict[str, int]:
+    """Validate two or more actions at the actual chat generation boundary."""
+    labels = tuple(labels)
+    if len(labels) < 2 or len(set(labels)) != len(labels):
+        raise ValueError("actions require distinct labels")
     kwargs = {"tokenize": False, "add_generation_prompt": True}
     try:
         prompt = tokenizer.apply_chat_template(messages, enable_thinking=False, **kwargs)
@@ -37,7 +47,7 @@ def verify_chat_choice_tokens(tokenizer, messages, labels: Iterable[str]) -> dic
                 f"choice {label!r} is not a clean one-token chat continuation"
             )
         token_ids[label] = int(completed[-1])
-    if len(set(token_ids.values())) != 2:
+    if len(set(token_ids.values())) != len(labels):
         raise ValueError("chat choice labels do not map to distinct tokens")
     return token_ids
 
