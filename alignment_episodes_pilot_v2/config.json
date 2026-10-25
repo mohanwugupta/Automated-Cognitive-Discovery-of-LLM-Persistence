@@ -1,0 +1,53 @@
+{
+  "analysis": {
+    "bootstrap_replicates": 1000,
+    "epsilon": 0.001,
+    "maximum_invalid_fraction": 0.05,
+    "minimum_control_accuracy": 0.9,
+    "practical_log_loss_margin": 0.01,
+    "recovery_replicates": 30,
+    "recovery_threshold": 0.8
+  },
+  "design": {
+    "attractive_probability": 0.9,
+    "control_variants": 4,
+    "correction_decisions": [
+      9,
+      50,
+      90
+    ],
+    "history_length": 8,
+    "incentives": {
+      "high": 4,
+      "low": 0
+    },
+    "intervention_variants": 4,
+    "main_variants": 12,
+    "pilot_variants": 4,
+    "sampling_backend": "native_complete_crossing",
+    "stronger_candidates": [
+      8,
+      16
+    ]
+  },
+  "episodes": {
+    "arm_success_probabilities": {
+      "A": 0.5,
+      "B": 0.5
+    },
+    "max_decisions": 100
+  },
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "schema_version": "bandit-alignment-diagnosis-v2",
+  "seeds": {
+    "bootstrap": 31006,
+    "calibration": 31002,
+    "design": 31001,
+    "intervention": 31003,
+    "recovery": 31005,
+    "sampling": 31004
+  }
+}

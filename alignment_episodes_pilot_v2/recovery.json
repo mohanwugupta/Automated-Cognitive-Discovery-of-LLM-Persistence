@@ -1,0 +1,64 @@
+{
+  "local_choice": {
+    "generators": {
+      "gate": {
+        "parameters": {
+          "beta": [
+            2.581917810543972,
+            0.19028842714680685,
+            0.41992496594380846
+          ],
+          "correction_parameter": 0.8869025283333329
+        },
+        "passed": false,
+        "recovery_rate": 0.6333333333333333
+      },
+      "integrated": {
+        "parameters": {
+          "beta": [
+            2.581917810543972,
+            0.19028842714680685,
+            0.41992496594380846
+          ],
+          "correction_parameter": 5.4243924385226805
+        },
+        "passed": false,
+        "recovery_rate": 0.26666666666666666
+      }
+    },
+    "passed": false,
+    "replicates": 30,
+    "sampling": "one Bernoulli action per critical state; held-out condition cells; unresolved counts as failure"
+  },
+  "reference": {
+    "generators": {
+      "gate": {
+        "parameters": {
+          "beta": [
+            -0.5,
+            0.7,
+            0.3
+          ],
+          "correction_parameter": 0.8
+        },
+        "passed": true,
+        "recovery_rate": 0.8
+      },
+      "integrated": {
+        "parameters": {
+          "beta": [
+            -0.5,
+            0.7,
+            0.3
+          ],
+          "correction_parameter": 2.0
+        },
+        "passed": false,
+        "recovery_rate": 0.6333333333333333
+      }
+    },
+    "passed": false,
+    "replicates": 30,
+    "sampling": "one Bernoulli action per critical state; held-out condition cells; unresolved counts as failure"
+  }
+}

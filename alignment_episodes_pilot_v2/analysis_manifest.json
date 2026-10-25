@@ -1,0 +1,26 @@
+{
+  "dataset_sha256": "8e9dbcb542156d9c3e93da2910dff8f7a66acaf144ec33ca34e7d1ea2a21e583",
+  "freeze_sha256": "acad2de066feee6e1608c646260322d810f1f1ddbd9be8a5f01c498eeeef494c",
+  "intervention_observation_hashes": {
+    "intervention_observations.shard000-of008.jsonl": "8318e1aa1687d6c7deccb04fc202b78d9a163c0ab76fd86f233219c8f2d341ea",
+    "intervention_observations.shard001-of008.jsonl": "ed7fa03d3f29169d4412cbdc2e54f6f79e9e82deb9701f6346192b25c58a20cf",
+    "intervention_observations.shard002-of008.jsonl": "d72b2662675c98682db6b66fe1e3e2ea54373ccdc7cc99006612c0490c2e532f",
+    "intervention_observations.shard003-of008.jsonl": "393a855270e8df10983f89c7c1000ab71b07e83c29a4f154042f579476ddc262",
+    "intervention_observations.shard004-of008.jsonl": "902dc5a63334ee535d28b41e2fbaa85e82d51599bf086b92d781d52a8562335d",
+    "intervention_observations.shard005-of008.jsonl": "b85b6f9531a28d3b8c44eb99d634c12d4de397ed9af4cc852b95d365c81150a4",
+    "intervention_observations.shard006-of008.jsonl": "768227d9bcd46c51ce4edf7141f0a2948435c42b8a57e5d232474cbdc38f7dfd",
+    "intervention_observations.shard007-of008.jsonl": "2b809dd0a3b75f77417a3cf6fefc5530749e2eefd57a33a76774165a7eb3602f"
+  },
+  "outputs": {
+    "condition_summary.csv": "51ef89a3608c038d8d5eef19580ad3e5aeb46d577de8b2c6ed2ca45970dbcf9b",
+    "counterfactual_results.csv": "0b0a2abd5d58262cd6b2fd7f97de68a0f850bbfed77f5371223a850f7664667c",
+    "diagnosis.json": "c571944ee97e49894aa535aebe33b0901a28c6fc044f5269e531aea7d5e34f98",
+    "diagnosis.md": "ab929a2470a8ab557bc71b1ef8538acf5e186ab612250069a4a319c605df8e3f",
+    "diagnostic_figure.png": "02fca7cad4c14fd3f34407e4edf7e0853800bbb34485016703e444fada92e15e",
+    "episode_conditions.csv": "99f1c36c699bbb8081091b7a9a824ae4b6bb6fede984a035ee4348d33bbfd87d",
+    "episode_report.md": "bd724108f4d54492d20563ddb503d8e8afaa902a9202e268c1813b68ec60e24d",
+    "episode_summary.csv": "ad7928e4ced46789481142afc1d9368bb23dfcdb64d408191118edf3bc483804",
+    "failure_diagnoses.jsonl": "9470fa2afded047bbad51dca871019713f7a0ab19f646fb6129ca69924f961b0",
+    "paired_effects.csv": "8ae646bb6a38cce78b20d961498496d7c254f1dc5168a18d1e9af7d2fe6f7188"
+  }
+}

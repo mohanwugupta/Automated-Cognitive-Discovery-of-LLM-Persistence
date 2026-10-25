@@ -1,0 +1,77 @@
+{
+  "created_utc": "2026-10-25T14:19:15.275964+00:00",
+  "data_kind": "qwen",
+  "endpoints": {
+    "behavior": "sampled A/B after correction among parseable A/B/C",
+    "policy": "(P(A)+P(B))/(P(A)+P(B)+P(C))"
+  },
+  "environment_lock_sha256": "1da819846ebda7993e472dc2b7c6b44a09a76249dc2026ecc7d77ac1d4903661",
+  "episode_protocol": {
+    "arm_success_probabilities": {
+      "A": 0.5,
+      "B": 0.5
+    },
+    "max_decisions": 100
+  },
+  "git_commit": "0df8017d460c271922452ac5b4a49dad631a6426",
+  "git_dirty": false,
+  "inputs": {
+    "calibration_design.jsonl": "74f45754a6abc733682c12f85a660be83a678f50896b4def33e13c958e3be4b6",
+    "config.json": "528e28fa009463ac7b1006c8a5095629b7d411fcc9fa1a7be1217cc7a3931ca8",
+    "counterbalance_audit.json": "1458dba1d0daba765d75a9cbcad51c82839c921273fd6ff1c3bdda9e257d8ded",
+    "design_spec.json": "cd7b40d6e0bfda2ed6049eb011973c416415432e0be324181b4bfcf7ff9a8d52",
+    "main_design.jsonl": "ca963945f6e318c4b6b280f3a0bdb742bc2059f6efa9ca78d471ac4f36138c87"
+  },
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "pilot": true,
+  "runtime": {
+    "packages": {
+      "huggingface-hub": "1.29.0",
+      "matplotlib": "3.11.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "scipy": "1.17.1",
+      "sweetbean": "not_installed",
+      "sweetpea": "0.2.14",
+      "torch": "2.13.0",
+      "transformers": "5.16.1"
+    },
+    "python": "3.11.16 (main, Aug 27 2026, 14:44:21) [GCC 14.3.0]"
+  },
+  "sampling": {
+    "constrained_decoding": false,
+    "max_new_tokens": 8,
+    "seed_unit": "trial_id",
+    "temperature": 1.0,
+    "top_k": 0,
+    "top_p": 1.0
+  },
+  "schema_version": "bandit-alignment-diagnosis-provenance-v1",
+  "seeds": {
+    "bootstrap": 31006,
+    "calibration": 31002,
+    "design": 31001,
+    "intervention": 31003,
+    "recovery": 31005,
+    "sampling": 31004
+  },
+  "source_hashes": {
+    "src/cognitive_discovery/alignment_diagnosis/__init__.py": "92ff7cec1964cb4d63fb45779667f626bb0fc670c049552af020fd9b86d2eb2d",
+    "src/cognitive_discovery/alignment_diagnosis/cli.py": "703d8f13f52d48ff4ac983a48320658e677380396aa1d008452e23d4162749e3",
+    "src/cognitive_discovery/alignment_diagnosis/counterbalance.py": "2014ccb8491e76544fb5b199fe9ac325a540747cde55a9c5bea31fa5b9e3f35a",
+    "src/cognitive_discovery/alignment_diagnosis/design.py": "2a133ad8fb3d26f583be9ce4522f56301b7dd7de61c0441d18499103c6081b80",
+    "src/cognitive_discovery/alignment_diagnosis/episodes.py": "28804d4e251ab08f7d6adc60b453d1c47c82b7548384d1f68dcf246ac3ebf58d",
+    "src/cognitive_discovery/alignment_diagnosis/models.py": "7c6a8a321b1214c12570ff88a3cd390ab3bbefaeeb5e947bed3cf0af44045f51",
+    "src/cognitive_discovery/alignment_diagnosis/participant.py": "6b680a84a7c94979560985bbdf3c32c5bd3d3905d295c70a57549ceff889320c",
+    "src/cognitive_discovery/alignment_diagnosis/pipeline.py": "cc472793b69030a0bf8155c4827e49cd39813d3ec8a30966b1feb23d593dfbe5",
+    "src/cognitive_discovery/alignment_diagnosis/reporting.py": "7b33be7f235ba7d1764ee4906f26fa53ba91f925588db8e8864b7472969a5d44",
+    "src/cognitive_discovery/data/storage.py": "a5774f76d42b4b7707fa789e6a4874f45494551ea715f8b748bc6e8e1d47d935",
+    "src/cognitive_discovery/models/features.py": "4973fed74ef9b0297edd0106de05633d7e3f4b4b64ac7134b6d1bf1ea21911f9",
+    "src/cognitive_discovery/participants/qwen.py": "90984bb91cd2d0a03c13d9d3ce965760fa77c6f05da9ff864d1196715351e02c",
+    "src/cognitive_discovery/participants/token_mapping.py": "d2e37199d6285f581ea4f6801becc3958c8f7c9d96c3b017ce98f4d2648d7fad"
+  },
+  "synthetic_generator": null
+}

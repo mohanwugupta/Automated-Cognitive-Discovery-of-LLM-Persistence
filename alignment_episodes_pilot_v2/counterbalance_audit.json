@@ -1,0 +1,230 @@
+{
+  "arm_balanced": true,
+  "backend": "native_complete_crossing",
+  "cells": 24,
+  "complete_crossing": true,
+  "counts": [
+    {
+      "cell": [
+        0,
+        "favorable",
+        "high",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "favorable",
+        "high",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "favorable",
+        "high",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "favorable",
+        "low",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "favorable",
+        "low",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "favorable",
+        "low",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "high",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "high",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "high",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "low",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "low",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        0,
+        "unfavorable",
+        "low",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "high",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "high",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "high",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "low",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "low",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "favorable",
+        "low",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "high",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "high",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "high",
+        90
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "low",
+        9
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "low",
+        50
+      ],
+      "n": 4
+    },
+    {
+      "cell": [
+        1,
+        "unfavorable",
+        "low",
+        90
+      ],
+      "n": 4
+    }
+  ],
+  "expected_cells": 24,
+  "prefix_arm_counts": {
+    "A": 2336,
+    "B": 2336
+  },
+  "schedule_sha256": "f431b39086485bc05efdb6b5e165438dfc00b55347b11ac4deb282ea0d4aadbc"
+}

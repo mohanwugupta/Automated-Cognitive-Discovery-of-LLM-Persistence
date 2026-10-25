@@ -1,0 +1,41 @@
+{
+  "absorbing_action": "C",
+  "backend": "native_complete_crossing",
+  "constraints": [
+    "complete crossing in every replicate",
+    "correction twins share the same prefix and available rewards",
+    "A/B prefix counts balanced across replicate pairs"
+  ],
+  "crossing": [
+    "correction",
+    "history",
+    "incentive_name",
+    "scheduled_correction_decision"
+  ],
+  "events": [
+    "controller_instruction",
+    "action",
+    "reward_feedback"
+  ],
+  "factors": {
+    "correction": [
+      0,
+      1
+    ],
+    "history": [
+      "favorable",
+      "unfavorable"
+    ],
+    "incentive_name": [
+      "low",
+      "high"
+    ],
+    "scheduled_correction_decision": [
+      9,
+      50,
+      90
+    ]
+  },
+  "max_decisions": 100,
+  "renderer": "role-preserving SweetBean-style event renderer"
+}

@@ -1,0 +1,184 @@
+{
+  "choice": {
+    "comparison": {
+      "advantages": {
+        "baseline": {
+          "cluster_bootstrap_95_ci": [
+            3.784785808119289,
+            4.1759031232453205
+          ],
+          "mean_log_loss_advantage": 4.036456107076121
+        },
+        "descriptive": {
+          "cluster_bootstrap_95_ci": [
+            -0.06862830900179437,
+            0.09599743471242059
+          ],
+          "mean_log_loss_advantage": 0.01368456285531311
+        },
+        "gate": {
+          "cluster_bootstrap_95_ci": [
+            -0.07129196593370829,
+            0.08575318236455089
+          ],
+          "mean_log_loss_advantage": 0.007230608215421301
+        }
+      },
+      "beats_simpler_baselines": false,
+      "candidate": "integrated",
+      "corrected_log_loss": {
+        "baseline": 4.400809734328979,
+        "descriptive": 0.38360665559591894,
+        "gate": 0.3770073240280475,
+        "integrated": 0.3672398102830746
+      },
+      "reason": "candidate predictions unresolved at the registered margin",
+      "winner": null
+    },
+    "fitted": {
+      "baseline_fit_on": "no-correction fitting trials only; shared and frozen for M1/M2",
+      "beta_bounds": [
+        -20,
+        20
+      ],
+      "epsilon": 0.001,
+      "features": [
+        "intercept",
+        "incentive",
+        "history_outcome_kernel (decay=0.7)"
+      ],
+      "kappa_bounds": [
+        0,
+        40
+      ],
+      "models": {
+        "baseline": {
+          "beta": [
+            2.581917810543972,
+            0.19028842714680685,
+            0.41992496594380846
+          ],
+          "correction_parameter": 0.0
+        },
+        "descriptive": {
+          "beta": [
+            2.6625878270254533,
+            0.0,
+            0.0
+          ],
+          "correction_parameter": 0.10638297872340426
+        },
+        "gate": {
+          "beta": [
+            2.581917810543972,
+            0.19028842714680685,
+            0.41992496594380846
+          ],
+          "correction_parameter": 0.8869025283333329
+        },
+        "integrated": {
+          "beta": [
+            2.581917810543972,
+            0.19028842714680685,
+            0.41992496594380846
+          ],
+          "correction_parameter": 5.4243924385226805
+        }
+      },
+      "n_baseline": 46,
+      "n_corrected": 47,
+      "status": "complete"
+    }
+  },
+  "policy": {
+    "comparison": {
+      "advantages": {
+        "baseline": {
+          "cluster_bootstrap_95_ci": [
+            2.1277145677837837,
+            2.289777440324205
+          ],
+          "mean_log_loss_advantage": 2.198449997274224
+        },
+        "descriptive": {
+          "cluster_bootstrap_95_ci": [
+            -0.006930188970012546,
+            0.01012712616963077
+          ],
+          "mean_log_loss_advantage": 0.0021164198924884625
+        },
+        "gate": {
+          "cluster_bootstrap_95_ci": [
+            -0.006685650434850492,
+            0.009038612307030784
+          ],
+          "mean_log_loss_advantage": 0.0015223752727921234
+        }
+      },
+      "beats_simpler_baselines": false,
+      "candidate": "integrated",
+      "corrected_log_loss": {
+        "baseline": 2.5432171895661217,
+        "descriptive": 0.34688361218438635,
+        "gate": 0.34628956756469,
+        "integrated": 0.34476719229189784
+      },
+      "reason": "candidate predictions unresolved at the registered margin",
+      "winner": null
+    },
+    "fitted": {
+      "baseline_fit_on": "no-correction fitting trials only; shared and frozen for M1/M2",
+      "beta_bounds": [
+        -20,
+        20
+      ],
+      "epsilon": 0.001,
+      "features": [
+        "intercept",
+        "incentive",
+        "history_outcome_kernel (decay=0.7)"
+      ],
+      "kappa_bounds": [
+        0,
+        40
+      ],
+      "models": {
+        "baseline": {
+          "beta": [
+            2.733002804827019,
+            -0.004311112191458873,
+            0.2328762256848749
+          ],
+          "correction_parameter": 0.0
+        },
+        "descriptive": {
+          "beta": [
+            2.6756178140356415,
+            0.0,
+            0.0
+          ],
+          "correction_parameter": 0.10701452745464084
+        },
+        "gate": {
+          "beta": [
+            2.733002804827019,
+            -0.004311112191458873,
+            0.2328762256848749
+          ],
+          "correction_parameter": 0.8865192269663708
+        },
+        "integrated": {
+          "beta": [
+            2.733002804827019,
+            -0.004311112191458873,
+            0.2328762256848749
+          ],
+          "correction_parameter": 4.972148265196779
+        }
+      },
+      "n_baseline": 48,
+      "n_corrected": 48,
+      "status": "complete"
+    }
+  }
+}

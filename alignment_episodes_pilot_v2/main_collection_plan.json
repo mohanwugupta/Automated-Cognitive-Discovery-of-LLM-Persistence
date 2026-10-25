@@ -1,0 +1,5 @@
+{
+  "assignment": "matched pair order modulo shard count",
+  "phase": "main",
+  "shard_count": 8
+}
