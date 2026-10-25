@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import getpass
 from importlib.metadata import PackageNotFoundError, version
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -236,7 +238,55 @@ def _measurement(row, response, seed):
     }
 
 
-def collect(output, phase, *, execute=False, online=False, participant=None):
+def _load_qwen(output, config, model_path, *, online):
+    """Use the same local checkpoint directory as the other Della Qwen jobs."""
+    raw_path = (
+        model_path
+        or os.environ.get("DIAGNOSIS_MODEL_PATH")
+        or os.environ.get("MODEL_PATH")
+    )
+    if raw_path is None and not online:
+        user = os.environ.get("USER") or getpass.getuser()
+        raw_path = f"/scratch/gpfs/JORDANAT/{user}/models/Qwen--Qwen3.5-4B"
+    source = {
+        "model_id": config["model"]["id"],
+        "declared_revision": config["model"]["revision"],
+    }
+    if raw_path is not None:
+        path = Path(raw_path).expanduser().resolve()
+        if not (path / "config.json").is_file():
+            raise FileNotFoundError(
+                f"local Qwen model lacks config.json: {path}. "
+                "Set MODEL_PATH or --model-path to the existing cluster model directory."
+            )
+        load_path, local_only = str(path), True
+        source.update(
+            local_path=str(path),
+            local_files_only=True,
+            config_sha256=file_hash(path / "config.json"),
+            revision_verified_from_local_directory=False,
+        )
+    else:
+        load_path, local_only = config["model"]["id"], False
+        source.update(local_path=None, local_files_only=False)
+    source_record = output / "model_source.json"
+    if source_record.exists() and json.loads(source_record.read_text()) != source:
+        raise ValueError("model source differs from the earlier collection phase")
+    print(f"Loading Qwen from {load_path} (local_files_only={local_only})", flush=True)
+    participant = BanditQwenParticipant.from_pretrained(
+        load_path,
+        revision=config["model"]["revision"],
+        local_files_only=local_only,
+    )
+    # Retain the scientific checkpoint identity separately from its filesystem location.
+    participant.model_id = config["model"]["id"]
+    dump(source_record, source)
+    return participant
+
+
+def collect(
+    output, phase, *, execute=False, online=False, participant=None, model_path=None
+):
     output = Path(output)
     config, provenance = load_run(output)
     if phase not in ("main", "calibration", "intervention"):
@@ -265,11 +315,7 @@ def collect(output, phase, *, execute=False, online=False, participant=None):
                 config, provenance["synthetic_generator"]
             )
         else:
-            participant = BanditQwenParticipant.from_pretrained(
-                config["model"]["id"],
-                revision=config["model"]["revision"],
-                local_files_only=not online,
-            )
+            participant = _load_qwen(output, config, model_path, online=online)
     expected_id = (
         "synthetic/bandit-diagnosis"
         if provenance["data_kind"] == "synthetic"
@@ -369,6 +415,8 @@ def freeze_predictions(output):
             "preregistered_predictions.jsonl",
         )
     }
+    if (output / "model_source.json").exists():
+        hashes["model_source.json"] = file_hash(output / "model_source.json")
     frozen = {
         "schema_version": "bandit-diagnosis-prediction-freeze-v1",
         "created_utc": datetime.now(timezone.utc).isoformat(),

@@ -65,3 +65,16 @@ collection request GPUs, with `afterok` dependencies between all five jobs.
 The focused regression run passed **50 tests** across submission, diagnosis,
 Slurm resource contracts, and documentation. Shell syntax and whitespace checks
 also passed. Actual Slurm submission was simulated locally, not executed remotely.
+
+## Offline cluster model regression
+
+Added four failing cases before repairing the model source: the collector must
+load the existing local Qwen directory, a missing directory must fail before any
+hub lookup, and both GPU phases must pass `--model-path` with offline environment
+flags. All four were observed red, then green after the fix. The implementation
+now follows the other Qwen jobs' `MODEL_PATH` convention, defaulting to
+`/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B`, and records the local source
+separately from the canonical model ID. The complete CPU regression suite passed
+**334 tests, with 2 skipped** and the same two environment compatibility warnings.
+Canonical validation passed with **43 verified hashes**. Local model loading was
+tested with a fake loader; real GPU inference remains a cluster check.

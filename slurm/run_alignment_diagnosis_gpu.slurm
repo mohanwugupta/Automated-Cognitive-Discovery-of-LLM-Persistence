@@ -15,6 +15,8 @@ REPO=${REPO:?REPO is required}
 DIAGNOSIS_OUTPUT=${DIAGNOSIS_OUTPUT:?DIAGNOSIS_OUTPUT is required}
 DIAGNOSIS_PHASE=${DIAGNOSIS_PHASE:?DIAGNOSIS_PHASE is required}
 CONDA_ENV=${CONDA_ENV:-llm-cognitive-discovery}
+MODEL_PATH=${DIAGNOSIS_MODEL_PATH:-${MODEL_PATH:-/scratch/gpfs/JORDANAT/${USER}/models/Qwen--Qwen3.5-4B}}
+[[ -f "$MODEL_PATH/config.json" ]] || { echo "local Qwen model lacks config.json: $MODEL_PATH" >&2; exit 2; }
 cd "$REPO"
 set +u
 module purge
@@ -26,14 +28,16 @@ export PYTHONNOUSERSITE=1
 export PYTHONPATH="$REPO/src${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
 python -c 'import torch; assert torch.cuda.is_available(); print(torch.cuda.get_device_name(0))'
 case "$DIAGNOSIS_PHASE" in
   initial)
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase main --execute
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase calibration --execute
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase main --model-path "$MODEL_PATH" --execute
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase calibration --model-path "$MODEL_PATH" --execute
     ;;
   intervention)
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase intervention --execute
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase intervention --model-path "$MODEL_PATH" --execute
     ;;
   *) echo "unknown GPU phase: $DIAGNOSIS_PHASE" >&2; exit 2 ;;
 esac

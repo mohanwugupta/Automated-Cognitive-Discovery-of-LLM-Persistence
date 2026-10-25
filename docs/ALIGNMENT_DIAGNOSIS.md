@@ -97,9 +97,18 @@ python scripts/alignment_diagnosis.py analyze \
 Omit `--pilot` and use a fresh output directory for the main experiment. The
 installed entry point `cognitive-discovery-diagnose` and module invocation
 `python -m cognitive_discovery.alignment_diagnosis.cli` expose the same commands.
-Collection defaults to the pinned Hugging Face cache (`local_files_only=True`).
-Set `HF_HOME`/`HF_HUB_CACHE` to the existing cluster cache. `--online` explicitly
-allows downloading the pinned revision; CPU analysis never loads weights.
+Collection defaults to the same local model directory used by the other Qwen
+experiments: `/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B`.
+Override it with `MODEL_PATH`, `DIAGNOSIS_MODEL_PATH`, or `collect --model-path`;
+an explicit CLI path takes precedence, followed by `DIAGNOSIS_MODEL_PATH` and
+`MODEL_PATH`. The loader reads configuration, tokenizer, and weights directly
+from that directory with `local_files_only=True`. A missing `config.json` fails
+before any Hugging Face lookup. The canonical model ID remains separate from its
+local path; `model_source.json` records the path, configuration hash, and declared
+revision. A local directory does not independently verify that revision.
+For an explicitly online non-cluster run, `--online` without a local path allows
+loading the configured model ID; the cluster wrappers always use a local path and
+set `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`. CPU analysis never loads weights.
 
 Repeat a collection command to resume; completed trial IDs are skipped, and
 per-trial seeds preserve later responses. Prompt/config hashes and collection
@@ -111,19 +120,22 @@ intervention collection or analysis. A new fit requires a new run directory.
 You may run `analyze` immediately after `freeze` to inspect the preregistered
 report and plot; validation is marked pending until intervention collection ends.
 
-On Della, ensure the pinned model is cached, then submit from the login node.
+On Della, use the existing local checkpoint, then submit from the login node.
 The wrapper calls `sbatch` directly; it runs no Python preparation on the login
 node. Jobs activate the project conda environment themselves:
 
 ```bash
 export DIAGNOSIS_OUTPUT=/scratch/gpfs/JORDANAT/$USER/alignment_diagnosis_pilot_v1
 export DIAGNOSIS_PILOT=1
+export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
 bash scripts/submit_alignment_diagnosis.sh
 ```
 
 The dependency chain is CPU preparation → GPU initial collection → CPU
 fit/recovery/freeze → GPU intervention collection → CPU analysis. Each job ID is
 printed as soon as its submission returns. Only collection jobs request a GPU.
+The submit wrapper checks that the local model's `config.json` exists before
+queueing jobs. All three collection calls receive `--model-path "$MODEL_PATH"`.
 `DIAGNOSIS_CONFIG`, `REPO`, and `CONDA_ENV` can override the corresponding defaults.
 After inspecting the pilot, submit the main experiment to a new output directory
 with `DIAGNOSIS_PILOT=0`. No cluster jobs are launched by ordinary tests or smoke runs.
@@ -188,6 +200,7 @@ Every completed run contains:
 | `diagnosis.md`, `diagnosis.json` | One-page readable report and structured bounded diagnosis |
 | `failure_diagnoses.jsonl` | Each observed failure linked to its expected action, functional diagnosis, predictions, and uncertainty |
 | `provenance.json`, `analysis_manifest.json` | Model/revision, seeds, source/environment hashes, input/output hashes |
+| `model_source.json` | Local checkpoint directory, config hash, and declared checkpoint identity; included in the prediction freeze |
 
 The figure overlays choice-fit predictions; an unavailable choice fit leaves
 the data visible without substituting a policy fit. Shading marks the held-out

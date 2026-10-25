@@ -186,6 +186,65 @@ def test_probabilities_and_failures_are_distinct(config):
     assert not result["valid_response"]
 
 
+def test_offline_collection_loads_cluster_model_directory(
+    config, tmp_path, monkeypatch
+):
+    output = tmp_path / "run"
+    model_path = tmp_path / "models" / "Qwen--Qwen3.5-4B"
+    model_path.mkdir(parents=True)
+    (model_path / "config.json").write_text("{}")
+    prepare(config, output, pilot=True)
+    monkeypatch.setenv("MODEL_PATH", str(model_path))
+    monkeypatch.delenv("DIAGNOSIS_MODEL_PATH", raising=False)
+    calls = []
+
+    class LocalParticipant:
+        model_id = str(model_path)
+        revision = config["model"]["revision"]
+
+        def decision(self, messages, labels, *, seed):
+            # Valid responses without loading weights; exercise real-Qwen routing.
+            probabilities = dict.fromkeys(labels, 1 / len(labels))
+            return {
+                "raw_response": labels[-1],
+                "action_logits": dict.fromkeys(labels, 0.0),
+                "action_probabilities": probabilities,
+                "p_action_mass_raw": 1.0,
+                "top_token_is_action": True,
+            }
+
+    def load(source, **kwargs):
+        calls.append((source, kwargs))
+        assert source == str(
+            model_path
+        ), "offline load must use the existing local checkout"
+        assert kwargs["local_files_only"] is True
+        return LocalParticipant()
+
+    monkeypatch.setattr(BanditQwenParticipant, "from_pretrained", load)
+    collect(output, "main", execute=True)
+    assert len(calls) == 1
+    rows = records(output / "main_observations.jsonl")
+    assert {row["model_id"] for row in rows} == {config["model"]["id"]}
+    source = json.loads((output / "model_source.json").read_text())
+    assert source["local_path"] == str(model_path)
+    assert source["local_files_only"] is True
+
+
+def test_missing_offline_model_never_falls_back_to_hub(config, tmp_path, monkeypatch):
+    output = tmp_path / "run"
+    prepare(config, output, pilot=True)
+    monkeypatch.setenv("MODEL_PATH", str(tmp_path / "missing"))
+    monkeypatch.delenv("DIAGNOSIS_MODEL_PATH", raising=False)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("missing local models must be rejected before any hub lookup")
+
+    monkeypatch.setattr(BanditQwenParticipant, "from_pretrained", forbidden)
+    with pytest.raises(FileNotFoundError, match="config.json"):
+        collect(output, "main", execute=True)
+
+
 class FakeTokenizer:
     eos_token_id = 7
 

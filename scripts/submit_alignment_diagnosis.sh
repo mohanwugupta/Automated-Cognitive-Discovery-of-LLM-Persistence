@@ -5,7 +5,8 @@ REPO=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 DIAGNOSIS_OUTPUT=${DIAGNOSIS_OUTPUT:?export DIAGNOSIS_OUTPUT to a new scratch directory}
 DIAGNOSIS_CONFIG=${DIAGNOSIS_CONFIG:-$REPO/configs/alignment_diagnosis/v1.yaml}
 DIAGNOSIS_PILOT=${DIAGNOSIS_PILOT:-0}
-export REPO DIAGNOSIS_OUTPUT DIAGNOSIS_CONFIG DIAGNOSIS_PILOT
+MODEL_PATH=${DIAGNOSIS_MODEL_PATH:-${MODEL_PATH:-/scratch/gpfs/JORDANAT/${USER}/models/Qwen--Qwen3.5-4B}}
+export REPO DIAGNOSIS_OUTPUT DIAGNOSIS_CONFIG DIAGNOSIS_PILOT MODEL_PATH
 printf 'Submitting alignment diagnosis jobs from %s\n' "$REPO"
 trap 'printf "Submission failed at line %s; check the error above.\n" "$LINENO" >&2' ERR
 command -v sbatch >/dev/null || { echo "sbatch is unavailable; run on Della" >&2; exit 1; }
@@ -15,6 +16,8 @@ if [[ -e "$DIAGNOSIS_OUTPUT" ]]; then
   exit 2
 fi
 [[ -f "$DIAGNOSIS_CONFIG" ]] || { echo "missing config: $DIAGNOSIS_CONFIG" >&2; exit 2; }
+[[ -f "$MODEL_PATH/config.json" ]] || { echo "local Qwen model lacks config.json: $MODEL_PATH; set MODEL_PATH to the existing cluster model directory" >&2; exit 2; }
+printf 'Local Qwen checkpoint: %s\n' "$MODEL_PATH"
 mkdir -p logs
 printf 'Submitting prepare (CPU)...\n'
 prepare=$(sbatch --parsable --export=ALL,DIAGNOSIS_PHASE=prepare slurm/run_alignment_diagnosis_cpu.slurm)

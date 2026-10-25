@@ -34,6 +34,9 @@ def main(argv=None):
     )
     command.add_argument("--execute", action="store_true")
     command.add_argument(
+        "--model-path", type=Path, help="local Qwen checkpoint directory"
+    )
+    command.add_argument(
         "--online", action="store_true", help="allow pinned model download"
     )
     for name in ("freeze", "analyze"):
@@ -44,7 +47,11 @@ def main(argv=None):
         result = prepare(load_config(args.config), args.output, pilot=args.pilot)
     elif args.command == "collect":
         result = collect(
-            args.output, args.phase, execute=args.execute, online=args.online
+            args.output,
+            args.phase,
+            execute=args.execute,
+            online=args.online,
+            model_path=args.model_path,
         )
     elif args.command == "freeze":
         result = freeze_predictions(args.output)
