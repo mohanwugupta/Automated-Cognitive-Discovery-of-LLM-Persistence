@@ -110,3 +110,7 @@ This means an E interpretation is initially an output-level abstraction. It does
 5. If a stronger implementation claim remains essential, design one discriminating experiment with predictions fixed for competing computations, including generic decision evidence. Audit existing data first. More repetitions of the same controller score will not answer this question.
 
 The present results support a case study in cognitive-model-guided causal discovery with clear limits. They do not support the original narrative's unqualified positive E identification or a broadly replicated common mechanism.
+
+## Updated discrimination audit
+
+The [CPU audit](computational-discrimination-audit.md) confirms complete evaluation of the declared 280 semantic test contrasts. It also finds predicted O/H effects correlated at 0.975 and 92.5% of E target energy in one family. See the [follow-up specification](computational-discrimination-protocol.md) for a staged test of distinct computational programs. It has not been run.
