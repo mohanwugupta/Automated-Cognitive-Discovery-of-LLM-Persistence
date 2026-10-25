@@ -95,3 +95,27 @@ and nested histories remain intact. All three cases passed after the fix; the
 full suite passed **337 tests, with 2 skipped** and the same two environment
 compatibility warnings. Canonical validation passed all **43 hashes**. The
 storage implementation is also included in new diagnosis source provenance.
+
+## Counterbalanced timing and 100-decision episodes
+
+Added episode and resource tests before the new configuration/runner. The initial
+run failed on the missing episode configuration and the old two-hour GPU request.
+The subsequent integration tests exposed missing timing keys in paired contrasts,
+the distinction between pilot row labels and collection directories, and an
+accepted change of shard count during resumption. Each was repaired with its
+regression assertion retained.
+
+The final CPU suite passed **344 tests, 2 skipped**, including the full sharded
+workflow under Pandas 3-style strings. Tests cover all 24 crossed cells, equal A/B
+prefix counts, STOP absorption, decision 100, invalid responses, per-decision
+resumption, fixed shard counts, and GPU array arguments/dependencies. Canonical
+validation passed **43 hashes**; shell syntax and whitespace checks passed.
+
+A full default synthetic v2 run also completed: **192 trajectories, 3,990 episode
+model decisions, 122 STOP endings, 70 horizon endings**, plus the separate controls.
+No invalid synthetic responses occurred, and the counterfactual report completed
+without claiming empirical Qwen evidence. The pilot audit found 96 primary
+episodes, 24 cells with four repeats, and 2,336 A / 2,336 B prescribed prefix
+actions. Actual SweetPea 0.2.14 generated the same complete 96-row crossing;
+SweetBean 1.3.17 constructed the preview Experiment. These optional library
+checks used an isolated temporary installation, not the cluster environment.

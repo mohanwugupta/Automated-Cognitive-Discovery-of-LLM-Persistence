@@ -107,16 +107,24 @@ def model_predictions(rows, fitted):
 
 
 def cross_validate(rows, target, *, epsilon):
-    """Leave an entire history/incentive cell out, grouping all correction twins."""
+    """Hold out history/incentive/timing cells with all correction twins grouped."""
     frame = pd.DataFrame(rows)
     predictions = []
-    for (history, incentive), test in frame.groupby(["history", "incentive"]):
-        train = frame[~(frame.history.eq(history) & frame.incentive.eq(incentive))]
+    groups = ["history", "incentive"]
+    if "scheduled_correction_decision" in frame:
+        groups.append("scheduled_correction_decision")
+    for _, test in frame.groupby(groups):
+        train = frame.drop(index=test.index)
         fitted = fit(train, target, epsilon=epsilon)
         if fitted["status"] != "complete":
             return pd.DataFrame()
         out = test[
             ["trial_id", "variant", "history", "incentive", "correction", target]
+            + (
+                ["scheduled_correction_decision"]
+                if "scheduled_correction_decision" in test
+                else []
+            )
         ].copy()
         for name, p in model_predictions(test, fitted).items():
             out[f"p_{name}"] = p
@@ -216,5 +224,5 @@ def recovery(rows, config, fitted=None):
         "passed": all(r["passed"] for r in results.values()),
         "generators": results,
         "replicates": config["analysis"]["recovery_replicates"],
-        "sampling": "one Bernoulli action per prompt; four held-out cells; unresolved counts as failure",
+        "sampling": "one Bernoulli action per critical state; held-out condition cells; unresolved counts as failure",
     }

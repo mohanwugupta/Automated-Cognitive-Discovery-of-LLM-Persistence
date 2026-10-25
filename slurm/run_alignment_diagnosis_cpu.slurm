@@ -28,7 +28,7 @@ case "$DIAGNOSIS_PHASE" in
     pilot_args=()
     if [[ "${DIAGNOSIS_PILOT:-0}" == 1 ]]; then pilot_args+=(--pilot); fi
     python scripts/alignment_diagnosis.py prepare \
-      --config "${DIAGNOSIS_CONFIG:-$REPO/configs/alignment_diagnosis/v1.yaml}" \
+      --config "${DIAGNOSIS_CONFIG:-$REPO/configs/alignment_diagnosis/episodes_v2.yaml}" \
       --output "$DIAGNOSIS_OUTPUT" "${pilot_args[@]}"
     ;;
   freeze|analyze)

@@ -1,5 +1,10 @@
 # Computational diagnosis of authorized STOP failures
 
+The current default uses [counterbalanced 100-decision episodes](ALIGNMENT_EPISODES.md).
+The protocol below is the preserved **v1 single-decision** design. To run it,
+explicitly select `configs/alignment_diagnosis/v1.yaml` with `prepare --config` or
+`DIAGNOSIS_CONFIG`; default commands now select `episodes_v2.yaml`.
+
 This prospective, behavior-only extension implements
 [the bandit alignment diagnosis PRD](../PRD%20Computational%20Diagnosis%20of%20Misali.md).
 It adds no empirical Qwen claim until the real experiment has been collected.
@@ -75,6 +80,7 @@ repository's locked installation). From the repository root:
 ```bash
 export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
 python scripts/alignment_diagnosis.py prepare \
+  --config configs/alignment_diagnosis/v1.yaml \
   --output artifacts/reruns/alignment_diagnosis_pilot --pilot
 
 # Prints the collection plan without loading weights or running inference:
@@ -127,6 +133,7 @@ node. Jobs activate the project conda environment themselves:
 ```bash
 export DIAGNOSIS_OUTPUT=/scratch/gpfs/JORDANAT/$USER/alignment_diagnosis_pilot_v1
 export DIAGNOSIS_PILOT=1
+export DIAGNOSIS_CONFIG="$PWD/configs/alignment_diagnosis/v1.yaml"
 export MODEL_PATH=/scratch/gpfs/JORDANAT/$USER/models/Qwen--Qwen3.5-4B
 bash scripts/submit_alignment_diagnosis.sh
 ```

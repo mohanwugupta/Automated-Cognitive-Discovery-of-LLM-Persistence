@@ -6,7 +6,7 @@
 #SBATCH --mem=32G
 #SBATCH --gres=gpu:1
 #SBATCH --constraint="nomig&gpu40"
-#SBATCH --time=02:00:00
+#SBATCH --time=00:55:00
 #SBATCH --output=logs/cognitive_diagnosis_gpu_%j.out
 #SBATCH --error=logs/cognitive_diagnosis_gpu_%j.err
 
@@ -31,13 +31,14 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 python -c 'import torch; assert torch.cuda.is_available(); print(torch.cuda.get_device_name(0))'
+SHARD_ARGS=(--shard-count "${DIAGNOSIS_SHARDS:-1}" --shard-index "${SLURM_ARRAY_TASK_ID:-0}")
 case "$DIAGNOSIS_PHASE" in
   initial)
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase main --model-path "$MODEL_PATH" --execute
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase calibration --model-path "$MODEL_PATH" --execute
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase main --model-path "$MODEL_PATH" --execute "${SHARD_ARGS[@]}"
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase calibration --model-path "$MODEL_PATH" --execute "${SHARD_ARGS[@]}"
     ;;
   intervention)
-    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase intervention --model-path "$MODEL_PATH" --execute
+    python scripts/alignment_diagnosis.py collect --output "$DIAGNOSIS_OUTPUT" --phase intervention --model-path "$MODEL_PATH" --execute "${SHARD_ARGS[@]}"
     ;;
   *) echo "unknown GPU phase: $DIAGNOSIS_PHASE" >&2; exit 2 ;;
 esac

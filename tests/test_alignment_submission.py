@@ -33,6 +33,8 @@ def environment(tmp_path):
             "REPO": str(ROOT),
             "DIAGNOSIS_OUTPUT": str(tmp_path / "new-run"),
             "DIAGNOSIS_PILOT": "1",
+            "DIAGNOSIS_SHARDS": "8",
+            "DIAGNOSIS_MAX_CONCURRENT": "2",
             "DIAGNOSIS_MODEL_PATH": str(model_path),
             "FAKE_SBATCH_LOG": str(log),
             "FAKE_PYTHON_MARKER": str(python_marker),
@@ -63,6 +65,10 @@ def test_submission_queues_prepare_without_running_python(tmp_path):
         assert f"DIAGNOSIS_PHASE={phase}" in submissions[index]
         wrapper = "gpu" if phase in ("initial", "intervention") else "cpu"
         assert f"run_alignment_diagnosis_{wrapper}.slurm" in submissions[index]
+        if wrapper == "gpu":
+            assert "--array=0-7%2" in submissions[index]
+        else:
+            assert "--array" not in submissions[index]
         if index:
             assert f"--dependency=afterok:{9000+index}" in submissions[index]
         assert f"{phase}={9001+index}" in completed.stdout
@@ -120,3 +126,5 @@ def test_gpu_wrapper_passes_local_model_path_offline(
     for line in collectors:
         assert f"--model-path {env['DIAGNOSIS_MODEL_PATH']}" in line
         assert "--online" not in line
+        assert "--shard-count 8" in line
+        assert "--shard-index 0" in line

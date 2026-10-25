@@ -25,13 +25,16 @@ def interval(successes, total):
 
 def condition_summary(frame):
     rows = []
-    for keys, group in frame.groupby(["phase", "history", "incentive", "correction"]):
+    groups = ["phase", "history", "incentive", "correction"]
+    if "scheduled_correction_decision" in frame:
+        groups.append("scheduled_correction_decision")
+    for keys, group in frame.groupby(groups):
         valid = group.choice_continue.dropna()
         n, successes = len(valid), int(valid.sum())
         lo, hi = interval(successes, n)
         rows.append(
             dict(
-                zip(("phase", "history", "incentive", "correction"), keys),
+                zip(groups, keys),
                 prompts=len(group),
                 valid_choices=n,
                 invalid_responses=len(group) - n,
@@ -82,6 +85,8 @@ def paired_effects(frame, config):
             ]
         )
     for name, subset, factor, left, right, indices in comparisons:
+        if "scheduled_correction_decision" in subset:
+            indices = [*indices, "scheduled_correction_decision"]
         for endpoint in ("choice_continue", "p_continue"):
             wide = subset.pivot(index=indices, columns=factor, values=endpoint)
             if left not in wide or right not in wide:
@@ -139,6 +144,11 @@ def counterfactual_evaluation(output, intervention, config):
             ]
         ), {"status": "pending_independent_collection"}
     observed = pd.DataFrame(intervention)
+    timing_columns = (
+        ["scheduled_correction_decision"]
+        if "scheduled_correction_decision" in observed
+        else []
+    )
     joined = predictions.merge(
         observed[
             [
@@ -150,6 +160,7 @@ def counterfactual_evaluation(output, intervention, config):
                 "choice_continue",
                 "p_continue",
             ]
+            + timing_columns
         ],
         on="trial_id",
         validate="many_to_one",
@@ -188,7 +199,12 @@ def figure(output, frame, intervention, fitted, incentive):
     combined = pd.concat([frame, pd.DataFrame(intervention)], ignore_index=True)
     for ax, history in zip(axes, ("favorable", "unfavorable")):
         base = frame[frame.history.eq(history) & frame.correction.eq(0)]
-        base = base.drop_duplicates("variant")
+        identifiers = ["variant"] + (
+            ["scheduled_correction_decision"]
+            if "scheduled_correction_decision" in base
+            else []
+        )
+        base = base.drop_duplicates(identifiers)
         for correction, color in ((0, "#3674a5"), (1, "#b7443c")):
             for model, style in (("integrated", "-"), ("gate", "--")):
                 xs = np.linspace(frame.incentive.min(), incentive, 80)
@@ -291,11 +307,16 @@ def write_outputs(output, config, provenance, freeze, main, intervention):
     if intervention:
         heldout = pd.DataFrame(intervention)
         uncorrected = heldout[heldout.correction.eq(0)]
+        groups = ["history"] + (
+            ["scheduled_correction_decision"]
+            if "scheduled_correction_decision" in uncorrected
+            else []
+        )
         intervention_quality = bool(
             heldout.valid_response.mean()
             >= 1 - config["analysis"]["maximum_invalid_fraction"]
             and (
-                uncorrected.groupby("history").p_continue.mean()
+                uncorrected.groupby(groups).p_continue.mean()
                 >= config["design"]["attractive_probability"]
             ).all()
         )
@@ -454,7 +475,7 @@ def write_outputs(output, config, provenance, freeze, main, intervention):
         f"There were {violations}/{n} valid A/B responses after correction ({rate}), across "
         f"{failure_variants} replay variants, and {len(corrected)-n} invalid corrected responses. "
         f"These counts exclude isolated and comprehension controls.\n\n"
-        f"**Supporting evidence.** Four-cell held-out corrected-choice log loss (lower is better): "
+        f"**Supporting evidence.** Held-out condition corrected-choice log loss (lower is better): "
         f"{fit_text}. Each fit uses a shared no-correction policy, the existing outcome-history "
         f"kernel (decay 0.7), and fixed gate error epsilon={config['analysis']['epsilon']}. "
         f"Candidate identity is {selected or 'unresolved'}; both reference and local sampled-action "

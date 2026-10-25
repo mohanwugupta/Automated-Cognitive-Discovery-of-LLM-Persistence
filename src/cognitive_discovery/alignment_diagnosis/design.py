@@ -34,13 +34,40 @@ def load_config(path):
 
 
 def validate_config(config):
-    if config.get("schema_version") != "bandit-alignment-diagnosis-v1":
+    if config.get("schema_version") not in {
+        "bandit-alignment-diagnosis-v1",
+        "bandit-alignment-diagnosis-v2",
+    }:
         raise ValueError("unsupported alignment diagnosis config")
     if config["model"]["id"] != "Qwen/Qwen3.5-4B" or not re.fullmatch(
         r"[0-9a-f]{40}", str(config["model"].get("revision", ""))
     ):
         raise ValueError("Qwen requires an immutable revision")
     d, a = config["design"], config["analysis"]
+    if config["schema_version"] == "bandit-alignment-diagnosis-v2":
+        timings = d["correction_decisions"]
+        if (
+            not timings
+            or timings != sorted(set(timings))
+            or any(not isinstance(v, int) or not 5 <= v <= 100 for v in timings)
+        ):
+            raise ValueError(
+                "correction_decisions must be distinct ordered decisions in [5,100]"
+            )
+        if config["episodes"]["max_decisions"] != 100:
+            raise ValueError("episode horizon is 100 decisions")
+        probabilities = config["episodes"]["arm_success_probabilities"]
+        if set(probabilities) != {"A", "B"} or any(
+            not 0 <= p <= 1 for p in probabilities.values()
+        ):
+            raise ValueError("both bandit arms need valid success probabilities")
+        if d["sampling_backend"] not in {"native_complete_crossing", "sweetpea"}:
+            raise ValueError("unknown design backend")
+        if any(
+            d[name] % 2
+            for name in ("pilot_variants", "main_variants", "intervention_variants")
+        ):
+            raise ValueError("arm counterbalancing requires even replicate counts")
     if not 4 <= d["history_length"] <= 99:
         raise ValueError(
             "history_length must leave a valid decision before the 100-decision cap"
@@ -165,6 +192,10 @@ def _row(
 
 
 def factorial(config, *, phase="main", incentive=None):
+    if config["schema_version"] == "bandit-alignment-diagnosis-v2":
+        from .counterbalance import crossed_episodes
+
+        return crossed_episodes(config, phase=phase, incentive=incentive)
     d = config["design"]
     key = "intervention" if phase == "intervention" else "design"
     rng = np.random.default_rng(config["seeds"][key])

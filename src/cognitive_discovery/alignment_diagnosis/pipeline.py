@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import uuid
 
 import numpy as np
 import pandas as pd
@@ -32,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[3]
 
 def dump(path, value):
     path = Path(path)
-    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     temporary.write_text(
         json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n"
     )
@@ -51,8 +52,19 @@ def prepare(config, output, *, pilot=False, synthetic=None):
     # A new directory prevents accidental mixing with any existing scientific run.
     output.mkdir(parents=True, exist_ok=False)
     dump(output / "config.json", config)
-    write_records(main_design(config, pilot=pilot), output / "main_design.jsonl")
+    main_rows = main_design(config, pilot=pilot)
+    write_records(main_rows, output / "main_design.jsonl")
     write_records(calibration_design(config), output / "calibration_design.jsonl")
+    extra_inputs = []
+    if config["schema_version"] == "bandit-alignment-diagnosis-v2":
+        from .counterbalance import balance_audit, design_spec
+
+        dump(output / "design_spec.json", design_spec(config))
+        audit = balance_audit(main_rows, config)
+        if not audit["complete_crossing"]:
+            raise ValueError("incomplete counterbalanced design")
+        dump(output / "counterbalance_audit.json", audit)
+        extra_inputs = ["design_spec.json", "counterbalance_audit.json"]
     packages = {}
     for name in (
         "numpy",
@@ -62,6 +74,8 @@ def prepare(config, output, *, pilot=False, synthetic=None):
         "matplotlib",
         "transformers",
         "huggingface-hub",
+        "sweetpea",
+        "sweetbean",
     ):
         try:
             packages[name] = version(name)
@@ -74,6 +88,7 @@ def prepare(config, output, *, pilot=False, synthetic=None):
         "model": config["model"],
         "seeds": config["seeds"],
         "pilot": pilot,
+        "episode_protocol": config.get("episodes"),
         "data_kind": "synthetic" if synthetic else "qwen",
         "synthetic_generator": synthetic,
         "sampling": {
@@ -106,7 +121,12 @@ def prepare(config, output, *, pilot=False, synthetic=None):
         "runtime": {"python": sys.version, "packages": packages},
         "inputs": {
             name: file_hash(output / name)
-            for name in ("config.json", "main_design.jsonl", "calibration_design.jsonl")
+            for name in (
+                "config.json",
+                "main_design.jsonl",
+                "calibration_design.jsonl",
+                *extra_inputs,
+            )
         },
     }
     dump(output / "provenance.json", provenance)
@@ -140,12 +160,31 @@ def _stage_rows(output, phase):
     return records(Path(output) / f"{phase}_design.jsonl")
 
 
-def _observations(output, phase, *, complete=True):
+def observation_paths(output, phase, *, shard_index=None, shard_count=1):
+    output = Path(output)
+    canonical = output / f"{phase}_observations.jsonl"
+    if shard_index is not None:
+        path = (
+            canonical
+            if shard_count == 1
+            else output
+            / f"{phase}_observations.shard{shard_index:03d}-of{shard_count:03d}.jsonl"
+        )
+        return [path]
+    shards = sorted(output.glob(f"{phase}_observations.shard*.jsonl"))
+    if shards and canonical.exists():
+        raise ValueError("cannot mix sharded and unsharded collection in one run")
+    return shards or [canonical]
+
+
+def _observations(output, phase, *, complete=True, shard_index=None, shard_count=1):
     config, provenance = load_run(output)
     design = _stage_rows(output, phase)
     expected = {r["trial_id"]: r for r in design}
-    path = Path(output) / f"{phase}_observations.jsonl"
-    observed = records(path) if path.exists() else []
+    paths = observation_paths(
+        output, phase, shard_index=shard_index, shard_count=shard_count
+    )
+    observed = [row for path in paths if path.exists() for row in records(path)]
     ids = [r["trial_id"] for r in observed]
     if len(ids) != len(set(ids)) or not set(ids) <= set(expected):
         raise ValueError("duplicate or unknown observed trial IDs")
@@ -196,6 +235,12 @@ def _observations(output, phase, *, complete=True):
         )
         if any(key not in row or row[key] != measured[key] for key in derived_fields):
             raise ValueError("inconsistent observation measurement")
+        if row.get("episode_mode") and row["trial_type"] == "choice":
+            trace = Path(output) / "trajectories" / phase / f"{row['trial_id']}.jsonl"
+            if not trace.is_file() or file_hash(trace) != row.get("trajectory_sha256"):
+                raise ValueError(
+                    "episode trajectory differs from its completed observation"
+                )
     if complete and set(ids) != set(expected):
         raise ValueError(
             f"{phase} collection is incomplete: {len(ids)}/{len(expected)}"
@@ -286,30 +331,63 @@ def _load_qwen(output, config, model_path, *, online):
 
 
 def collect(
-    output, phase, *, execute=False, online=False, participant=None, model_path=None
+    output,
+    phase,
+    *,
+    execute=False,
+    online=False,
+    participant=None,
+    model_path=None,
+    shard_index=0,
+    shard_count=1,
 ):
     output = Path(output)
     config, provenance = load_run(output)
     if phase not in ("main", "calibration", "intervention"):
         raise ValueError("unknown collection phase")
+    if shard_count < 1 or not 0 <= shard_index < shard_count:
+        raise ValueError("invalid collection shard")
+    collection_plan = output / f"{phase}_collection_plan.json"
+    if (
+        collection_plan.exists()
+        and json.loads(collection_plan.read_text())["shard_count"] != shard_count
+    ):
+        raise ValueError("collection shard count differs from the previous attempt")
     if phase == "intervention":
         verify_freeze(output)
     elif (output / "freeze.json").exists():
         verify_freeze(output)
         return {"phase": phase, "complete": len(_observations(output, phase))}
     rows = _stage_rows(output, phase)
-    old = _observations(output, phase, complete=False)
+    old = _observations(
+        output, phase, complete=False, shard_index=shard_index, shard_count=shard_count
+    )
     seen = {row["trial_id"] for row in old}
-    pending = [r for r in rows if r["trial_id"] not in seen]
+    pair_owners = {
+        pair: index % shard_count
+        for index, pair in enumerate(dict.fromkeys(r["pair_id"] for r in rows))
+    }
+    owned = [r for r in rows if pair_owners[r["pair_id"]] == shard_index]
+    pending = [r for r in owned if r["trial_id"] not in seen]
     plan = {
         "phase": phase,
-        "total": len(rows),
+        "total": len(owned),
         "pending": len(pending),
         "data_kind": provenance["data_kind"],
         "execute": execute,
+        "shard_index": shard_index,
+        "shard_count": shard_count,
     }
     if not execute or not pending:
         return plan
+    dump(
+        collection_plan,
+        {
+            "phase": phase,
+            "shard_count": shard_count,
+            "assignment": "matched pair order modulo shard count",
+        },
+    )
     if participant is None:
         if provenance["data_kind"] == "synthetic":
             participant = SyntheticParticipant(
@@ -329,17 +407,30 @@ def collect(
     )
     if participant.model_id != expected_id or participant.revision != expected_revision:
         raise ValueError("participant identity differs from prepared run")
-    with (output / f"{phase}_observations.jsonl").open("a") as handle:
+
+    def score(row, seed):
+        labels = ("X", "Y") if row["trial_type"] == "comprehension" else ("A", "B", "C")
+        if provenance["data_kind"] == "synthetic":
+            return participant.decision_for_row(row, seed=seed)
+        return participant.decision(row["messages"], labels, seed=seed)
+
+    destination = observation_paths(
+        output, phase, shard_index=shard_index, shard_count=shard_count
+    )[0]
+    with destination.open("a") as handle:
         for i, row in enumerate(pending, 1):
             seed = sampling_seed(config, row["trial_id"])
-            labels = (
-                ("X", "Y") if row["trial_type"] == "comprehension" else ("A", "B", "C")
-            )
-            if provenance["data_kind"] == "synthetic":
-                response = participant.decision_for_row(row, seed=seed)
+            if row.get("episode_mode") and row["trial_type"] == "choice":
+                from .episodes import run_episode
+
+                measurement = run_episode(
+                    config, row, score, output / "trajectories" / phase
+                )
+                measurement["trajectory_file"] = str(
+                    Path("trajectories") / phase / f"{row['trial_id']}.jsonl"
+                )
             else:
-                response = participant.decision(row["messages"], labels, seed=seed)
-            measurement = _measurement(row, response, seed)
+                measurement = _measurement(row, score(row, seed), seed)
             measurement["data_kind"] = provenance["data_kind"]
             measurement["model_id"] = expected_id
             measurement["model_revision"] = expected_revision
@@ -348,16 +439,26 @@ def collect(
             )
             handle.flush()
             if i % 20 == 0:
-                print(f"{phase}: {len(seen)+i}/{len(rows)}", flush=True)
+                print(
+                    f"{phase} shard {shard_index}: {len(seen)+i}/{len(owned)}",
+                    flush=True,
+                )
+            elif measurement.get("episode_mode") and row["trial_type"] == "choice":
+                print(
+                    f"{phase} shard {shard_index}: {len(seen)+i}/{len(owned)}; "
+                    f"episode={row['trial_id']} end={measurement['episode_end_reason']} "
+                    f"model_decisions={measurement['episode_model_decisions']}",
+                    flush=True,
+                )
     return {**plan, "pending": 0}
 
 
 def freeze_predictions(output):
     output = Path(output)
     config, provenance = load_run(output)
-    if (output / "freeze.json").exists() or (
-        output / "intervention_observations.jsonl"
-    ).exists():
+    if (output / "freeze.json").exists() or any(
+        path.exists() for path in observation_paths(output, "intervention")
+    ):
         raise ValueError("predictions are immutable; use a new run to refit")
     main = pd.DataFrame(_observations(output, "main"))
     calibration = pd.DataFrame(_observations(output, "calibration"))
@@ -370,7 +471,10 @@ def freeze_predictions(output):
         cv.to_csv(output / f"cv_{target}.csv", index=False)
     # Fit and recovery see only factorial data. Stronger calibration outcomes do
     # not enter any fit; they select an incentive using no-correction policy only.
-    attractiveness = calibration.groupby(["incentive", "history"]).p_continue.mean()
+    groups = ["incentive", "history"]
+    if "scheduled_correction_decision" in calibration:
+        groups.append("scheduled_correction_decision")
+    attractiveness = calibration.groupby(groups).p_continue.mean()
     candidate_scores = attractiveness.groupby("incentive").min().to_dict()
     eligible = [
         v
@@ -406,8 +510,6 @@ def freeze_predictions(output):
             "config.json",
             "main_design.jsonl",
             "calibration_design.jsonl",
-            "main_observations.jsonl",
-            "calibration_observations.jsonl",
             "cv_choice_continue.csv",
             "cv_p_continue.csv",
             "model_comparison.json",
@@ -416,6 +518,14 @@ def freeze_predictions(output):
             "preregistered_predictions.jsonl",
         )
     }
+    for phase in ("main", "calibration"):
+        plan_path = output / f"{phase}_collection_plan.json"
+        if plan_path.exists():
+            hashes[plan_path.name] = file_hash(plan_path)
+        for path in observation_paths(output, phase):
+            hashes[path.name] = file_hash(path)
+        for path in sorted((output / "trajectories" / phase).glob("*.jsonl")):
+            hashes[str(path.relative_to(output))] = file_hash(path)
     if (output / "model_source.json").exists():
         hashes["model_source.json"] = file_hash(output / "model_source.json")
     frozen = {
@@ -427,7 +537,7 @@ def freeze_predictions(output):
         "calibration_minimum_by_history": {
             str(k): v for k, v in candidate_scores.items()
         },
-        "selection_rule": "smallest candidate with mean uncorrected p_continue >= target in both histories",
+        "selection_rule": "smallest candidate with mean uncorrected p_continue >= target in every history/timing cell",
         "data_kind": provenance["data_kind"],
     }
     dump(output / "freeze.json", frozen)
@@ -449,16 +559,23 @@ def analyze(output):
         )
     write_records(main + calibration + intervention, output / "dataset.jsonl")
     result = write_outputs(output, config, provenance, freeze, main, intervention)
+    if config["schema_version"] == "bandit-alignment-diagnosis-v2":
+        from .episodes import write_episode_outputs
+
+        result["episodes"] = write_episode_outputs(
+            output, main + calibration + intervention
+        )
+        dump(output / "diagnosis.json", result)
     dump(
         output / "analysis_manifest.json",
         {
             "freeze_sha256": file_hash(output / "freeze.json"),
             "dataset_sha256": file_hash(output / "dataset.jsonl"),
-            "intervention_observations_sha256": (
-                file_hash(output / "intervention_observations.jsonl")
-                if intervention
-                else None
-            ),
+            "intervention_observation_hashes": {
+                p.name: file_hash(p)
+                for p in observation_paths(output, "intervention")
+                if p.exists()
+            },
             "outputs": {
                 name: file_hash(output / name)
                 for name in (
@@ -469,6 +586,15 @@ def analyze(output):
                     "counterfactual_results.csv",
                     "diagnostic_figure.png",
                     "failure_diagnoses.jsonl",
+                    *(
+                        [
+                            "episode_summary.csv",
+                            "episode_conditions.csv",
+                            "episode_report.md",
+                        ]
+                        if config.get("episodes")
+                        else []
+                    ),
                 )
             },
         },

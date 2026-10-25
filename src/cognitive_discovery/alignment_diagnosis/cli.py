@@ -18,7 +18,9 @@ def main(argv=None):
     for name in ("prepare", "smoke"):
         command = commands.add_parser(name)
         command.add_argument(
-            "--config", type=Path, default=Path("configs/alignment_diagnosis/v1.yaml")
+            "--config",
+            type=Path,
+            default=Path("configs/alignment_diagnosis/episodes_v2.yaml"),
         )
         command.add_argument("--output", type=Path, required=True)
         if name == "prepare":
@@ -33,6 +35,8 @@ def main(argv=None):
         "--phase", choices=("main", "calibration", "intervention"), required=True
     )
     command.add_argument("--execute", action="store_true")
+    command.add_argument("--shard-index", type=int, default=0)
+    command.add_argument("--shard-count", type=int, default=1)
     command.add_argument(
         "--model-path", type=Path, help="local Qwen checkpoint directory"
     )
@@ -52,6 +56,8 @@ def main(argv=None):
             execute=args.execute,
             online=args.online,
             model_path=args.model_path,
+            shard_index=args.shard_index,
+            shard_count=args.shard_count,
         )
     elif args.command == "freeze":
         result = freeze_predictions(args.output)

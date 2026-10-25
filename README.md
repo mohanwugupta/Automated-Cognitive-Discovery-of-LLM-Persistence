@@ -54,9 +54,11 @@ documented in [TASK_TRANSFER.md](docs/TASK_TRANSFER.md). It adds no scientific
 claim until its staged validation, Qwen, and transfer gates have been run.
 
 The behavior-only bandit correction experiment is documented in
-[ALIGNMENT_DIAGNOSIS.md](docs/ALIGNMENT_DIAGNOSIS.md). It tests competing computational
+[ALIGNMENT_EPISODES.md](docs/ALIGNMENT_EPISODES.md). It tests competing computational
 explanations of authorized STOP failures, freezes predictions before an independent
-incentive intervention, and produces a bounded alignment diagnosis report.
+incentive intervention, and produces a bounded alignment diagnosis report. The
+default now counterbalances correction timing across episodes capped at 100 decisions,
+with 55-minute GPU requests and matched-pair collection shards.
 
 ## 5. Reproduce manuscript numbers
 
